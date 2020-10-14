@@ -1,11 +1,10 @@
 import numbers
 
-from openmdao.api import Group
+from openmdao.api import Group, NewtonSolver
 from openmdao.core.component import Component
 
 from lsdo_utils.api import LinearCombinationComp, PowerCombinationComp
 from omtools.builders.binops import Minus, Plus, Pow, Times
-
 """
 Expression classes
 
@@ -19,17 +18,11 @@ Special methods return binary expressions.
 Unary expressions are defined elsewhere.
 """
 
-# TODO: check that naming conventions are robust to duplication of
-# components and builders
-# TODO: group expressions by parentheses
-# TODO: guarantee that explicit components don't form feedback loops if
-# there aren't any.
-
 
 class Expression(object):
     """
-    Store builders for creating components that evaluate expressions
-    and define operations on a Expression objects
+    Container for instructions that direct OpenMDAO to create components
+    that OpenMDAO uses to evaluate user defined expressions
     """
     def __init__(self, *args, **kwargs):
         # name of component, default name for output
@@ -39,19 +32,19 @@ class Expression(object):
         self.input_shapes = []
         # Storing builders in a dict avoids duplication of components
         # NOTE: requires careful naming of components
-        self.builders = {}
+        self.builders = []
         self.initialize(*args, **kwargs)
 
     def initialize(self):
         pass
 
-    def rename(self,name):
+    def rename(self, name):
         """
         Use this method to rename output variables for access outside
         the group where expressions are defined
         """
-        self.builders[self.name].name = name
 
+    # TODO: accept arguments of number type
     def __add__(self, other):
         return BinaryExpression(self, other, Plus(self, other))
 
@@ -65,7 +58,7 @@ class Expression(object):
         return BinaryExpression(self, other, Pow(self, other))
 
 
-class Variable(Expression):
+class NullaryExpression(Expression):
     """
     Container for declaring an input or an output
     """
@@ -73,8 +66,78 @@ class Variable(Expression):
         self.name = name
         self.shape = shape
 
+    def __getitem__(self, key):
+        pass
+
+
+class Indep(NullaryExpression):
+    """
+    Container for creating a constant or design variable
+    """
     def __repr__(self):
-        ns = "Variable "
+        ns = "Independent Variable "
+        shape_str = "("
+        for dim in self.shape:
+            shape_str += str(dim) + ","
+        shape_str += ")"
+        ns += "('" + self.name + "', " + shape_str + ")"
+        return ns
+
+
+class Input(NullaryExpression):
+    """
+    Container for declaring an input
+    """
+    def __repr__(self):
+        ns = "Input Variable "
+        shape_str = "("
+        for dim in self.shape:
+            shape_str += str(dim) + ","
+        shape_str += ")"
+        ns += "('" + self.name + "', " + shape_str + ")"
+        return ns
+
+
+class ExplicitOutput(NullaryExpression):
+    """
+    Container for declaring an explicit output
+    """
+    def initialize(self, group, name, shape=(1, )):
+        self.name = name
+        self.shape = shape
+        self.group = group
+
+    def define(self, expr):
+        self.group.register_output(self.name, expr)
+
+    # TODO: add slices
+    def __setitem__(self, key, value):
+        pass
+
+    def __repr__(self):
+        ns = "Explicit Output "
+        shape_str = "("
+        for dim in self.shape:
+            shape_str += str(dim) + ","
+        shape_str += ")"
+        ns += "('" + self.name + "', " + shape_str + ")"
+        return ns
+
+
+class ImplicitOutput(NullaryExpression):
+    """
+    Container for declaring an impicit output
+    """
+    def initialize(self, group, name, shape=(1, )):
+        self.name = name
+        self.shape = shape
+        self.group = group
+
+    def define_residual(self, expr):
+        self.group.register_output(self.name, expr)
+
+    def __repr__(self):
+        ns = "Implicit Output "
         shape_str = "("
         for dim in self.shape:
             shape_str += str(dim) + ","
@@ -105,23 +168,23 @@ class BinaryExpression(Expression):
         self.name = builder.name
         self.shape = builder.shape
 
-        # TODO: supply builders with literals
+        # TODO: supply builders with literals/number types
         if isinstance(expr2, Expression) and isinstance(expr2, Expression):
-            self.builders = {
-                **expr1.builders,
-                **expr2.builders,
-            }
+            self.builders = [
+                *expr1.builders,
+                *expr2.builders,
+            ]
         elif isinstance(expr2, Expression) and isinstance(
                 expr2, numbers.Number):
-            self.builders = {
-                **expr1.builders,
-            }
+            self.builders = [
+                *expr1.builders,
+            ]
         elif isinstance(expr1, numbers.Number) and isinstance(
                 expr2, Expression):
-            self.builders = {
-                **expr2.builders,
-            }
-        self.builders[builder.name] = builder
+            self.builders = [
+                *expr2.builders,
+            ]
+        self.builders.append(builder)
 
     def __repr__(self):
         ns = "BinaryExpression "

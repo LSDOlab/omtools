@@ -1,23 +1,23 @@
 import numbers
 
 from lsdo_utils.api import LinearCombinationComp, PowerCombinationComp
+from omtools.builders.builder import Builder
 
 """
 Builders for creating binary expressions from binary
 operations.
 """
 
-# TODO: group expressions by parentheses
 # TODO: create builders for expressions where input shapes do not match
-# output shapes (e.g. generalized einsum)
-# TODO: take ad vantage of lsdo_utils and generalize to any number of args
+# output shapes (e.g. generalized einsum, array expansion, accumulators)
+# TODO: take advantage of lsdo_utils and generalize to any number of args
 
 
-class Plus():
+class Plus(Builder):
     """
     Create a LinearCombinationComp for addition.
     """
-    def __init__(self, expr1, expr2):
+    def initialize(self, name, expr1, expr2):
         e1 = expr1.name
         e2 = expr2.name
         if len(expr1.builders) > 1:
@@ -29,7 +29,7 @@ class Plus():
         if expr1.shape == expr2.shape:
             self.shape = expr1.shape
 
-            def build(name):
+            def build(name=name):
                 return LinearCombinationComp(
                     shape=expr1.shape,
                     out_name=name,
@@ -44,12 +44,11 @@ class Plus():
             raise ValueError("Shapes do not match")
 
 
-
-class Minus():
+class Minus(Builder):
     """
     Create a LinearCombinationComp for subtraction
     """
-    def __init__(self, expr1, expr2):
+    def initialize(self, name, expr1, expr2):
         e1 = expr1.name
         e2 = expr2.name
         if len(expr1.builders) > 1:
@@ -61,7 +60,7 @@ class Minus():
         if expr1.shape == expr2.shape:
             self.shape = expr1.shape
 
-            def build(name):
+            def build(name=name):
                 return LinearCombinationComp(
                     shape=expr1.shape,
                     out_name=name,
@@ -72,11 +71,11 @@ class Minus():
             self.build = build
 
 
-class Times():
+class Times(Builder):
     """
     Create a PowerCombinationComp for multiplication
     """
-    def __init__(self, expr1, expr2):
+    def initialize(self, name, expr1, expr2):
         e1 = expr1.name
         e2 = expr2.name
         if len(expr1.builders) > 1:
@@ -88,7 +87,7 @@ class Times():
         if expr1.shape == expr2.shape:
             self.shape = expr1.shape
 
-            def build(name):
+            def build(name=name):
                 return PowerCombinationComp(
                     shape=expr1.shape,
                     out_name=name,
@@ -98,11 +97,11 @@ class Times():
             self.build = build
 
 
-class Pow():
+class Pow(Builder):
     """
     Create a PowerCombinationComp for scalar exponent
     """
-    def __init__(self, expr1, expr2):
+    def initialize(self, name, expr1, expr2):
         if isinstance(expr2, numbers.Number):
             e = expr1.name
             if len(expr1.builders) > 1:
@@ -111,7 +110,7 @@ class Pow():
             self.name = e + "_POW_" + str(expr2)
             self.shape = expr1.shape
 
-            def build(name):
+            def build(name=name):
                 return PowerCombinationComp(
                     shape=expr1.shape,
                     out_name=name,
@@ -129,7 +128,7 @@ class Pow():
             # self.name = e + "_POW_" + str(expr2)
             # self.shape = expr1.shape
 
-            # def build(name):
+            # def build(name=name):
             #     return PowerCombinationComp(
             #         shape=expr1.shape,
             #         out_name=name,
