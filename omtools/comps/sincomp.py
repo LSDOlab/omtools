@@ -3,6 +3,23 @@ from openmdao.api import ExplicitComponent
 
 
 class SinComp(ExplicitComponent):
+    '''
+    This is a component that computes sin() using numpy.sin()
+
+    Options
+    -------
+    in_name: str
+        Name of the input 
+    
+    out_name: str
+        Name of the output
+
+    shape: tuple[int]
+        Shape of the input and output
+    '''
+
+
+
     def initialize(self):
         self.options.declare('in_name')
         self.options.declare('out_name')
@@ -12,6 +29,7 @@ class SinComp(ExplicitComponent):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
         shape = self.options['shape']
+        
         self.add_input(
             in_name,
             shape=shape,

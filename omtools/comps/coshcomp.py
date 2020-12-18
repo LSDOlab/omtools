@@ -2,7 +2,22 @@ import numpy as np
 from openmdao.api import ExplicitComponent
 
 
-class CosComp(ExplicitComponent):
+class CoshComp(ExplicitComponent):
+    '''
+    This is a component that computes the hyperbolic cosine using numpy.cosh()
+
+    Options
+    -------
+    in_name: str
+        Name of the input 
+    
+    out_name: str
+        Name of the output
+
+    shape: tuple[int]
+        Shape of the input and output
+    '''
+
     def initialize(self):
         self.options.declare('in_name')
         self.options.declare('out_name')
@@ -12,7 +27,6 @@ class CosComp(ExplicitComponent):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
         shape = self.options['shape']
-        
         self.add_input(
             in_name,
             shape=shape,
@@ -27,12 +41,12 @@ class CosComp(ExplicitComponent):
     def compute(self, inputs, outputs):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
-        outputs[out_name] = np.cos(inputs[in_name]).flatten()
+        outputs[out_name] = np.cosh(inputs[in_name]).flatten()
 
     def compute_partials(self, inputs, partials):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
-        partials[out_name, in_name] = -np.sin(inputs[in_name]).flatten()
+        partials[out_name, in_name] = np.sinh(inputs[in_name]).flatten()
 
 
 if __name__ == "__main__":
@@ -53,11 +67,9 @@ if __name__ == "__main__":
         promotes=['*'],
     )
     prob.model.add_subsystem(
-        'cos',
-        CosComp(in_name='x', out_name='y', shape=(n, )),
+        'cosh',
+        CoshComp(in_name='x', out_name='y', shape=(n, )),
         promotes=['*'],
     )
     prob.setup()
     prob.check_partials(compact_print=True)
-
- 
