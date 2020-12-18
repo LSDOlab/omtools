@@ -3,6 +3,20 @@ from openmdao.api import ExplicitComponent
 
 
 class CosComp(ExplicitComponent):
+    '''
+    This is a component that computes the cosecant using numpy.cos()
+
+    Options
+    -------
+    in_name: str
+        Name of the input
+
+    out_name: str
+        Name of the output
+
+    shape: tuple[int]
+        Shape of the input and output
+    '''
     def initialize(self):
         self.options.declare('in_name')
         self.options.declare('out_name')
@@ -12,7 +26,7 @@ class CosComp(ExplicitComponent):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
         shape = self.options['shape']
-        
+
         self.add_input(
             in_name,
             shape=shape,
@@ -59,5 +73,3 @@ if __name__ == "__main__":
     )
     prob.setup()
     prob.check_partials(compact_print=True)
-
- 

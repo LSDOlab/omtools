@@ -3,9 +3,8 @@ from copy import deepcopy
 import time
 from guppy import hpy
 
-
 from openmdao.api import ExplicitComponent
-from omtools.miscellaneous_functions.process_options import name_types, get_names_list, shape_types, get_shapes_list
+from omtools.utils.miscellaneous_functions.process_options import name_types, get_names_list, shape_types, get_shapes_list
 
 
 class EinsumComp(ExplicitComponent):
@@ -26,9 +25,11 @@ class EinsumComp(ExplicitComponent):
     out_name: str
         Output component name that represents the output array calculated based on the Einstein summation operation given.
     """
-
     def initialize(self):
-        self.options.declare('in_names', default=None, types=name_types, allow_none=True)
+        self.options.declare('in_names',
+                             default=None,
+                             types=name_types,
+                             allow_none=True)
         self.options.declare('out_name', types=str)
         self.options.declare('in_shapes', types=shape_types)
         # Nametypes might be a string or a list
@@ -59,14 +60,14 @@ class EinsumComp(ExplicitComponent):
         check_string = 'abcdefghijklmnopqrstuvwxyz'
         self.unused_chars = ''
         for char in check_string:
-            if not(char in operation):
+            if not (char in operation):
                 self.unused_chars += char
 
         # Translate the operation string into a list
         self.operation_aslist = []
 
         # Representation of each tensor in the operation string
-        tensor_rep = '' 
+        tensor_rep = ''
         for char in operation:
             if char.isalpha():
                 tensor_rep += char
@@ -74,14 +75,13 @@ class EinsumComp(ExplicitComponent):
                 self.operation_aslist.append(tensor_rep)
                 tensor_rep = ''
         self.operation_aslist.append(tensor_rep)
-
         '''
         String parse to find output shape
         '''
         out_shape = []
         for char in self.operation_aslist[-1]:
             i = -1
-            for tensor_rep in self.operation_aslist[: -1]:
+            for tensor_rep in self.operation_aslist[:-1]:
                 i += 1
                 if (char in tensor_rep):
                     shape_ind = tensor_rep.index(char)
@@ -89,8 +89,8 @@ class EinsumComp(ExplicitComponent):
                     break
         self.out_shape = tuple(out_shape)
 
-        self.add_output(out_name, shape = self.out_shape)
-        
+        self.add_output(out_name, shape=self.out_shape)
+
         completed_in_names = []
         self.I = []
         operation_aslist = self.operation_aslist
@@ -100,35 +100,36 @@ class EinsumComp(ExplicitComponent):
                 continue
             else:
                 completed_in_names.append(in_name)
-            self.add_input(in_name, shape = in_shapes[in_name_index])
+            self.add_input(in_name, shape=in_shapes[in_name_index])
             self.declare_partials(out_name, in_name)
 
             shape = in_shapes[in_name_index]
             size = np.prod(shape)
             rank = len(shape)
-            flat_indices = np.arange(size)  
+            flat_indices = np.arange(size)
             ind = np.unravel_index(flat_indices, shape)
             # self.list_of_tuple_of_indices_of_input_tensors.append(ind)
 
             # Generate I efficiently for each in_name
-            
+
             I_shape = 2 * list(shape)
             I_shape = tuple(I_shape)
             I_ind = 2 * list(ind)
             I_ind = tuple(I_ind)
-            
+
             I = np.zeros(I_shape)
             I[I_ind] += 1
 
             self.I.append(I)
- 
+
     def compute(self, inputs, outputs):
         in_names = self.options['in_names']
         out_name = self.options['out_name']
         operation = self.options['operation']
 
-        outputs[out_name] = np.einsum(operation, *(inputs[in_name] for in_name in in_names))
-        
+        outputs[out_name] = np.einsum(
+            operation, *(inputs[in_name] for in_name in in_names))
+
     def compute_partials(self, inputs, partials):
         in_names = self.options['in_names']
         in_shapes = self.options['in_shapes']
@@ -156,11 +157,11 @@ class EinsumComp(ExplicitComponent):
             for idx, same_name in enumerate(in_names):
                 if same_name == in_name:
                     locations.append(idx)
-            
+
             new_in_name_tensor_rep = operation_aslist[in_name_index]
-            new_in_name_tensor_rep += unused_chars[: rank]
+            new_in_name_tensor_rep += unused_chars[:rank]
             new_output_tensor_rep = operation_aslist[-1]
-            new_output_tensor_rep += unused_chars[: rank]    
+            new_output_tensor_rep += unused_chars[:rank]
 
             new_operation_aslist = deepcopy(operation_aslist)
             new_operation_aslist[in_name_index] = new_in_name_tensor_rep
@@ -168,40 +169,50 @@ class EinsumComp(ExplicitComponent):
 
             # Compute new_operation by replacing each tensor_rep for in_name in first location by I's tensor_rep
             new_operation = ''
-            for string_rep in new_operation_aslist[: -1]:
+            for string_rep in new_operation_aslist[:-1]:
                 new_operation += string_rep
                 new_operation += ','
-            new_operation = new_operation[:-1] + '->' 
+            new_operation = new_operation[:-1] + '->'
             new_operation += new_operation_aslist[-1]
 
-            partials[out_name, in_name] = np.einsum(new_operation, *(inputs[in_name] for in_name in in_names[:in_name_index]), self.I[in_name_index], *(inputs[in_name] for in_name in in_names[in_name_index + 1 :]))
+            partials[out_name, in_name] = np.einsum(
+                new_operation,
+                *(inputs[in_name] for in_name in in_names[:in_name_index]),
+                self.I[in_name_index],
+                *(inputs[in_name] for in_name in in_names[in_name_index + 1:]))
 
             for i in locations[1:]:
                 new_operation_aslist = deepcopy(operation_aslist)
-                new_operation_aslist[i] = operation_aslist[i] + unused_chars[: rank]
+                new_operation_aslist[
+                    i] = operation_aslist[i] + unused_chars[:rank]
                 new_operation_aslist[-1] = new_output_tensor_rep
 
                 new_operation = ''
-                for string_rep in new_operation_aslist[: -1]:
+                for string_rep in new_operation_aslist[:-1]:
                     new_operation += string_rep
                     new_operation += ','
-                new_operation = new_operation[:-1] + '->' 
+                new_operation = new_operation[:-1] + '->'
                 new_operation += new_operation_aslist[-1]
 
-                partials[out_name, in_name] += np.einsum(new_operation, *(inputs[in_name] for in_name in in_names[:i]), self.I[len(completed_in_names)-1], *(inputs[in_name] for in_name in in_names[i + 1 :])).reshape(partials[out_name, in_name].shape)
-    
+                partials[out_name, in_name] += np.einsum(
+                    new_operation,
+                    *(inputs[in_name] for in_name in in_names[:i]),
+                    self.I[len(completed_in_names) - 1],
+                    *(inputs[in_name]
+                      for in_name in in_names[i + 1:])).reshape(
+                          partials[out_name, in_name].shape)
+
 
 if __name__ == '__main__':
     from openmdao.api import Problem, IndepVarComp
     # h = hpy()
 
-    
     shape1 = (2, 2, 4)
     shape2 = (2, 7, 4)
     shape3 = (7, 2, 4)
 
     prob = Problem()
-    
+
     comp = IndepVarComp()
     comp.add_output('x', np.random.rand(*shape1))
     comp.add_output('y', np.random.rand(*shape2))
@@ -210,23 +221,23 @@ if __name__ == '__main__':
     # out_shape = (2, 3, 4, 4, 7)
 
     comp = EinsumComp(
-        in_names = ['x', 'y', 'x'],
-        in_shapes = [(2, 2, 4), (2, 7, 4), (2, 2, 4)],
-        out_name = 'f',
-        operation = 'abc,ade,fae->bcdfa',
+        in_names=['x', 'y', 'x'],
+        in_shapes=[(2, 2, 4), (2, 7, 4), (2, 2, 4)],
+        out_name='f',
+        operation='abc,ade,fae->bcdfa',
     )
     # print(np.einsum('abc,ade,fae->abcdf', np.random.rand(*shape1), np.random.rand(*shape2), np.random.rand(*shape3)))
     prob.model.add_subsystem('comp', comp, promotes=['*'])
 
     start = time.time()
     # h.setrelheap()
-    
+
     prob.setup(check=True)
     prob.run_model()
     prob.check_partials(compact_print=True)
-    
+
     # mem = h.heap()
     end = time.time()
 
-    print(end-start)
+    print(end - start)
     # print(mem.size / 1024 / 1024)
