@@ -1,9 +1,8 @@
 from omtools.comps.arctancomp import ArctanComp
 from omtools.core.expression import Expression
-from omtools.core.unary_function import UnaryFunction
 
 
-class arctan(UnaryFunction):
+class arctan(Expression):
     def initialize(self, expr):
         if isinstance(expr, Expression):
             self.shape = expr.shape

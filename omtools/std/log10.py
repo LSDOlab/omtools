@@ -1,9 +1,8 @@
 from omtools.comps.log10comp import Log10Comp
 from omtools.core.expression import Expression
-from omtools.core.unary_function import UnaryFunction
 
 
-class log10(UnaryFunction):
+class log10(Expression):
     def initialize(self, expr):
         if isinstance(expr, Expression):
             self.shape = expr.shape

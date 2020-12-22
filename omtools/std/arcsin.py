@@ -1,9 +1,8 @@
 from omtools.comps.arcsincomp import ArcsinComp
 from omtools.core.expression import Expression
-from omtools.core.unary_function import UnaryFunction
 
 
-class arcsin(UnaryFunction):
+class arcsin(Expression):
     def initialize(self, expr):
         if isinstance(expr, Expression):
             self.shape = expr.shape

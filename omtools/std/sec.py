@@ -1,9 +1,8 @@
 from omtools.comps.seccomp import SecComp
 from omtools.core.expression import Expression
-from omtools.core.unary_function import UnaryFunction
 
 
-class sec(UnaryFunction):
+class sec(Expression):
     def initialize(self, expr):
         if isinstance(expr, Expression):
             self.shape = expr.shape

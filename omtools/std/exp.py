@@ -1,9 +1,8 @@
 from omtools.comps.expcomp import ExpComp
 from omtools.core.expression import Expression
-from omtools.core.unary_function import UnaryFunction
 
 
-class exp(UnaryFunction):
+class exp(Expression):
     def initialize(self, expr):
         if isinstance(expr, Expression):
             self.shape = expr.shape

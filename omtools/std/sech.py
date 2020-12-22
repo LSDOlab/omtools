@@ -1,9 +1,8 @@
 from omtools.comps.sechcomp import SechComp
 from omtools.core.expression import Expression
-from omtools.core.unary_function import UnaryFunction
 
 
-class sech(UnaryFunction):
+class sech(Expression):
     def initialize(self, expr):
         if isinstance(expr, Expression):
             self.shape = expr.shape

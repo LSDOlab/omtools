@@ -1,9 +1,8 @@
 from omtools.comps.arccoscomp import ArccosComp
 from omtools.core.expression import Expression
-from omtools.core.unary_function import UnaryFunction
 
 
-class arccos(UnaryFunction):
+class arccos(Expression):
     def initialize(self, expr):
         if isinstance(expr, Expression):
             self.shape = expr.shape

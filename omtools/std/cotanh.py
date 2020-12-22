@@ -1,9 +1,8 @@
 from omtools.comps.cotanhcomp import CotanhComp
 from omtools.core.expression import Expression
-from omtools.core.unary_function import UnaryFunction
 
 
-class cotanh(UnaryFunction):
+class cotanh(Expression):
     def initialize(self, expr):
         if isinstance(expr, Expression):
             self.shape = expr.shape
