@@ -2,7 +2,7 @@ from openmdao.api import Problem, IndepVarComp
 import numpy as np
 import omtools.api as ot
 from omtools.api import Group
-from omtools.comps.matnormcomp import MatNormComp
+from omtools.comps.normcomp import NormComp
 
 
 
@@ -24,8 +24,9 @@ prob.model.add_subsystem(
 )
 prob.model.add_subsystem(
     'fro_norm',
-    MatNormComp(in_name='x', out_name='y', shape=(n, m), norm_type='fro'),
+    NormComp(in_name='x', out_name='y', shape=(n, m), norm_type='fro'),
     promotes=['*'],
 )
 prob.setup()
 prob.check_partials(compact_print=True)
+prob.run_model()
