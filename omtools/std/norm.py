@@ -4,7 +4,7 @@ from typing import List
 
 
 class norm(Expression):
-    def initialize(self, expr, norm_type: str, axis = None):
+    def initialize(self, expr, norm_type, axis = None):
         if isinstance(expr, Expression):
             self.shape = expr.shape
             self.add_predecessor_node(expr)

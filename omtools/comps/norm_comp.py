@@ -19,6 +19,11 @@ class NormComp(ExplicitComponent):
 
         self.rank = len(shape)
 
+        if self.rank == 2 and axis != None:
+            self.m = shape[0]       # rows
+            self.n = shape[1]       # cols
+
+
         self.add_input(
             in_name,
             shape=shape,           
@@ -29,19 +34,29 @@ class NormComp(ExplicitComponent):
                 out_name,
             )
 
+            self.declare_partials(out_name, in_name)
+
         elif axis == 0:
             self.add_output(
                 out_name,
-                shape=(shape[1],)
+                shape=(self.n,)
             )
+
+            r = np.arange(self.n).repeat(self.m)
+            c = self.n*np.tile(np.arange(self.m),self.n) + np.arange(self.n).repeat(self.m)
+            # print=(self.n)
+            # print(self.n*np.tile(np.arange(self.m),self.n))
+            # print(c)
+            self.declare_partials(out_name, in_name, rows=r, cols=c)
         
         elif axis == 1:
             self.add_output(
                 out_name,
-                shape=(shape[0],)
+                shape=(self.m,)
             )
-
-        self.declare_partials(out_name, in_name)
+            r = np.arange(self.m).repeat(self.n)
+            c = np.arange(self.m*self.n)
+            self.declare_partials(out_name, in_name, rows=r, cols=c)
 
         
     def compute(self, inputs, outputs):
@@ -58,12 +73,25 @@ class NormComp(ExplicitComponent):
 
             else:
                 # Under here are axis-wise norms
-                pass
+                if norm_type == 2:
+                    outputs[out_name] = np.linalg.norm(inputs[in_name], 2, axis=axis)
+                elif norm_type == 1:
+                    outputs[out_name] = np.linalg.norm(inputs[in_name], 1, axis=axis)
+                elif norm_type == np.inf:
+                    outputs[out_name] = np.linalg.norm(inputs[in_name], np.inf, axis=axis)
+
+                
                 
         else:
             # Under here are all the vector norms
             if norm_type == 2:
                 outputs[out_name] = np.linalg.norm(inputs[in_name], 2)      
+            elif norm_type == 1:
+                outputs[out_name] = np.linalg.norm(inputs[in_name], 1)
+            elif norm_type == np.inf:
+                outputs[out_name] = np.linalg.norm(inputs[in_name], np.inf)
+
+                
         
         ''' Develop this later, need smoothing function to provide partial derivatives '''
         # elif norm_type == 1:
@@ -86,9 +114,14 @@ class NormComp(ExplicitComponent):
                 if norm_type == 'fro':
                     partials[out_name, in_name] = inputs[in_name]/ np.linalg.norm(inputs[in_name], 'fro')
 
-            else:
+            elif axis == 0:
                 # Under here are axis-wise norms
-                pass
+                if norm_type == 2:
+                    partials[out_name, in_name] = inputs[in_name].flatten('F') / np.linalg.norm(inputs[in_name], 2, axis=axis).repeat(self.m)
+                
+            elif axis == 1:
+                if norm_type == 2:
+                    partials[out_name, in_name] = inputs[in_name].flatten() / np.linalg.norm(inputs[in_name], 2, axis=axis).repeat(self.n)           
                 
         else:
             # Under here are all the vector norms
@@ -107,8 +140,8 @@ class NormComp(ExplicitComponent):
 
 if __name__ == "__main__":
     from openmdao.api import Problem, IndepVarComp, Group
-    n = 10
-    m = 20
+    n = 2
+    m = 3
     val = np.random.rand(n, m)
     indeps = IndepVarComp()
     indeps.add_output(
@@ -125,7 +158,7 @@ if __name__ == "__main__":
     )
     prob.model.add_subsystem(
         'fro_norm',
-        MatNormComp(in_name='x', out_name='y', shape=(n, m), norm_type='fro'),
+        NormComp(in_name='x', out_name='y', shape=(n, m), axis=0, norm_type=2),
         promotes=['*'],
     )
     prob.setup()
