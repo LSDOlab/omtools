@@ -29,4 +29,4 @@ connected such that there are no unnecessary feedbacks, regardless of
 the order in which each output is defined or registered.
 
 .. embed-n2::
-  ../examples/ex_simple_explicit_with_subsystems.py
+  ../omtools/examples/ex_simple_explicit_with_subsystems.py

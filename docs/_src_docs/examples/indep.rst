@@ -13,7 +13,22 @@ In this example, a single independent variable is created within the
 model even though there are no dependencies on the independent variable
 within the model.
 
-.. embed-module :: omtools.examples.ex_create_indep_var
+.. code-block:: python
+
+  from omtools.api import Group
+  from openmdao.api import Problem
+  
+  
+  class Example(Group):
+      def setup(self):
+          z = self.create_indep_var('z', val=10)
+  
+  
+  prob = Problem()
+  prob.model = Example()
+  prob.setup()
+  prob.run_model()
+  
 
 .. embed-n2 ::
-  ../examples/ex_create_indep_var.py
+  ../omtools/examples/ex_create_indep_var.py

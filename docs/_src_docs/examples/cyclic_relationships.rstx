@@ -12,4 +12,4 @@ to.
 .. embed-module :: omtools.examples.ex_explicit_cycles
 
 .. embed-n2 ::
-  ../examples/ex_explicit_cycles.py
+  ../omtools/examples/ex_explicit_cycles.py

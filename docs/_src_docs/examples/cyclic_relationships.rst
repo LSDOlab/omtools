@@ -58,4 +58,4 @@ to.
   
 
 .. embed-n2 ::
-  ../examples/ex_explicit_cycles.py
+  ../omtools/examples/ex_explicit_cycles.py

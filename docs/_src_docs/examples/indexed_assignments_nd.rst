@@ -35,4 +35,4 @@ individual indices and ranges to concatenate arrays.
   
 
 .. embed-n2 ::
-  ../examples/ex_multidimensional_index_assignment.py
+  ../omtools/examples/ex_multidimensional_index_assignment.py

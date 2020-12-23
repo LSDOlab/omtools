@@ -34,4 +34,4 @@ Below, we see how ``omtools`` directs ``OpenMDAO`` to construct a
 ``Component`` object for each operation.
 
 .. embed-n2 ::
-  ../examples/ex_working_with_literal_values.py
+  ../omtools/examples/ex_working_with_literal_values.py

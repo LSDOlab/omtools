@@ -4,6 +4,7 @@ from copy import deepcopy
 from openmdao.api import ExplicitComponent
 
 from omtools.utils.miscellaneous_functions.process_options import name_types, get_names_list, shape_types, get_shapes_list
+from omtools.utils.compute_einsum_shape import compute_einsum_shape
 
 
 class EinsumComp(ExplicitComponent):
@@ -34,6 +35,8 @@ class EinsumComp(ExplicitComponent):
         # Nametypes might be a string or a list
         # self.options.declare('operation', types=str)
         self.options.declare('operation', types=list)
+        self.options.declare('compute_out_shape', types=bool, default=True)
+        self.options.declare('out_shape', types=tuple, default=None)
 
         self.post_initialize()
 
@@ -105,16 +108,10 @@ class EinsumComp(ExplicitComponent):
         '''
         String parse to find output shape
         '''
-        out_shape = []
-        for char in self.operation_aslist[-1]:
-            i = -1
-            for tensor_rep in self.operation_aslist[:-1]:
-                i += 1
-                if (char in tensor_rep):
-                    shape_ind = tensor_rep.index(char)
-                    out_shape.append(in_shapes[i][shape_ind])
-                    break
-        self.out_shape = tuple(out_shape)
+        self.out_shape = compute_einsum_shape(
+            self.operation_aslist,
+            in_shapes,
+        )
         self.add_output(out_name, shape=self.out_shape)
 
         completed_in_names = []

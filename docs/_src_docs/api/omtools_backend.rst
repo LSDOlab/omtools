@@ -24,10 +24,6 @@ OM Tools Developer API
 .. autoclass:: omtools.core.subsystem.Subsystem
    :members:
 
-.. autoclass:: omtools.core.unary_function.UnaryFunction
-   :members:
-   :undoc-members:
-
 .. autofunction:: omtools.core.group._post_setup
 
 .. automodule :: omtools.core.graph
