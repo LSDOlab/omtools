@@ -3,10 +3,10 @@ import numbers
 from omtools.comps.sincomp import SinComp
 from omtools.core.expression import Expression
 from omtools.core.indep import Indep
-from omtools.core.unary_function import UnaryFunction
+from omtools.core.expression import Expression
 
 
-class sin(UnaryFunction):
+class sin(Expression):
     def initialize(self, expr):
         if isinstance(expr, Expression):
             self.shape = expr.shape

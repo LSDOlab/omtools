@@ -7,4 +7,4 @@ concatenate arrays.
 .. embed-module :: omtools.examples.ex_one_dimensional_index_assignment
 
 .. embed-n2 ::
-  ../examples/ex_one_dimensional_index_assignment.py
+  ../omtools/examples/ex_one_dimensional_index_assignment.py

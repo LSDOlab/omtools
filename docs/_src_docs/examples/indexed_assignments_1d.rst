@@ -37,4 +37,4 @@ concatenate arrays.
   
 
 .. embed-n2 ::
-  ../examples/ex_one_dimensional_index_assignment.py
+  ../omtools/examples/ex_one_dimensional_index_assignment.py

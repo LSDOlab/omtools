@@ -1,9 +1,8 @@
 from omtools.comps.sinhcomp import SinhComp
 from omtools.core.expression import Expression
-from omtools.core.unary_function import UnaryFunction
 
 
-class sinh(UnaryFunction):
+class sinh(Expression):
     def initialize(self, expr):
         if isinstance(expr, Expression):
             self.shape = expr.shape

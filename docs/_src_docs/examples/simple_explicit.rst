@@ -44,12 +44,12 @@ unnecessary feedbacks.
           self.register_output('y6', 2 / x2)
   
           # Elementwise Power
-          y5 = x2**2
-          self.register_output('y8', y5)
+          y8 = x2**2
+          self.register_output('y8', y8)
           self.register_output('y7', x1**2)
   
           # Adding other expressions
-          self.register_output('y9', y1 + y5)
+          self.register_output('y9', y1 + y8)
   
           # Array of powers
           y10 = x3**(2 * np.ones(7))
@@ -70,4 +70,4 @@ In this case, since there are no cycles, the n2 diagram is upper
 triangular.
 
 .. embed-n2::
-  ../examples/ex_simple_binary_operations.py
+  ../omtools/examples/ex_simple_binary_operations.py

@@ -1,9 +1,8 @@
 from omtools.comps.cosechcomp import CosechComp
 from omtools.core.expression import Expression
-from omtools.core.unary_function import UnaryFunction
 
 
-class cosech(UnaryFunction):
+class cosech(Expression):
     def initialize(self, expr):
         if isinstance(expr, Expression):
             self.shape = expr.shape

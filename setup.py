@@ -13,5 +13,6 @@ setup(
         'openmdao',
         'pint',
         'guppy3',
+        'sphinx-rtd-theme',
     ],
 )

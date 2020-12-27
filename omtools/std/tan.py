@@ -1,9 +1,8 @@
 from omtools.comps.tancomp import TanComp
 from omtools.core.expression import Expression
-from omtools.core.unary_function import UnaryFunction
 
 
-class tan(UnaryFunction):
+class tan(Expression):
     def initialize(self, expr):
         if isinstance(expr, Expression):
             self.shape = expr.shape

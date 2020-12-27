@@ -43,4 +43,4 @@ Other ``Component`` objects that compute the values that are
 concatenated are also constructed.
 
 .. embed-n2 ::
-  ../examples/ex_integer_index_assignment.py
+  ../omtools/examples/ex_integer_index_assignment.py

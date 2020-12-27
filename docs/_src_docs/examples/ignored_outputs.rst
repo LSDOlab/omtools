@@ -44,4 +44,4 @@ correspond to the outputs registered in ``'sys'``.
   
 
 .. embed-n2 ::
-  ../examples/ex_no_registered_outputs.py
+  ../omtools/examples/ex_no_registered_outputs.py

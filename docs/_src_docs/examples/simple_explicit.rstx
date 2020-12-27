@@ -19,4 +19,4 @@ In this case, since there are no cycles, the n2 diagram is upper
 triangular.
 
 .. embed-n2::
-  ../examples/ex_simple_binary_operations.py
+  ../omtools/examples/ex_simple_binary_operations.py

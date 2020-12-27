@@ -30,12 +30,12 @@ class Example(Group):
         self.register_output('y6', 2 / x2)
 
         # Elementwise Power
-        y5 = x2**2
-        self.register_output('y8', y5)
+        y8 = x2**2
+        self.register_output('y8', y8)
         self.register_output('y7', x1**2)
 
         # Adding other expressions
-        self.register_output('y9', y1 + y5)
+        self.register_output('y9', y1 + y8)
 
         # Array of powers
         y10 = x3**(2 * np.ones(7))

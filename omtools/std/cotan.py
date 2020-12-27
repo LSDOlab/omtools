@@ -1,9 +1,8 @@
 from omtools.comps.cotancomp import CotanComp
 from omtools.core.expression import Expression
-from omtools.core.unary_function import UnaryFunction
 
 
-class cotan(UnaryFunction):
+class cotan(Expression):
     def initialize(self, expr):
         if isinstance(expr, Expression):
             self.shape = expr.shape

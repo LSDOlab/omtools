@@ -1,9 +1,8 @@
 from omtools.comps.coscomp import CosComp
 from omtools.core.expression import Expression
-from omtools.core.unary_function import UnaryFunction
 
 
-class cos(UnaryFunction):
+class cos(Expression):
     def initialize(self, expr):
         if isinstance(expr, Expression):
             self.shape = expr.shape
