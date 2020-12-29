@@ -18,3 +18,4 @@ from omtools.std.sinh import sinh
 from omtools.std.tan import tan
 from omtools.std.tanh import tanh
 from omtools.std.pnorm import pnorm
+from omtools.std.reshape import reshape
