@@ -17,4 +17,4 @@ from omtools.std.sin import sin
 from omtools.std.sinh import sinh
 from omtools.std.tan import tan
 from omtools.std.tanh import tanh
-from omtools.std.norm import norm
+from omtools.std.pnorm import pnorm
