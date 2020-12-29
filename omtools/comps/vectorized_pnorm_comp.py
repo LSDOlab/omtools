@@ -24,10 +24,10 @@ class VectorizedPnormComp(ExplicitComponent):
 
     """
     def initialize(self):
-        self.options.declare('in_name')
-        self.options.declare('out_name')
-        self.options.declare('shape')
-        self.options.declare('pnorm_type')
+        self.options.declare('in_name', types=str)
+        self.options.declare('out_name', types=str)
+        self.options.declare('shape', types=tuple)
+        self.options.declare('pnorm_type', types=int, default=2)
 
     def setup(self):
         in_name = self.options['in_name']

@@ -32,7 +32,7 @@ class VectorizedAxisWisePnormComp(ExplicitComponent):
         self.options.declare('in_name', types=str)
         self.options.declare('out_name', types=str)
         self.options.declare('shape', types=tuple)
-        self.options.declare('pnorm_type', types=int)
+        self.options.declare('pnorm_type', types=int, default=2)
         self.options.declare('axis', types=tuple)
         self.options.declare('out_shape', default= None, types=tuple)
 
