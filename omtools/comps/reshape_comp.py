@@ -43,10 +43,10 @@ class ReshapeComp(ExplicitComponent):
         self.size = np.prod(shape)
 
         r = np.arange(self.size)
-        c = np.arange(self.size)
+
         val = np.ones((self.size,))
 
-        self.declare_partials(out_name, in_name, rows=r, cols=c, val=val)
+        self.declare_partials(out_name, in_name, rows=r, cols=r, val=val)
 
     def compute(self, inputs, outputs):
         in_name = self.options['in_name']
