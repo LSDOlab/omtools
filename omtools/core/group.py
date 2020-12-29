@@ -133,8 +133,8 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
     subsystem, ``omtools.Group`` also supports adding a subystem defined
     using a subclass of ``omtools.Group`` or ``openmdao.System``.
     """
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.nodes: dict = {}
         self.input_vals: dict = {}
         self.sorted_builders = []
