@@ -26,5 +26,11 @@ Unary Expressions
 - tan
 - tanh
 
-Binary Expressions
-------------------
+Array Expressions
+-----------------
+
+.. toctree::
+   :maxdepth: 1
+   :titlesonly:
+
+   ../expressions/expand.rst

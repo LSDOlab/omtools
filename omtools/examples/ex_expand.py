@@ -6,12 +6,12 @@ import numpy as np
 
 class Example(Group):
     def setup(self):
-        # Test scalar expansion
+        # Expanding a scalar into an array
         scalar = self.declare_input('scalar', val=1.)
         expanded_scalar = ot.expand(scalar, (2, 3))
         self.register_output('expanded_scalar', expanded_scalar)
 
-        # Test array expansion
+        # Expanding an array into a higher-rank array
         val = np.array([
             [1., 2., 3.],
             [4., 5., 6.],
