@@ -6,6 +6,7 @@ class VectorizedAxisWisePnormComp(ExplicitComponent):
     """
     This is a component that computes the axis-wise p-norm of a tensor. 
     This is exclusively for p-norms that are greater than 0 and even. 
+    The output is a tensor.
 
     Options
     -------
