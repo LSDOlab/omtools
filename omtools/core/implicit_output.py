@@ -3,7 +3,7 @@ from omtools.core.input import Input
 from omtools.core.output import Output
 from omtools.core.subsystem import Subsystem
 from omtools.utils.collect_input_exprs import collect_input_exprs
-from omtools.utils.comps.composite_implicit_comp import CompositeImplicitComp
+from omtools.comps.composite_implicit_comp import CompositeImplicitComp
 from omtools.utils.replace_output_leaf_nodes import replace_output_leaf_nodes
 from omtools.utils.gen_hex_name import gen_hex_name
 from copy import deepcopy
@@ -116,6 +116,7 @@ class ImplicitOutput(Output):
         # Here, we replace the leaf nodes of residual Expression objects with Input objects that
         # do not depend on the most recently added subsystem.
         residual_expr_copy = deepcopy(residual_expr)
+        residual_expr.is_residual = True
         replace_input_leaf_nodes(
             residual_expr_copy,
             dict(),
