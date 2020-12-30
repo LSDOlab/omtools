@@ -109,6 +109,7 @@ class Expression():
         self.times_visited = 0
         self.num_successors = 0
         self._dag_cost = 1
+        self.is_residual: bool = False
         self.initialize(*args, **kwargs)
 
     def __getitem__(
@@ -133,6 +134,10 @@ class Expression():
             An Expression object upon which this Expression object
             depends
         """
+        if predecessor.is_residual == True:
+            raise ValueError(
+                predecessor.name +
+                " already used as residual; cannot use in another expression")
 
         # Get number of predecessors
         num_predecessors = len(self.predecessors)

@@ -19,3 +19,4 @@ from omtools.std.tan import tan
 from omtools.std.tanh import tanh
 from omtools.std.pnorm import pnorm
 from omtools.std.reshape import reshape
+from omtools.std.expand import expand

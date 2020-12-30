@@ -4,7 +4,7 @@ from openmdao.api import ExplicitComponent
 
 class ReshapeComp(ExplicitComponent):
     '''
-    This component reshape the input to a new shape that is specified by the user.
+    This component reshapes the input to a new shape that is specified by the user.
     The input must be a numpy array. 
 
     Options

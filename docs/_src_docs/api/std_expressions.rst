@@ -61,5 +61,22 @@ Unary Expressions
 - omtools.tanh(x):
 	Computes the element-wise hyperbolic tangent of an array.
 
-Binary Expressions
-------------------
+Array Expressions
+-----------------
+
+.. toctree::
+   :maxdepth: 1
+   :titlesonly:
+
+   ../expressions/expand.rst
+
+Tensor Algebra
+--------------
+
+.. toctree::
+   :maxdepth: 1
+   :titlesonly:
+
+   ../expressions/reshape.rst
+   ../expressions/pnorm.rst
+

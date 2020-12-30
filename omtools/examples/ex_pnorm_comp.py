@@ -8,19 +8,24 @@ from omtools.core.expression import Expression
 
 class Example(Group):
     def setup(self):
-        i = 2
-        j = 3
-        k = 4
-        l = 5
-        shape = (i, j, k, l)
-        axis  = (1, 3)
+        
+        # Shape of the tensor
+        shape = (2, 3, 4, 5)
+        
+        # Number of elements in the tensor
+        num_of_elements = np.prod(shape)
 
-        val = np.arange(np.prod(shape)).reshape(shape)
+        # Creating a numpy tensor with the desired shape and size
+        tensor = np.arange(num_of_elements).reshape(shape)
 
-        in1 = self.declare_input('in1', val=val)
- 
+        # Declaring in1 as input tensor
+        in1 = self.declare_input('in1', val=tensor)
+
+        # Computing the 6-norm on in1 without specifying an axis
         self.register_output('axis_free_pnorm', ot.pnorm(in1, pnorm_type=6))
-        self.register_output('axiswise_pnorm', ot.pnorm(in1, axis=axis, pnorm_type=6))
+
+        # Computing the 6-norm of in1 over the specified axes. 
+        self.register_output('axiswise_pnorm', ot.pnorm(in1, axis=(1, 3), pnorm_type=6))
 
         
 
