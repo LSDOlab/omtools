@@ -24,22 +24,20 @@ class Example(Group):
 
         x.define_residual(
             y,
-            linear_solver=ScipyKrylov(
-                # iprint=2,
-                maxiter=100, ),
-            nonlinear_solver=NewtonSolver(
-                # iprint=2,
-                solve_subsystems=False,
-                maxiter=100,
-            ),
+            linear_solver=ScipyKrylov(),
         )
-
-        # self.nonlinear_solver = NewtonSolver(iprint=2, solve_subsystems=False)
 
 
 prob = Problem()
 prob.model = Example()
 prob.setup(force_alloc_complex=True)
-# Warm start
-prob.set_val('x', 7)
+
+prob.set_val('x', 1.9)
 prob.run_model()
+x1 = np.array(prob['x'])
+print(x1)
+
+prob.set_val('x', 2.1)
+prob.run_model()
+x2 = np.array(prob['x'])
+print(x2)
