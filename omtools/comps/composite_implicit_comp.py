@@ -34,6 +34,8 @@ class CompositeImplicitComp(ImplicitComponent):
         self.options.declare('out_expr', types=ImplicitOutput)
         self.options.declare('res_expr', types=Expression)
         self.options.declare('maxiter', types=int)
+        self.options.declare('x1')
+        self.options.declare('x2')
 
         # create Problem and Group containing any number of
         # Components to compute composite residual and partials
@@ -49,7 +51,7 @@ class CompositeImplicitComp(ImplicitComponent):
             raise ValueError(
                 "Output and residual Expressions must be the same shape")
 
-        rows = np.arange(np.prod(out_expr.shape))
+        # rows = np.arange(np.prod(out_expr.shape))
         for in_expr in in_exprs:
             self.add_input(
                 in_expr.name,
@@ -59,8 +61,8 @@ class CompositeImplicitComp(ImplicitComponent):
             self.declare_partials(
                 of=out_expr.name,
                 wrt=in_expr.name,
-                rows=rows,
-                cols=np.arange(np.prod(in_expr.shape)),
+                # rows=rows,
+                # cols=np.arange(np.prod(in_expr.shape)),
             )
         self.add_output(
             out_expr.name,
@@ -71,8 +73,8 @@ class CompositeImplicitComp(ImplicitComponent):
         self.declare_partials(
             of=out_expr.name,
             wrt=out_expr.name,
-            rows=rows,
-            cols=rows,
+            # rows=rows,
+            # cols=rows,
         )
 
         # register expression that computes residual
@@ -124,14 +126,27 @@ class CompositeImplicitComp(ImplicitComponent):
 
     def solve_nonlinear(self, inputs, outputs):
         out_expr = self.options['out_expr']
-
         shape = out_expr.shape
-        xp = np.zeros(shape)
-        xn = np.ones(shape)
+
+        x1 = self.options['x1'] * np.ones(shape)
+        x2 = self.options['x2'] * np.ones(shape)
+
+        r1 = self.run(inputs, x1)
+        r2 = self.run(inputs, x2)
+        mask1 = r1 >= r2
+        mask2 = r1 < r2
+
+        xp = np.empty(shape)
+        xp[mask1] = x1[mask1]
+        xp[mask2] = x2[mask2]
+
+        xn = np.empty(shape)
+        xn[mask1] = x2[mask1]
+        xn[mask2] = x1[mask2]
 
         for _ in range(100):
             x = 0.5 * xp + 0.5 * xn
-            r = self.run(inputs, outputs[out_expr.name])
+            r = self.run(inputs, x)
             mask_p = r >= 0
             mask_n = r < 0
             xp[mask_p] = x[mask_p]
@@ -157,12 +172,23 @@ class CompositeImplicitComp(ImplicitComponent):
 
         # compute partials
         res_name = res_expr.name
-        wrt = [in_expr.name for in_expr in in_exprs]
-        wrt.append(out_expr.name)
-        jac = self.prob.compute_totals(of=[res_name], wrt=wrt)
         out_name = out_expr.name
+
+        jac = self.prob.compute_totals(
+            of=[res_name], 
+            wrt=[in_expr.name for in_expr in in_exprs] + [out_expr.name],
+        )
         for in_expr in in_exprs:
-            jacobian[out_name, in_expr.name] = jac[res_name,
-                                                   in_expr.name].flatten()
-        jacobian[out_name, out_expr.name] = jac[res_name,
-                                                out_expr.name].flatten()
+            jacobian[out_name, in_expr.name] = jac[res_name, in_expr.name]
+        jacobian[out_name, out_expr.name] = jac[res_name, out_expr.name]
+
+        self.derivs = np.diag(jac[res_name, out_expr.name]).reshape(out_expr.shape)
+
+    def solve_linear(self, d_outputs, d_residuals, mode):
+        out_expr = self.options['out_expr']
+        out_name = out_expr.name
+
+        if mode == 'fwd':
+            d_outputs[out_name] += 1. / self.derivs * d_residuals[out_name]
+        else:
+            d_residuals[out_name] += 1. / self.derivs * d_outputs[out_name]
