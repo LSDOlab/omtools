@@ -10,7 +10,8 @@ from copy import deepcopy
 from typing import Dict, Tuple
 from openmdao.api import DirectSolver, NewtonSolver
 from openmdao.solvers.solver import LinearSolver, NonlinearSolver
-from omtools.utils.get_shape import get_shape
+from omtools.utils.get_shape_val import get_shape_val
+import numpy as np
 
 
 def replace_input_leaf_nodes(
@@ -62,8 +63,7 @@ class ImplicitOutput(Output):
             Initial value of variable to compute implicitly
         """
         self.name = name
-        self.shape = get_shape(shape, val)
-        self.val = val
+        self.shape, self.val = get_shape_val(shape, val)
         self.defined = False
         self.linear_solver = DirectSolver()
         self.nonlinear_solver = NewtonSolver(solve_subsystems=False)

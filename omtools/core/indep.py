@@ -1,7 +1,8 @@
 from openmdao.api import IndepVarComp
 
 from omtools.core.expression import Expression
-from omtools.utils.get_shape import get_shape
+from omtools.utils.get_shape_val import get_shape_val
+import numpy as np
 
 
 class Indep(Expression):
@@ -29,8 +30,7 @@ class Indep(Expression):
             allowing the optimizer to modify the value
         """
         self.name = name
-        self.shape = get_shape(shape, val)
-        self.val = val
+        self.shape, self.val = get_shape_val(shape, val)
         self.dv = dv
 
         def build(name: str):
