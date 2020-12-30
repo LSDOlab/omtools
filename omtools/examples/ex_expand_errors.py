@@ -13,8 +13,8 @@ class ErrorScalarIncorrectOrder(Group):
 class ErrorScalarIndices(Group):
     def setup(self):
         scalar = self.declare_input('scalar', val=1.)
-        expanded_scalar = ot.expand(scalar, (2, 3))
-        self.register_output('expanded_scalar', expanded_scalar, [1])
+        expanded_scalar = ot.expand(scalar, (2, 3), [1])
+        self.register_output('expanded_scalar', expanded_scalar)
 
 
 class ErrorArrayNoIndices(Group):
