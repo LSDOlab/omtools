@@ -16,9 +16,9 @@ def test_implicit_nonlinearc():
 
 def test_solve_quadratic_bracketed_scalar():
     import omtools.examples.ex_implicit_bracketed_scalar as example
-    np.testing.assert_almost_equal(example.x, np.array([1.0]))
+    np.testing.assert_almost_equal(example.prob['x'], np.array([1.0]))
 
 
 def test_solve_quadratic_bracketed_array():
     import omtools.examples.ex_implicit_bracketed_array as example
-    np.testing.assert_almost_equal(example.x, np.array([3.0, 3.0]))
+    np.testing.assert_almost_equal(example.prob['x'], np.array([1.0, 3.0]))

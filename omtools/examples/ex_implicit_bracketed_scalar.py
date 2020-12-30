@@ -32,7 +32,5 @@ class Example(Group):
 prob = Problem()
 prob.model = Example()
 prob.setup(force_alloc_complex=True)
-
 prob.run_model()
-prob.model.list_outputs()
-x = prob['x']
+print(prob['x'])
