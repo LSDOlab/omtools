@@ -14,5 +14,7 @@ setup(
         'pint',
         'guppy3',
         'sphinx-rtd-theme',
+        'sphinx-code-include',
+        'jupyter-sphinx',
     ],
 )

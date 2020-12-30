@@ -33,4 +33,4 @@ Array Expressions
    :maxdepth: 1
    :titlesonly:
 
-   ../expressions/expand.rst
+   ../examples/expand.rst

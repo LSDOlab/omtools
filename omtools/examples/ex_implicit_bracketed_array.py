@@ -23,8 +23,8 @@ class Example(Group):
 
         x.define_residual_bracketed(
             y,
-            x1=2.,
-            x2=np.pi,
+            x1=[0, 2.],
+            x2=[2, np.pi],
         )
 
 
@@ -32,6 +32,4 @@ prob = Problem()
 prob.model = Example()
 prob.setup(force_alloc_complex=True)
 prob.run_model()
-prob.model.list_outputs()
-x = prob['x']
-print(x)
+print(prob['x'])
