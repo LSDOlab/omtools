@@ -5,37 +5,8 @@ Indexed Assignments (Integer Indices)
 In this example, integer indices are used to concatenate values from
 multiple expressions/variables into one variable.
 
-.. code-block:: python
-
-  from omtools.api import Group
-  from openmdao.api import Problem
-  import numpy as np
-  
-  
-  class Example(Group):
-      def setup(self):
-          a = self.declare_input('a', val=0)
-          b = self.declare_input('b', val=1)
-          c = self.declare_input('c', val=2)
-          d = self.declare_input('d', val=7.4)
-          e = self.declare_input('e', val=np.pi)
-          f = self.declare_input('f', val=9)
-          g = e + f
-          x = self.create_output('x', shape=(7, ))
-          x[0] = a
-          x[1] = b
-          x[2] = c
-          x[3] = d
-          x[4] = e
-          x[5] = f
-          x[6] = g
-  
-  
-  prob = Problem()
-  prob.model = Example()
-  prob.setup(force_alloc_complex=True)
-  prob.run_model()
-  
+.. jupyter-execute::
+  ../../../omtools/examples/ex_integer_index_assignment.py
 
 The result is a component that concatenates values from the inputs
 defined by the indices.

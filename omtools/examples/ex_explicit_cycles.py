@@ -34,11 +34,11 @@ class Example(Group):
 prob = Problem()
 prob.model = Example()
 prob.setup(force_alloc_complex=True)
+
 # Warm start
 prob.set_val('cycle_3.x', -10)
 prob.run_model()
 
-# embed-module-print not working for displaying values in docs
 print('cycle_1.x', prob['cycle_1.x'])
 print('cycle_2.x', prob['cycle_2.x'])
 print('cycle_3.x', prob['cycle_3.x'])

@@ -16,6 +16,12 @@ sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('./_exts'))
 sys.path.insert(0, os.path.abspath('./docs/_exts'))
 
+# Ensure package can be imported by any IPython kernels (necessary for
+# jupyter-sphinx)
+package_path = os.path.abspath('../..')
+os.environ['PYTHONPATH'] = ':'.join(
+    (package_path, os.environ.get('PYTHONPATH', '')))
+
 do_monkeypatch()
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -38,6 +44,8 @@ extensions = [
     'embed_n2',
     # 'embed_options',
     'sphinx_rtd_theme',
+    'jupyter_sphinx',
+    'code_include.extension',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -101,6 +109,10 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+html_css_files = [
+    'custom.css',
+]
 
 # -- Options for HTMLHelp output ------------------------------------------
 
