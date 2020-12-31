@@ -13,7 +13,7 @@ class ErrorScalarIncorrectOrder(Group):
 class ErrorScalarIndices(Group):
     def setup(self):
         scalar = self.declare_input('scalar', val=1.)
-        expanded_scalar = ot.expand(scalar, (2, 3), [1])
+        expanded_scalar = ot.expand(scalar, (2, 3), '->ij')
         self.register_output('expanded_scalar', expanded_scalar)
 
 
@@ -37,7 +37,7 @@ class ErrorArrayInvalidIndices1(Group):
             [4., 5., 6.],
         ])
         array = self.declare_input('array', val=val)
-        expanded_array = ot.expand(array, (2, 4, 3, 1), [1])
+        expanded_array = ot.expand(array, (2, 4, 3, 1), 'ij->iaj')
         self.register_output('expanded_array', expanded_array)
 
 
@@ -49,5 +49,5 @@ class ErrorArrayInvalidIndices2(Group):
             [4., 5., 6.],
         ])
         array = self.declare_input('array', val=val)
-        expanded_array = ot.expand(array, (2, 4, 3, 1), [0, 1])
+        expanded_array = ot.expand(array, (2, 4, 3, 1), 'ij->ijab')
         self.register_output('expanded_array', expanded_array)

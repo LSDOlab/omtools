@@ -12,7 +12,7 @@ def test_expand_errors():
         prob.model = example.ErrorScalarIncorrectOrder()
         prob.setup()
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         prob = Problem()
         prob.model = example.ErrorScalarIndices()
         prob.setup()
