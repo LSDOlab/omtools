@@ -106,22 +106,6 @@ class ImplicitOutput(Output):
             Input(self.name, shape=self.shape, val=self.val),
         )
 
-        # The ImplicitOutput object directs OpenMDAO to construct a
-        # CompositeImplicitComp object. The CompositeImplicitComp class
-        # defines a Problem with a model that computes the residual. The
-        # model contained within the
-        # CompositeImplicitComp object does not contain any subsystems
-        # added prior to the declared inputs for this ImplicitOutput
-        # object.
-        # Here, we replace the leaf nodes of residual Expression objects with Input objects that
-        # do not depend on the most recently added subsystem.
-        residual_expr_copy = deepcopy(residual_expr)
-        residual_expr.is_residual = True
-        replace_input_leaf_nodes(
-            residual_expr_copy,
-            dict(),
-        )
-
         # Assign solvers and update costs to reflect iterative
         # computations
         if linear_solver is not None:
@@ -133,17 +117,11 @@ class ImplicitOutput(Output):
             if 'maxiter' in self.nonlinear_solver.options._dict.keys():
                 self._dag_cost += self.nonlinear_solver.options['maxiter']
 
-        in_exprs = []
-        all_in_exprs = collect_input_exprs([], residual_expr_copy)
-        for expr in all_in_exprs:
-            if expr.name != self.name:
-                in_exprs.append(expr)
-
         def build(name: str):
             comp = CompositeImplicitComp(
-                in_exprs=in_exprs,
+                in_exprs=input_exprs,
                 out_expr=self,
-                res_expr=residual_expr_copy,
+                res_expr=residual_expr,
             )
             comp.linear_solver = self.linear_solver
             comp.nonlinear_solver = self.nonlinear_solver
@@ -190,33 +168,11 @@ class ImplicitOutput(Output):
             Input(self.name, shape=self.shape, val=self.val),
         )
 
-        # The ImplicitOutput object directs OpenMDAO to construct a
-        # CompositeImplicitComp object. The CompositeImplicitComp class
-        # defines a Problem with a model that computes the residual. The
-        # model contained within the
-        # CompositeImplicitComp object does not contain any subsystems
-        # added prior to the declared inputs for this ImplicitOutput
-        # object.
-        # Here, we replace the leaf nodes of residual Expression objects with Input objects that
-        # do not depend on the most recently added subsystem.
-        residual_expr_copy = deepcopy(residual_expr)
-        residual_expr.is_residual = True
-        replace_input_leaf_nodes(
-            residual_expr_copy,
-            dict(),
-        )
-
-        in_exprs = []
-        all_in_exprs = collect_input_exprs([], residual_expr_copy)
-        for expr in all_in_exprs:
-            if expr.name != self.name:
-                in_exprs.append(expr)
-
         def build(name: str):
             comp = CompositeImplicitComp(
-                in_exprs=in_exprs,
+                in_exprs=input_exprs,
                 out_expr=self,
-                res_expr=residual_expr_copy,
+                res_expr=residual_expr,
                 x1=x1,
                 x2=x2,
             )

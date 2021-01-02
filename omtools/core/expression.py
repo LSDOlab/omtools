@@ -28,8 +28,7 @@ class Expression():
         return self
 
     def __neg__(self):
-        raise NotImplementedError(
-            "Negation of Expresion objects is not supported at the moment")
+        return ElementwiseMultiplication(self, -1)
 
     def __add__(self, other):
         """
