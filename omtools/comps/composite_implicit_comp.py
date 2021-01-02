@@ -36,6 +36,7 @@ class CompositeImplicitComp(ImplicitComponent):
         self.options.declare('maxiter', types=int, default=100)
         self.options.declare('x1')
         self.options.declare('x2')
+        self.options.declare('n2', types=bool, default=False)
 
         # create Problem and Group containing any number of
         # Components to compute composite residual and partials
@@ -97,11 +98,12 @@ class CompositeImplicitComp(ImplicitComponent):
             self.prob[in_expr.name] = in_expr.val
         self.prob[out_expr.name] = out_expr.val
 
-        # self.prob.run_model()
-        # self.prob.model.list_inputs()
-        # self.prob.model.list_outputs()
-        # from openmdao.api import n2
-        # n2(self.prob)
+        if self.options['n2'] == True:
+            self.prob.run_model()
+            self.prob.model.list_inputs()
+            self.prob.model.list_outputs()
+            from openmdao.api import n2
+            n2(self.prob)
 
     def run(self, inputs, output):
         in_exprs = self.options['in_exprs']

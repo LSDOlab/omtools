@@ -27,11 +27,7 @@ class Example(ImplicitGroup):
         b = self.declare_input('b')
         y = self.create_implicit_output('y')
         z = a * y**2 + b * y + c
-        y.define_residual_bracketed(
-            z,
-            x1=0,
-            x2=2,
-        )
+        y.define_residual_bracketed(z, x1=0, x2=2)
 
 
 prob = Problem()

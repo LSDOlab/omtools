@@ -34,6 +34,7 @@ class Example(ImplicitGroup):
                 solve_subsystems=False,
                 maxiter=100,
             ),
+            n2=True,
         )
 
 

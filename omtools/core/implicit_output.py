@@ -73,6 +73,7 @@ class ImplicitOutput(Output):
         residual_expr: Expression,
         linear_solver: LinearSolver = None,
         nonlinear_solver: NonlinearSolver = None,
+        n2: bool = False,
     ):
         """
         Define the residual that must equal zero for this output to be
@@ -122,6 +123,7 @@ class ImplicitOutput(Output):
                 in_exprs=input_exprs,
                 out_expr=self,
                 res_expr=residual_expr,
+                n2=n2,
             )
             comp.linear_solver = self.linear_solver
             comp.nonlinear_solver = self.nonlinear_solver
@@ -135,6 +137,7 @@ class ImplicitOutput(Output):
         residual_expr: Expression,
         x1=0.,
         x2=1.,
+        n2: bool = False,
     ):
         """
         Define the residual that must equal zero for this output to be
@@ -175,6 +178,7 @@ class ImplicitOutput(Output):
                 res_expr=residual_expr,
                 x1=x1,
                 x2=x2,
+                n2=n2,
             )
             return comp
 
