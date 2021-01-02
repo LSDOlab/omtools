@@ -92,7 +92,7 @@ class ImplicitOutput(Output):
 
         # Establish direct dependence of ImplicitOutput object on Input
         # objects, which depend on most recently added subsystem
-        input_exprs = collect_input_exprs([], residual_expr)
+        input_exprs = set(collect_input_exprs([], residual_expr))
         for input_expr in input_exprs:
             self.add_predecessor_node(input_expr)
             input_expr.decr_num_successors()
@@ -154,7 +154,7 @@ class ImplicitOutput(Output):
 
         # Establish direct dependence of ImplicitOutput object on Input
         # objects, which depend on most recently added subsystem
-        input_exprs = collect_input_exprs([], residual_expr)
+        input_exprs = set(collect_input_exprs([], residual_expr))
         for input_expr in input_exprs:
             self.add_predecessor_node(input_expr)
             input_expr.decr_num_successors()

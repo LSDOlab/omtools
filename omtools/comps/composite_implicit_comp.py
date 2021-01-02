@@ -30,7 +30,7 @@ class CompositeImplicitComp(ImplicitComponent):
         # this avoids circular imports
         from omtools.core.implicit_output import ImplicitOutput
         from omtools.core.group import Group
-        self.options.declare('in_exprs', types=list)
+        self.options.declare('in_exprs', types=(list, set))
         self.options.declare('out_expr', types=ImplicitOutput)
         self.options.declare('res_expr', types=Expression)
         self.options.declare('maxiter', types=int, default=100)
