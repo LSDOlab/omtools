@@ -6,7 +6,7 @@ from omtools.core.expression import Expression
 
 
 class min(Expression):
-    def initialize(self, *exprs, axis=None, rho=1.):
+    def initialize(self, *exprs, axis=None, rho=20.):
         for expr in exprs:
             if isinstance(expr, Expression):
                 self.add_predecessor_node(expr)

@@ -10,7 +10,7 @@ class AxisMinComp(ExplicitComponent):
         self.options.declare('axis', types=int)
         self.options.declare('out_name', types=str)
         self.options.declare('in_name', types=str)
-        self.options.declare('rho', 50.0, desc="Constraint Aggregation Factor.")
+        self.options.declare('rho', 20.0, desc="Constraint Aggregation Factor.")
 
     def setup(self):
         in_name = self.options['in_name']

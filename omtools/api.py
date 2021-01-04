@@ -25,4 +25,6 @@ from omtools.std.matmat import matmat
 from omtools.std.matvec import matvec
 from omtools.std.transpose import transpose
 from omtools.std.reorder_axes import reorder_axes
+from omtools.std.min import min
+from omtools.std.max import max
 
