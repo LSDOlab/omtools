@@ -29,7 +29,7 @@ some interval, `omtools` provides an API for bracketing solutions.
 .. jupyter-execute::
   ../../../omtools/examples/ex_implicit_bracketed_scalar.py
 
-Brackets may also be specified for multidimensional array values
+Brackets may also be specified for multidimensional array values.
 
 .. jupyter-execute::
   ../../../omtools/examples/ex_implicit_bracketed_array.py

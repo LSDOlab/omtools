@@ -2,11 +2,11 @@ from openmdao.api import NonlinearBlockGS, ScipyKrylov, NewtonSolver
 from openmdao.api import Problem
 import numpy as np
 import omtools.api as ot
-from omtools.api import Group
+from omtools.api import Group, ImplicitGroup
 from omtools.core.expression import Expression
 
 
-class Example(Group):
+class Example(ImplicitGroup):
     def setup(self):
         # Implicit component with composite residuals
         group = Group()

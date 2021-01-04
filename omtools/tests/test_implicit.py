@@ -3,11 +3,6 @@ import numpy as np
 import pytest
 
 
-def test_reuse_residual_error():
-    with pytest.raises(ValueError):
-        import omtools.examples.ex_reuse_residual_error as examples
-
-
 def test_implicit_nonlinearc():
     import omtools.examples.ex_implicit_nonlinear as example
     np.testing.assert_almost_equal(example.x1, np.array([1.0]))
@@ -22,3 +17,21 @@ def test_solve_quadratic_bracketed_scalar():
 def test_solve_quadratic_bracketed_array():
     import omtools.examples.ex_implicit_bracketed_array as example
     np.testing.assert_almost_equal(example.prob['x'], np.array([1.0, 3.0]))
+
+
+def test_implicit_nonlinear_with_subsystems_in_residual():
+    import omtools.examples.ex_implicit_with_subsystems as example
+    np.testing.assert_almost_equal(example.prob['y'], np.array([1.07440944]))
+
+
+def test_implicit_nonlinear_with_subsystems_bracketed_scalar():
+    import omtools.examples.ex_implicit_with_subsystems_bracketed_scalar as example
+    np.testing.assert_almost_equal(example.prob['y'], np.array([1.07440944]))
+
+
+def test_implicit_nonlinear_with_subsystems_bracketed_array():
+    import omtools.examples.ex_implicit_with_subsystems_bracketed_array as example
+    np.testing.assert_almost_equal(
+        example.prob['y'],
+        np.array([1.07440944, 2.48391993]),
+    )
