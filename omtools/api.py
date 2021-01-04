@@ -20,3 +20,8 @@ from omtools.std.tanh import tanh
 from omtools.std.pnorm import pnorm
 from omtools.std.reshape import reshape
 from omtools.std.expand import expand
+from omtools.std.matmat import matmat
+from omtools.std.matvec import matvec
+from omtools.std.transpose import transpose
+from omtools.std.reorder_axes import reorder_axes
+
