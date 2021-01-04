@@ -7,7 +7,8 @@ from typing import Union, Tuple, Dict, List
 from omtools.utils.slice_to_list import slice_to_list
 from omtools.utils.comps.array_comps.pass_through_comp import PassThroughComp
 from omtools.utils.comps.array_comps.indexed_pass_through_comp import IndexedPassThroughComp
-from omtools.utils.get_shape import get_shape
+from omtools.utils.get_shape_val import get_shape_val
+import numpy as np
 
 
 class ExplicitOutput(Output):
@@ -33,8 +34,7 @@ class ExplicitOutput(Output):
             Initial value of variable to compute explicitly
         """
         self.name = name
-        self.shape = get_shape(shape, val)
-        self.val = val
+        self.shape, self.val = get_shape_val(shape, val)
         self.defined = False
         self.indexed_assignment = False
         self.indices: Dict[Expression, List[int]] = {}

@@ -30,12 +30,13 @@ class CompositeImplicitComp(ImplicitComponent):
         # this avoids circular imports
         from omtools.core.implicit_output import ImplicitOutput
         from omtools.core.group import Group
-        self.options.declare('in_exprs', types=list)
+        self.options.declare('in_exprs', types=(list, set))
         self.options.declare('out_expr', types=ImplicitOutput)
         self.options.declare('res_expr', types=Expression)
-        self.options.declare('maxiter', types=int)
+        self.options.declare('maxiter', types=int, default=100)
         self.options.declare('x1')
         self.options.declare('x2')
+        self.options.declare('n2', types=bool, default=False)
 
         # create Problem and Group containing any number of
         # Components to compute composite residual and partials
@@ -97,11 +98,12 @@ class CompositeImplicitComp(ImplicitComponent):
             self.prob[in_expr.name] = in_expr.val
         self.prob[out_expr.name] = out_expr.val
 
-        # self.prob.run_model()
-        # self.prob.model.list_inputs()
-        # self.prob.model.list_outputs()
-        # from openmdao.api import n2
-        # n2(self.prob)
+        if self.options['n2'] == True:
+            self.prob.run_model()
+            self.prob.model.list_inputs()
+            self.prob.model.list_outputs()
+            from openmdao.api import n2
+            n2(self.prob)
 
     def run(self, inputs, output):
         in_exprs = self.options['in_exprs']
@@ -144,7 +146,7 @@ class CompositeImplicitComp(ImplicitComponent):
         xn[mask1] = x2[mask1]
         xn[mask2] = x1[mask2]
 
-        for _ in range(100):
+        for _ in range(self.options['maxiter']):
             x = 0.5 * xp + 0.5 * xn
             r = self.run(inputs, x)
             mask_p = r >= 0
@@ -175,14 +177,15 @@ class CompositeImplicitComp(ImplicitComponent):
         out_name = out_expr.name
 
         jac = self.prob.compute_totals(
-            of=[res_name], 
+            of=[res_name],
             wrt=[in_expr.name for in_expr in in_exprs] + [out_expr.name],
         )
         for in_expr in in_exprs:
             jacobian[out_name, in_expr.name] = jac[res_name, in_expr.name]
         jacobian[out_name, out_expr.name] = jac[res_name, out_expr.name]
 
-        self.derivs = np.diag(jac[res_name, out_expr.name]).reshape(out_expr.shape)
+        self.derivs = np.diag(jac[res_name,
+                                  out_expr.name]).reshape(out_expr.shape)
 
     def solve_linear(self, d_outputs, d_residuals, mode):
         out_expr = self.options['out_expr']

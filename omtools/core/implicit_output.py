@@ -10,7 +10,8 @@ from copy import deepcopy
 from typing import Dict, Tuple
 from openmdao.api import DirectSolver, NewtonSolver
 from openmdao.solvers.solver import LinearSolver, NonlinearSolver
-from omtools.utils.get_shape import get_shape
+from omtools.utils.get_shape_val import get_shape_val
+import numpy as np
 
 
 def replace_input_leaf_nodes(
@@ -62,8 +63,7 @@ class ImplicitOutput(Output):
             Initial value of variable to compute implicitly
         """
         self.name = name
-        self.shape = get_shape(shape, val)
-        self.val = val
+        self.shape, self.val = get_shape_val(shape, val)
         self.defined = False
         self.linear_solver = DirectSolver()
         self.nonlinear_solver = NewtonSolver(solve_subsystems=False)
@@ -73,6 +73,7 @@ class ImplicitOutput(Output):
         residual_expr: Expression,
         linear_solver: LinearSolver = None,
         nonlinear_solver: NonlinearSolver = None,
+        n2: bool = False,
     ):
         """
         Define the residual that must equal zero for this output to be
@@ -92,7 +93,7 @@ class ImplicitOutput(Output):
 
         # Establish direct dependence of ImplicitOutput object on Input
         # objects, which depend on most recently added subsystem
-        input_exprs = collect_input_exprs([], residual_expr)
+        input_exprs = set(collect_input_exprs([], residual_expr))
         for input_expr in input_exprs:
             self.add_predecessor_node(input_expr)
             input_expr.decr_num_successors()
@@ -104,22 +105,6 @@ class ImplicitOutput(Output):
             self,
             residual_expr,
             Input(self.name, shape=self.shape, val=self.val),
-        )
-
-        # The ImplicitOutput object directs OpenMDAO to construct a
-        # CompositeImplicitComp object. The CompositeImplicitComp class
-        # defines a Problem with a model that computes the residual. The
-        # model contained within the
-        # CompositeImplicitComp object does not contain any subsystems
-        # added prior to the declared inputs for this ImplicitOutput
-        # object.
-        # Here, we replace the leaf nodes of residual Expression objects with Input objects that
-        # do not depend on the most recently added subsystem.
-        residual_expr_copy = deepcopy(residual_expr)
-        residual_expr.is_residual = True
-        replace_input_leaf_nodes(
-            residual_expr_copy,
-            dict(),
         )
 
         # Assign solvers and update costs to reflect iterative
@@ -133,17 +118,12 @@ class ImplicitOutput(Output):
             if 'maxiter' in self.nonlinear_solver.options._dict.keys():
                 self._dag_cost += self.nonlinear_solver.options['maxiter']
 
-        in_exprs = []
-        all_in_exprs = collect_input_exprs([], residual_expr_copy)
-        for expr in all_in_exprs:
-            if expr.name != self.name:
-                in_exprs.append(expr)
-
         def build(name: str):
             comp = CompositeImplicitComp(
-                in_exprs=in_exprs,
+                in_exprs=input_exprs,
                 out_expr=self,
-                res_expr=residual_expr_copy,
+                res_expr=residual_expr,
+                n2=n2,
             )
             comp.linear_solver = self.linear_solver
             comp.nonlinear_solver = self.nonlinear_solver
@@ -157,6 +137,7 @@ class ImplicitOutput(Output):
         residual_expr: Expression,
         x1=0.,
         x2=1.,
+        n2: bool = False,
     ):
         """
         Define the residual that must equal zero for this output to be
@@ -176,7 +157,7 @@ class ImplicitOutput(Output):
 
         # Establish direct dependence of ImplicitOutput object on Input
         # objects, which depend on most recently added subsystem
-        input_exprs = collect_input_exprs([], residual_expr)
+        input_exprs = set(collect_input_exprs([], residual_expr))
         for input_expr in input_exprs:
             self.add_predecessor_node(input_expr)
             input_expr.decr_num_successors()
@@ -190,35 +171,14 @@ class ImplicitOutput(Output):
             Input(self.name, shape=self.shape, val=self.val),
         )
 
-        # The ImplicitOutput object directs OpenMDAO to construct a
-        # CompositeImplicitComp object. The CompositeImplicitComp class
-        # defines a Problem with a model that computes the residual. The
-        # model contained within the
-        # CompositeImplicitComp object does not contain any subsystems
-        # added prior to the declared inputs for this ImplicitOutput
-        # object.
-        # Here, we replace the leaf nodes of residual Expression objects with Input objects that
-        # do not depend on the most recently added subsystem.
-        residual_expr_copy = deepcopy(residual_expr)
-        residual_expr.is_residual = True
-        replace_input_leaf_nodes(
-            residual_expr_copy,
-            dict(),
-        )
-
-        in_exprs = []
-        all_in_exprs = collect_input_exprs([], residual_expr_copy)
-        for expr in all_in_exprs:
-            if expr.name != self.name:
-                in_exprs.append(expr)
-
         def build(name: str):
             comp = CompositeImplicitComp(
-                in_exprs=in_exprs,
+                in_exprs=input_exprs,
                 out_expr=self,
-                res_expr=residual_expr_copy,
+                res_expr=residual_expr,
                 x1=x1,
                 x2=x2,
+                n2=n2,
             )
             return comp
 

@@ -19,28 +19,82 @@ issue a
 [pull request](https://docs.github.com/en/free-pro-team@latest/desktop/contributing-and-collaborating-using-github-desktop/creating-an-issue-or-pull-request#creating-a-pull-request)
 for `omtools`.
 
+### Recommended Git Workflow
+
+1. Fork repository on GitHub
+2. Clone repository
+
+```sh
+git clone https://gihub.com/your_username/omtools.git
+cd omtools
+# You don't have to rename your remote repository or name it
+# anything in particular, but this helps to avoid confusion
+git remote rename origin fork
+# You don't have to name the upstream repository anything in
+# particular, but we will name it upstream in this guide
+git remote add upstream https://https://gihub.com/lsdolab/omtools.git
+```
+
+3. Make a branch for a new feature and make changes
+
+```sh
+# on branch master
+# pull changes from collaborators
+git pull upstream master
+# push changes from collaborators to your fork
+git push fork master
+
+# create and checkout a new branch for a feature you will be
+# adding (exclude -b if the branch exists)
+git checkout -b feature-name
+# now on branch feature-name, free to make and commit changes
+```
+
+4. Make changes, write commits...
+5. Push changes to YOUR repostory (`fork`)
+
+```sh
+# optional: push branch to YOUR repository
+git push fork feature-name
+git checkout master
+# pull changes from collaborators just in case
+git pull upstream master
+# merge changes into master (use --squash option to merge as
+# single commit)
+git merge feature-name
+# using a tool like VSCode, open the project and review merge
+# conflicts if any.
+# Then edit the commit message describing the overall feature.
+
+# push changes to YOUR fork's master branch
+git push fork master
+```
+
+6. Issue [Pull
+   Request](https://docs.github.com/en/free-pro-team@latest/desktop/contributing-and-collaborating-using-github-desktop/creating-an-issue-or-pull-request#creating-a-pull-request)
+   on GitHub.
+7. Review/Approve Pull Request if you are an `omtools` Maintainer.
+
 ## Contribute to Docs
 
 `omtools` uses [Sphinx](https://www.sphinx-doc.org/en/master/) to
 generate documentation automatically.
 Sphinx uses `.rst` files to generate documentation.
 
-Use `.rst` to write documentation if no example code will be included in
-the page that Sphinx generates from the `.rst`.
-For pages that include example code, `omtools` uses
-[sphinx_auto_embed](https://github.com/hwangjt/sphinx_auto_embed) to
-generate `.rst` files from `.rstx` files.
-This facilitates writing documentation that includes example code and
-its output.
+The directive `jupyter-execute` is available for embedding a code
+module and output into documentation. See the documentation for
+[jupyter-sphinx](https://jupyter-sphinx.readthedocs.io/en/latest/) for
+details on how to use the directive.
 
-Each time you add a feature, it is recommended to write example code
-(see the `examples/` directory).
+The directive `code-include` is available for embedding code for a class
+or function, as opposed to the entire module. See the dcumentation for
+[sphinx-code-include](https://sphinx-code-include.readthedocs.io/en/latest/index.html)
+for more details on how to use the directive.
+
+It is recommended to write example code (see the `examples/` directory)
+each time a feature is added.
 Example scripts use the `ex_` prefix by convention.
-To include example code in the documentation, create a `.rstx` file
-(see files in `docs/_src_docs/examples/`) describing the example code.
-
-To generate `.rst` files from `.rstx` files, run `sphinx_auto_embed` in
-the `docs/` directory.
+Use existing files in `docs/_src_docs/examples/` as a guide.
 
 To generate the docs, run `make html` in the `docs/` directory.
 

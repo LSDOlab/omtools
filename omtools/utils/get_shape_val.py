@@ -3,10 +3,10 @@ import numpy as np
 from numbers import Number
 
 
-def get_shape(
+def get_shape_val(
     shape: Tuple[int],
     val: Union[Number, np.ndarray],
-) -> Tuple[int]:
+) -> Tuple[Tuple[int], np.ndarray]:
     """
     Get shape from shape or value if shape is unspecified
 
@@ -24,10 +24,12 @@ def get_shape(
         Shape of value
     """
     if isinstance(val, Number):
-        return shape
+        return shape, val * np.ones(shape)
+    if isinstance(val, list):
+        val = np.array(val)
     if isinstance(val, np.ndarray):
         if shape == (1, ):
-            return val.shape
+            return val.shape, val
         if val.shape != shape:
             raise ValueError("Value shape mismatch")
-        return val.shape
+        return shape, val

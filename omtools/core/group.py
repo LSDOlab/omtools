@@ -3,11 +3,11 @@ from typing import Callable, Dict, Tuple
 from openmdao.api import Group as OMGroup
 from openmdao.core.system import System
 
+from omtools.core._group import _Group
 from omtools.core.output import Output
 from omtools.core.explicit_output import ExplicitOutput
-from omtools.core.expression import Expression
 from omtools.core.graph import remove_indirect_predecessors, topological_sort
-from omtools.core.implicit_output import ImplicitOutput
+from omtools.core.expression import Expression
 from omtools.core.indep import Indep
 from omtools.core.input import Input
 from omtools.core.subsystem import Subsystem
@@ -32,8 +32,8 @@ def _post_setup(func: Callable) -> Callable:
     """
     def _sort_expressions_and_build_components(self):
         """
-        User defined setup. After user code is run, ``omtools``
-        generates ``Component`` classes from user-supplied expressions.
+        User defined method to define expressions and add subsystems for
+        model execution
         """
         # The user-defined Group.setup() method
         func(self)
@@ -117,7 +117,7 @@ class _ComponentBuilder(type):
         return super(_ComponentBuilder, cls).__new__(cls, name, bases, attr)
 
 
-class Group(OMGroup, metaclass=_ComponentBuilder):
+class Group(_Group, metaclass=_ComponentBuilder):
     """
     The ``omtools.Group`` class builds ``openmdao.Component`` objects
     from Python-like expressions and adds their corresponding subsystems
@@ -132,68 +132,14 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
     In addition to supporting an expression-based style of defining a
     subsystem, ``omtools.Group`` also supports adding a subystem defined
     using a subclass of ``omtools.Group`` or ``openmdao.System``.
+
+    The ``omtools.Group`` class only allows for expressions that define
+    explicit relationships.
+    For defining models that use implicit relationships and defining
+    residuals, see ``omtools.ImplicitGroup``.
     """
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.nodes: dict = {}
-        self.input_vals: dict = {}
-        self.sorted_builders = []
-        self.reverse_branch_sorting: bool = False
-        self._root = Expression()
-        self._most_recently_added_subsystem: Subsystem = None
-
-    def initialize(*args, **kwargs):
-        """
-        User defined method to set options
-        """
-        pass
-
     def setup(self):
         pass
-
-    def declare_input(
-            self,
-            name: str,
-            shape: Tuple[int] = (1, ),
-            val=1,
-        # units=None,
-    ) -> Input:
-        """
-        Declare an input to use in an expression.
-
-        An input can be an output of a child ``System``. If the user
-        declares an input that is computed by a child ``System``, then
-        the call to ``self.declare_input`` must appear after the call to
-        ``self.add_subsystem``.
-
-        Parameters
-        ----------
-        name: str
-            Name of variable in OpenMDAO to be used as an input in
-            generated ``Component`` objects
-        shape: Tuple[int]
-            Shape of variable
-        val: Number or ndarray
-            Default value for variable
-
-        Returns
-        -------
-        Input
-            An object to use in expressions
-        """
-        inp = Input(
-            name,
-            shape=shape,
-            val=val,
-            # units=units,
-        )
-        if self._most_recently_added_subsystem is not None:
-            inp.add_predecessor_node(self._most_recently_added_subsystem)
-            # This is to guarantee that the subsystem is added even if
-            # outputs that depend on the subsystem are not registered
-            self._most_recently_added_subsystem.decr_num_successors()
-            self._most_recently_added_subsystem.num_inputs += 1
-        return inp
 
     def create_indep_var(
         self,
@@ -230,68 +176,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         self.register_output(name, indep)
         return indep
 
-    def create_output(
-            self,
-            name: str,
-            shape: Tuple[int] = (1, ),
-            val=1,
-    ) -> ExplicitOutput:
-        """
-        Create a value that is computed explicitly
-
-        Parameters
-        ----------
-        name: str
-            Name of variable in OpenMDAO to be computed by
-            ``ExplicitComponent`` objects connected in a cycle, or by an
-            ``ExplicitComponent`` that concatenates variables
-        shape: Tuple[int]
-            Shape of variable
-
-        Returns
-        -------
-        ExplicitOutput
-            An object to use in expressions
-        """
-        ex = ExplicitOutput(
-            name,
-            shape=shape,
-            val=val,
-        )
-        self.register_output(name, ex)
-        return ex
-
-    def create_implicit_output(
-            self,
-            name: str,
-            shape: Tuple[int] = (1, ),
-        # val=1,
-    ) -> ImplicitOutput:
-        """
-        Create a value that is computed implicitly
-
-        Parameters
-        ----------
-        name: str
-            Name of variable in OpenMDAO to be computed by an
-            ``ImplicitComponent``
-        shape: Tuple[int]
-            Shape of variable
-
-        Returns
-        -------
-        ImplicitOutput
-            An object to use in expressions
-        """
-        im = ImplicitOutput(
-            name,
-            shape=shape,
-            # val=val,
-        )
-        self.register_output(name, im)
-        return im
-
-    def register_output(self, name: str, expr: Expression):
+    def register_output(self, name: str, expr: Expression) -> Expression:
         """
         Register ``expr`` as an output of the ``Group``.
         When adding subsystems, each of the subsystem's inputs requires
@@ -316,50 +201,3 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         expr.name = name
         self._root.add_predecessor_node(expr)
         return expr
-
-    def add_subsystem(
-        self,
-        name: str,
-        subsys: System,
-        promotes: Iterable = None,
-        promotes_inputs: Iterable = None,
-        promotes_outputs: Iterable = None,
-    ):
-        """
-        Add a subsystem to the ``Group``.
-
-        ``self.add_subsystem`` call must be preceded by a call to
-        ``self.register_output`` for each of the subsystem's inputs,
-        and followed by ``self.declare_input`` for each of the
-        subsystem's outputs.
-
-        Parameters
-        ----------
-        name: str
-            Name of subsystem
-        subsys: System
-            Subsystem to add to `Group`
-        promotes: Iterable
-            Variables to promote
-        promotes_inputs: Iterable
-            Inputs to promote
-        promotes_outputs: Iterable
-            Outputs to promote
-
-        Returns
-        -------
-        System
-            Subsystem to add to `Group`
-        """
-        self._most_recently_added_subsystem = Subsystem(
-            name,
-            subsys,
-            promotes,
-            promotes_inputs=promotes_inputs,
-            promotes_outputs=promotes_outputs,
-        )
-        self._most_recently_added_subsystem.add_predecessor_node(self._root)
-        new_root = Expression()
-        new_root.add_predecessor_node(self._most_recently_added_subsystem)
-        self._root = new_root
-        return subsys

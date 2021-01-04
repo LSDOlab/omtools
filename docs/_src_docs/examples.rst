@@ -28,3 +28,6 @@ give an idea of how expressions are transformed to OpenMDAO
    examples/indexed_assignments_nd.rst
    examples/unary_exprs.rst
    examples/cyclic_relationships.rst
+   examples/implicit_relationships.rst
+   examples/implicit_with_subsystems.rst
+   examples/expand.rst

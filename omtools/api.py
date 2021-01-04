@@ -1,4 +1,5 @@
 from omtools.core.group import Group
+from omtools.core.implicit_group import ImplicitGroup
 from omtools.std.arccos import arccos
 from omtools.std.arcsin import arcsin
 from omtools.std.arctan import arctan

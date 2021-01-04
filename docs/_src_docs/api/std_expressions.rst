@@ -80,3 +80,4 @@ Tensor Algebra
    ../expressions/reshape.rst
    ../expressions/pnorm.rst
 
+   ../examples/expand.rst
