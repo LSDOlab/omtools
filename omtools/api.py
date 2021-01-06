@@ -18,4 +18,17 @@ from omtools.std.sin import sin
 from omtools.std.sinh import sinh
 from omtools.std.tan import tan
 from omtools.std.tanh import tanh
+from omtools.std.pnorm import pnorm
+from omtools.std.reshape import reshape
 from omtools.std.expand import expand
+from omtools.std.matmat import matmat
+from omtools.std.matvec import matvec
+from omtools.std.transpose import transpose
+from omtools.std.reorder_axes import reorder_axes
+from omtools.std.min import min
+from omtools.std.inner import inner
+from omtools.std.dot import dot
+from omtools.std.outer import outer
+from omtools.std.einsum import einsum
+from omtools.std.einsum_new_api import einsum_new_api
+
