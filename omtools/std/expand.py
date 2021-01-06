@@ -5,22 +5,35 @@ from omtools.utils.miscellaneous_functions.decompose_shape_tuple import decompos
 
 
 class expand(Expression):
-    def initialize(self, expr: Expression, shape: tuple, expand_indices=None):
+    def initialize(self, expr: Expression, shape: tuple, indices=None):
         if not isinstance(expr, Expression):
             raise TypeError(expr, " is not an Expression object")
 
-        if expand_indices is not None:
-            if not isinstance(expand_indices, list):
-                raise TypeError(expand_indices, " is not a list or None")
+        if indices is not None:
+            if not isinstance(indices, str):
+                raise TypeError(indices, " is not a str or None")
+
+            if '->' not in indices:
+                raise ValueError(indices, " is invalid")
+
+        if indices is not None:
+            in_indices, out_indices = indices.split('->')
+
+            expand_indices = []
+            for i in range(len(out_indices)):
+                index = out_indices[i]
+
+                if index not in in_indices:
+                    expand_indices.append(i)
 
         self.shape = shape
         self.add_predecessor_node(expr)
 
         if not expr.shape == (1,):
-            if expand_indices is None:
+            if indices is None:
                 raise ValueError(
                     'If expanding something other than a scalar ' +
-                    'expand_indices must be given'
+                    'indices must be given'
                 )
 
             (
@@ -30,7 +43,7 @@ class expand(Expression):
 
             if in_shape != expr.shape:
                 raise ValueError(
-                    'Shape or expand_indices is invalid'
+                    'Shape or indices is invalid'
                 )
 
             self.build = lambda name: ArrayExpansionComp(
@@ -40,10 +53,10 @@ class expand(Expression):
                 out_name=name,
             )
         else:
-            if expand_indices is not None:
+            if indices is not None:
                 raise ValueError(
                     'If expanding a scalar ' +
-                    'expand_indices must not be given'
+                    'indices must not be given'
                 )
 
             self.build = lambda name: ScalarExpansionComp(

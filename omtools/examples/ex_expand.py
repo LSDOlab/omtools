@@ -17,7 +17,7 @@ class Example(Group):
             [4., 5., 6.],
         ])
         array = self.declare_input('array', val=val)
-        expanded_array = ot.expand(array, (2, 4, 3, 1), [1, 3])
+        expanded_array = ot.expand(array, (2, 4, 3, 1), 'ij->iajb')
         self.register_output('expanded_array', expanded_array)
 
 
