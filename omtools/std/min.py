@@ -1,9 +1,10 @@
 from omtools.comps.axiswise_min_comp import AxisMinComp
 from omtools.comps.elementwise_min_comp import ElementwiseMinComp
-from omtools.comps.scalar_min_comp import ScalarMinComp
+from omtools.comps.scalar_extremum_comp import ScalarExtremumComp
 
 from omtools.core.expression import Expression
 
+import numpy as np
 
 class min(Expression):
     def initialize(self, *exprs, axis=None, rho=20.):
@@ -44,11 +45,12 @@ class min(Expression):
 
         elif len(exprs) == 1 and axis == None:
 
-            self.build = lambda name: ScalarMinComp(
+            self.build = lambda name: ScalarExtremumComp(
                 shape=expr.shape,
                 in_name=expr.name,
                 out_name=name,
                 rho=rho,
+                lower_flag=True,
             )
 
         else:

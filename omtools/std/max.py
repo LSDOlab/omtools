@@ -1,9 +1,10 @@
 from omtools.comps.axiswise_max_comp import AxisMaxComp
 from omtools.comps.elementwise_max_comp import ElementwiseMaxComp
-from omtools.comps.scalar_max_comp import ScalarMaxComp
+from omtools.comps.scalar_extremum_comp import ScalarExtremumComp
 
 from omtools.core.expression import Expression
 
+import numpy as np
 
 class max(Expression):
     def initialize(self, *exprs, axis=None, rho=20.):
@@ -44,11 +45,12 @@ class max(Expression):
 
         elif len(exprs) == 1 and axis == None:
 
-            self.build = lambda name: ScalarMaxComp(
+            self.build = lambda name: ScalarExtremumComp(
                 shape=expr.shape,
                 in_name=expr.name,
                 out_name=name,
                 rho=rho,
+                lower_flag=False,
             )
 
         else:
