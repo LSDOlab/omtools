@@ -38,7 +38,7 @@ def test_elementwise_min():
     tensor1 = np.array([[1, 5, -8],[10, -3, -5]])
     tensor2 = np.array([[2, 6, 9], [-1, 2, 4]])
 
-    desired_output = np.maximum(tensor1, tensor2)
+    desired_output = np.minimum(tensor1, tensor2)
     np.testing.assert_almost_equal(example.prob['ElementwiseMin'], desired_output) 
     
     partials_error = example.prob.check_partials(includes=['comp_ElementwiseMin'], out_stream=None, compact_print=True)
