@@ -1,6 +1,6 @@
 from openmdao.utils.assert_utils import assert_check_partials
 import numpy as np
-import omtools.examples.ex_matmat as example
+import omtools.examples.ex_min as example
 
 m = 2
 n = 3
@@ -14,7 +14,7 @@ tensor = np.arange(num_of_elements).reshape(tensor_shape)
 
 def test_axiswise_min():
 
-    desired_output = np.amin(tensor, axis=(1,3))
+    desired_output = np.amin(tensor, axis=1)
     np.testing.assert_almost_equal(example.prob['AxiswiseMin'], desired_output) 
 
     partials_error = example.prob.check_partials(includes=['comp_AxiswiseMin'], out_stream=None, compact_print=True)
@@ -30,11 +30,15 @@ def test_scalar_min():
 
 def test_elementwise_min():
 
-    mat1 = np.arange(m*n).reshape(shape) * 0.5
-    mat2 = np.arange(m*n).reshape(shape) * -1.
-    mat3 = np.arange(m*n).reshape(shape) 
+    m = 2
+    n = 3
+    # Shape of the three tensors is (2,3)
+    shape = (m,n)
+    
+    tensor1 = np.array([[1, 5, -8],[10, -3, -5]])
+    tensor2 = np.array([[2, 6, 9], [-1, 2, 4]])
 
-    desired_output = np.min(mat1, mat2, mat3)
+    desired_output = np.minimum(tensor1, tensor2)
     np.testing.assert_almost_equal(example.prob['ElementwiseMin'], desired_output) 
     
     partials_error = example.prob.check_partials(includes=['comp_ElementwiseMin'], out_stream=None, compact_print=True)
