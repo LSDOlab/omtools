@@ -116,7 +116,7 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
         Object that represents an expression to compute the residual
 
     """
-    def __init__(self, n2=False, **kwargs):
+    def __init__(self, maxiter=100, n2=False, **kwargs):
         super().__init__(**kwargs)
         self._inst_functs = {
             name: getattr(self, name, None)
@@ -130,10 +130,8 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
         self.all_inputs: Dict[Set[Input]] = dict()
         self.all_outputs: Set[str] = set()
         self.derivs = dict()
+        self.maxiter = 100
         self.n2 = n2
-
-    def initialize(self):
-        self.options.declare('maxiter', types=int, default=100)
 
     def _set_values(self, inputs, outputs):
         for res_expr in self.group._root.predecessors:
@@ -195,7 +193,7 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
                     xn[mask1] = x2[mask1]
                     xn[mask2] = x1[mask2]
 
-                    for _ in range(self.options['maxiter']):
+                    for _ in range(self.maxiter):
                         x = 0.5 * xp + 0.5 * xn
                         r = self.run(inputs, outputs, out_name, x)
                         mask_p = r[out_name] >= 0
