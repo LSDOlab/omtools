@@ -16,5 +16,6 @@ setup(
         'sphinx-rtd-theme',
         'sphinx-code-include',
         'jupyter-sphinx',
+        'numpydoc',
     ],
 )

@@ -1,17 +1,17 @@
+from copy import deepcopy
+from typing import Dict, Tuple
+
+import numpy as np
+
+# from omtools.comps.implicit_component import ImplicitComponent
 from omtools.core.expression import Expression
 from omtools.core.input import Input
 from omtools.core.output import Output
 from omtools.core.subsystem import Subsystem
 from omtools.utils.collect_input_exprs import collect_input_exprs
-from omtools.comps.composite_implicit_comp import CompositeImplicitComp
-from omtools.utils.replace_output_leaf_nodes import replace_output_leaf_nodes
 from omtools.utils.gen_hex_name import gen_hex_name
-from copy import deepcopy
-from typing import Dict, Tuple
-from openmdao.api import DirectSolver, NewtonSolver
-from openmdao.solvers.solver import LinearSolver, NonlinearSolver
 from omtools.utils.get_shape_val import get_shape_val
-import numpy as np
+from omtools.utils.replace_output_leaf_nodes import replace_output_leaf_nodes
 
 
 def replace_input_leaf_nodes(
@@ -21,7 +21,7 @@ def replace_input_leaf_nodes(
     """
     Replace ``Input`` objects that depend on previous subsystems
     with ``Input`` objects that do not. This is required for defining
-    graphs for residuals so that ``CompositeImplicitComp`` objects do
+    graphs for residuals so that ``ImplicitComponent`` objects do
     not include subsystems.
     """
     for pred in node.predecessors:
@@ -43,12 +43,11 @@ class ImplicitOutput(Output):
     Class for creating an implicit output
     """
     def initialize(
-        self,
-        name: str,
-        shape: Tuple[int] = (1, ),
-        val=1,
-        linear_solver: LinearSolver = None,
-        nonlinear_solver: NonlinearSolver = None,
+            self,
+            group,
+            name: str,
+            shape: Tuple[int] = (1, ),
+            val=1,
     ):
         """
         Initialize implicit output
@@ -62,18 +61,14 @@ class ImplicitOutput(Output):
         val: Number or ndarray
             Initial value of variable to compute implicitly
         """
+        self.group = group
         self.name = name
         self.shape, self.val = get_shape_val(shape, val)
         self.defined = False
-        self.linear_solver = DirectSolver()
-        self.nonlinear_solver = NewtonSolver(solve_subsystems=False)
 
     def define_residual(
         self,
         residual_expr: Expression,
-        linear_solver: LinearSolver = None,
-        nonlinear_solver: NonlinearSolver = None,
-        n2: bool = False,
     ):
         """
         Define the residual that must equal zero for this output to be
@@ -90,46 +85,24 @@ class ImplicitOutput(Output):
         if self.defined == True:
             raise ValueError("Expression for residual of " + self.name +
                              " is already defined")
-
-        # Establish direct dependence of ImplicitOutput object on Input
-        # objects, which depend on most recently added subsystem
-        input_exprs = set(collect_input_exprs([], residual_expr))
-        for input_expr in input_exprs:
-            self.add_predecessor_node(input_expr)
-            input_expr.decr_num_successors()
-
         # Replace leaf nodes of residual Expression object that
         # correspond to this ImplicitOutput node with Input objects;
-        # cannot be called before collect_input_exprs
         replace_output_leaf_nodes(
             self,
             residual_expr,
             Input(self.name, shape=self.shape, val=self.val),
         )
 
-        # Assign solvers and update costs to reflect iterative
-        # computations
-        if linear_solver is not None:
-            self.linear_solver = linear_solver
-            if 'maxiter' in self.linear_solver.options._dict.keys():
-                self._dag_cost += self.linear_solver.options['maxiter']
-        if nonlinear_solver is not None:
-            self.nonlinear_solver = nonlinear_solver
-            if 'maxiter' in self.nonlinear_solver.options._dict.keys():
-                self._dag_cost += self.nonlinear_solver.options['maxiter']
+        # register expression that computes residual
+        self.group.register_output(
+            residual_expr.name,
+            residual_expr,
+        )
 
-        def build(name: str):
-            comp = CompositeImplicitComp(
-                in_exprs=input_exprs,
-                out_expr=self,
-                res_expr=residual_expr,
-                n2=n2,
-            )
-            comp.linear_solver = self.linear_solver
-            comp.nonlinear_solver = self.nonlinear_solver
-            return comp
+        # map residual name to user defined output name
+        self.group.res_out_map[residual_expr.name] = self.name
+        self.group.out_vals[self.name] = self.val
 
-        self.build = build
         self.defined = True
 
     def define_residual_bracketed(
@@ -137,7 +110,6 @@ class ImplicitOutput(Output):
         residual_expr: Expression,
         x1=0.,
         x2=1.,
-        n2: bool = False,
     ):
         """
         Define the residual that must equal zero for this output to be
@@ -154,35 +126,26 @@ class ImplicitOutput(Output):
         if self.defined == True:
             raise ValueError("Expression for residual of " + self.name +
                              " is already defined")
-
-        # Establish direct dependence of ImplicitOutput object on Input
-        # objects, which depend on most recently added subsystem
-        input_exprs = set(collect_input_exprs([], residual_expr))
-        for input_expr in input_exprs:
-            self.add_predecessor_node(input_expr)
-            input_expr.decr_num_successors()
-
         # Replace leaf nodes of residual Expression object that
         # correspond to this ImplicitOutput node with Input objects;
-        # cannot be called before collect_input_exprs
         replace_output_leaf_nodes(
             self,
             residual_expr,
             Input(self.name, shape=self.shape, val=self.val),
         )
 
-        def build(name: str):
-            comp = CompositeImplicitComp(
-                in_exprs=input_exprs,
-                out_expr=self,
-                res_expr=residual_expr,
-                x1=x1,
-                x2=x2,
-                n2=n2,
-            )
-            return comp
+        # register expression that computes residual
+        self.group.register_output(
+            residual_expr.name,
+            residual_expr,
+        )
 
-        self.build = build
+        # map residual name to user defined output name
+        self.group.res_out_map[residual_expr.name] = self.name
+        self.group.brackets_map = (dict(), dict())
+        self.group.brackets_map[0][self.name] = x1
+        self.group.brackets_map[1][self.name] = x2
+
         self.defined = True
 
     def __repr__(self):
@@ -191,20 +154,3 @@ class ImplicitOutput(Output):
             shape_str += str(dim) + ","
         shape_str += ")"
         return "Implicit Output ('" + self.name + "', " + shape_str + ")"
-
-
-if __name__ == "__main__":
-    from openmdao.api import Problem
-    import omtools.api as ot
-
-    class G(ot.Group):
-        def setup(self):
-            z = self.declare_input('z')
-            x = self.create_implicit_output('x')
-            y = 4 - (x + 0.001)**2 + z
-            x.define_residual(y)
-
-    prob = Problem()
-    prob.model = G()
-    prob.setup()
-    prob.run_model()

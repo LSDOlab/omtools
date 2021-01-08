@@ -1,36 +1,38 @@
 from openmdao.api import NonlinearBlockGS, ScipyKrylov, NewtonSolver
 
 import omtools.api as ot
-from omtools.api import Group, ImplicitGroup
+from omtools.api import Group, ImplicitComponent
 from omtools.core.expression import Expression
 from openmdao.api import Problem
 import numpy as np
 
 
-class Example(ImplicitGroup):
+class Example(ImplicitComponent):
     def setup(self):
-        c = self.declare_input('c', val=[3, -3])
+        g = self.group
+
+        c = g.declare_input('c', val=[3, -3])
 
         # a == (3 + a - 2 * a**2)**(1 / 4)
         group = Group()
         a = group.create_output('a')
         a.define((3 + a - 2 * a**2)**(1 / 4))
         group.nonlinear_solver = NonlinearBlockGS(iprint=0, maxiter=100)
-        self.add_subsystem('coeff_a', group, promotes=['*'])
+        g.add_subsystem('coeff_a', group, promotes=['*'])
 
         # store positive and negative values of `a` in an array
-        ap = self.declare_input('a')
+        ap = g.declare_input('a')
         an = -ap
-        a = self.create_output('vec_a', shape=(2, ))
+        a = g.create_output('vec_a', shape=(2, ))
         a[0] = ap
         a[1] = an
 
         group = Group()
         group.create_indep_var('b', val=[-4, 4])
-        self.add_subsystem('coeff_b', group, promotes=['*'])
+        g.add_subsystem('coeff_b', group, promotes=['*'])
 
-        b = self.declare_input('b', shape=(2, ))
-        y = self.create_implicit_output('y', shape=(2, ))
+        b = g.declare_input('b', shape=(2, ))
+        y = g.create_implicit_output('y', shape=(2, ))
         z = a * y**2 + b * y + c
         y.define_residual_bracketed(
             z,
@@ -40,7 +42,8 @@ class Example(ImplicitGroup):
 
 
 prob = Problem()
-prob.model = Example()
+prob.model = Group()
+prob.model.add_subsystem('example', Example(), promotes=['*'])
 prob.setup(force_alloc_complex=True)
 prob.run_model()
 print(prob['y'])

@@ -1,5 +1,6 @@
 from omtools.core.expression import Expression
 from openmdao.api import Group
+from openmdao.core.system import System
 
 
 class Subsystem(Expression):
@@ -8,8 +9,8 @@ class Subsystem(Expression):
     """
     def initialize(
         self,
-        name,
-        subsys,
+        name: str,
+        subsys: System,
         promotes=None,
         promotes_inputs=None,
         promotes_outputs=None,
@@ -17,7 +18,7 @@ class Subsystem(Expression):
         max_procs=None,
         proc_weight=1.0,
     ):
-        self.name = name
+        self.name: str = name
         self.promotes = promotes
         self.promotes_inputs = promotes_inputs
         self.promotes_outputs = promotes_outputs

@@ -5,9 +5,10 @@ from guppy import hpy
 
 from openmdao.api import ExplicitComponent
 from omtools.utils.miscellaneous_functions.process_options import name_types, get_names_list, shape_types, get_shapes_list
+from omtools.utils.einsum_utils import compute_einsum_shape
 
 
-class EinsumComp(ExplicitComponent):
+class SparsePartialEinsumComp(ExplicitComponent):
     """
     This component computes the Einstein summation convention applied on input components that are arrays.
     In addition, the sparsity structure of the partial derivatives of the output with respect to each input is precomputed in the setup and partials are always stored in sparse format.
@@ -34,18 +35,10 @@ class EinsumComp(ExplicitComponent):
         self.options.declare('in_shapes', types=shape_types)
         # Nametypes might be a string or a list
         self.options.declare('operation', types=str)
-
-        self.post_initialize()
-
-    def post_initialize(self):
-        pass
-
-    def pre_setup(self):
-        pass
+        self.options.declare('out_shape', types=tuple, default=None)
 
     # Add inputs and output, and declare partials
     def setup(self):
-        self.pre_setup()
         operation = self.options['operation']
 
         # Changes from a string to a list with one element if there was only one input
@@ -55,6 +48,7 @@ class EinsumComp(ExplicitComponent):
         in_names = self.options['in_names']
         in_shapes = self.options['in_shapes']
         out_name = self.options['out_name']
+        out_shape = self.options['out_shape']
 
         # Find unused characters in operation
         check_string = 'abcdefghijklmnopqrstuvwxyz'
@@ -74,20 +68,29 @@ class EinsumComp(ExplicitComponent):
             elif (char == ',' or char == '-'):
                 self.operation_aslist.append(tensor_rep)
                 tensor_rep = ''
-        self.operation_aslist.append(tensor_rep)
-        '''
-        String parse to find output shape
-        '''
-        out_shape = []
-        for char in self.operation_aslist[-1]:
-            for idx, tensor_rep in enumerate(self.operation_aslist[:-1]):
-                if (char in tensor_rep):
-                    shape_ind = tensor_rep.index(char)
-                    out_shape.append(in_shapes[idx][shape_ind])
-                    break
-        self.out_shape = tuple(out_shape)
+       
+        # When output is a scalar
+        if operation[-1] == '>':
+            self.operation_aslist.append(tensor_rep)
 
-        self.add_output(out_name, shape=self.out_shape)
+        # When output is a tensor
+        else:
+            self.operation_aslist.append(tensor_rep)
+
+        # When output shape is not provided
+        if out_shape == None:
+            self.out_shape = compute_einsum_shape(
+                self.operation_aslist,
+                in_shapes,
+            )
+        else:
+            self.out_shape = out_shape
+
+        if self.out_shape == (1,):
+            self.add_output(out_name)
+        else:    
+            self.add_output(out_name, shape=self.out_shape)
+
         completed_in_names = []
         for idx, in_name in enumerate(in_names):
             if in_name in completed_in_names:
@@ -105,6 +108,8 @@ class EinsumComp(ExplicitComponent):
         self.partial_indices_list = []
         self.flattened_indices_list = []
         operation_aslist = self.operation_aslist
+        self.sparsity_partials = [False] * len(in_names)
+        
         for in_name_index, in_name in enumerate(in_names):
 
             # Map locations of axes from the input to that in the output for axes that does not get nullified in the output (for computing indices of nonzeros in the partials)
@@ -148,6 +153,7 @@ class EinsumComp(ExplicitComponent):
             for idx, same_name in enumerate(in_names):
                 if same_name == in_name:
                     locations.append(idx)
+            
             '''
             When tried to compute indices in just one go
 
@@ -182,65 +188,71 @@ class EinsumComp(ExplicitComponent):
             full_partial_indices_list = [np.array([
                 0,
             ])] * partial_rank
-            # full_partial_indices_array = [np.zeros((1,partial_rank))]
-
+            
             for loc in locations:
-                # Partials are dense if surviving_axes_map is empty
                 if self.surviving_axes_map[loc]:
-                    sparse_partial = True
-                    remainder_output_shape = []
-                    partial_indices_list = np.arange(partial_rank).tolist()
-                    partial_indices_list[-rank:] = ind
-                    tensor_rep = operation_aslist[loc]
+                    self.sparsity_partials[loc] = True
 
-                    # surviving_axes_index_in_output = [item for sublist in common_surviving_axes.values() for item in sublist]
-
-                    for idx, axis in enumerate(output_tensor_rep):
-                        if not (idx in self.surviving_axes_map[loc].values()):
-                            remainder_output_shape.append(out_shape[idx])
-                        else:
-                            partial_indices_list[output_tensor_rep.index(
-                                axis)] = ind[operation_aslist[loc].index(axis)]
-                        '''
-                        When tried to compute indices in just one go
-
-                        # else:
-                        #     for loc in locations:
-                        #         if axis in operation_aslist[loc]:
-                        #             partial_indices_list[output_tensor_rep.index(axis)] = ind[operation_aslist[loc].index(axis)]
-                        #             break
-                        '''
-
-                    remainder_output_shape = tuple(remainder_output_shape)
-                    remainder_output_size = np.prod(remainder_output_shape)
-                    print(remainder_output_size)
-                    # remainder_output_rank = len(remainder_output_shape)
-                    remainder_flat_indices = np.arange(remainder_output_size)
-                    print(remainder_flat_indices)
-                    remainder_output_ind = np.unravel_index(
-                        remainder_flat_indices, remainder_output_shape)
-
-                    i = 0
-                    # print(*(k.size for k in partial_indices_list[3:]))
-                    for idx, indices in enumerate(partial_indices_list):
-                        if isinstance(indices, np.ndarray):
-                            partial_indices_list[idx] = np.tile(
-                                indices, remainder_output_size)
-                        elif isinstance(indices, int):
-                            partial_indices_list[idx] = np.repeat(
-                                remainder_output_ind[i], size)
-                            i += 1
-                            # print(idx)
-                        else:
-                            raise Exception()
-
-                    for k in range(partial_rank):
-                        full_partial_indices_list[k] = np.append(
-                            full_partial_indices_list[k],
-                            partial_indices_list[k])
-
+            sparse_partial = True
+            for loc in locations:
+                if self.sparsity_partials[loc] == False:
+                    sparse_partial = False
+                    break
+            
             if sparse_partial:
-                sparse_partial = False
+                for loc in locations:
+                    # Partials are dense if surviving_axes_map is empty
+                    if not(self.surviving_axes_map[loc]):
+                        sparse_partial
+                    if self.surviving_axes_map[loc]:
+                        remainder_output_shape = []
+                        partial_indices_list = np.arange(partial_rank).tolist()
+                        partial_indices_list[-rank:] = ind
+                        tensor_rep = operation_aslist[loc]
+
+                        # surviving_axes_index_in_output = [item for sublist in common_surviving_axes.values() for item in sublist]
+
+                        for idx, axis in enumerate(output_tensor_rep):
+                            if not (idx in self.surviving_axes_map[loc].values()):
+                                remainder_output_shape.append(out_shape[idx])
+                            else:
+                                partial_indices_list[output_tensor_rep.index(
+                                    axis)] = ind[operation_aslist[loc].index(axis)]
+                            '''
+                            When tried to compute indices in just one go
+
+                            # else:
+                            #     for loc in locations:
+                            #         if axis in operation_aslist[loc]:
+                            #             partial_indices_list[output_tensor_rep.index(axis)] = ind[operation_aslist[loc].index(axis)]
+                            #             break
+                            '''
+                        
+                        remainder_output_size = 1
+                        # Computing remainder indices if remainder_output_shape is not empty
+                        if remainder_output_shape:
+                            remainder_output_shape = tuple(remainder_output_shape)
+                            remainder_output_size = np.prod(remainder_output_shape)
+                            remainder_flat_indices = np.arange(remainder_output_size)
+                            remainder_output_ind = np.unravel_index(
+                                remainder_flat_indices, remainder_output_shape)
+
+                        i = 0
+                        for idx, indices in enumerate(partial_indices_list):
+                            if isinstance(indices, np.ndarray):
+                                partial_indices_list[idx] = np.tile(
+                                    indices, remainder_output_size)
+                            elif isinstance(indices, int):
+                                partial_indices_list[idx] = np.repeat(
+                                    remainder_output_ind[i], size)
+                                i += 1
+                            else:
+                                raise Exception()
+
+                        for k in range(partial_rank):
+                            full_partial_indices_list[k] = np.append(
+                                full_partial_indices_list[k],
+                                partial_indices_list[k])
 
                 partial_size = full_partial_indices_list[0].size
                 full_partial_indices_array = full_partial_indices_list[
@@ -268,7 +280,6 @@ class EinsumComp(ExplicitComponent):
                                       in_name,
                                       rows=flattened_output_index,
                                       cols=flattened_input_index)
-                # self.partial_indices_list.append(partial_indices_list)
                 self.partial_indices_list.append(full_partial_indices_list)
                 self.flattened_indices_list.append(
                     (flattened_input_index, flattened_output_index))
@@ -354,17 +365,18 @@ class EinsumComp(ExplicitComponent):
                     self.I[len(completed_in_names) - 1],
                     *(inputs[in_name] for in_name in in_names[i + 1:]))
 
-            # Partials are dense if surviving_axes_map is empty
-            if self.surviving_axes_map[in_name_index]:
+            sparse_partial = True
+            for i in locations:
+                if self.sparsity_partials[i] == False:
+                    sparse_partial = False
+
+            # Partials are dense if surviving_axes_map is empty for at least one location
+            if sparse_partial:
                 partial_indices_list = self.partial_indices_list[
                     len(completed_in_names) - 1]
-                # flattened_input_index = self.flattened_indices_list[len(completed_in_names) - 1][0]
-                # flattened_output_index = self.flattened_indices_list[len(completed_in_names) - 1][1]
+
                 partials[out_name, in_name] = partial[partial_indices_list]
-                # partials[out_name, in_name][flattened_output_index, flattened_input_index] = partial[partial_indices_list]
-                # print(partial.size)
-                # print(np.nonzero(partial)[0].size)
-                # print(partial_indices_list[0].size)
+
 
             else:
                 partials[out_name, in_name] = partial
@@ -385,15 +397,14 @@ if __name__ == '__main__':
     comp.add_output('y', np.random.rand(*shape2))
     comp.add_output('z', np.random.rand(*shape3))
     prob.model.add_subsystem('inputs_comp', comp, promotes=['*'])
-    # out_shape = (2, 3, 4, 4, 7)
 
-    comp = EinsumComp(
+    comp = SparsePartialEinsumComp(
         in_names=['x', 'y', 'x'],
         in_shapes=[(2, 2, 4), (2, 7, 4), (2, 2, 4)],
         out_name='f',
         operation='abc,ade,fae->bcdfa',
     )
-    # print(np.einsum('abc,ade,fae->abcdf', np.random.rand(*shape1), np.random.rand(*shape2), np.random.rand(*shape3)))
+
     prob.model.add_subsystem('comp', comp, promotes=['*'])
 
     start = time.time()
@@ -406,5 +417,5 @@ if __name__ == '__main__':
     # mem = h.heap()
     end = time.time()
 
-    print(end - start)
+    # print(end - start)
     # print(mem.size / 1024 / 1024)

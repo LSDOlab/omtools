@@ -1,0 +1,6 @@
+reshape
+=======
+
+This function reshapes the input to a new shape that is specified by the user. The input must be a numpy array. 
+
+.. embed-module :: omtools.examples.ex_reshape

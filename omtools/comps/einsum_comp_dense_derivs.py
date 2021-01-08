@@ -5,6 +5,7 @@ from guppy import hpy
 
 from openmdao.api import ExplicitComponent
 from omtools.utils.miscellaneous_functions.process_options import name_types, get_names_list, shape_types, get_shapes_list
+from omtools.utils.einsum_utils import compute_einsum_shape
 
 
 class EinsumComp(ExplicitComponent):
@@ -34,18 +35,10 @@ class EinsumComp(ExplicitComponent):
         self.options.declare('in_shapes', types=shape_types)
         # Nametypes might be a string or a list
         self.options.declare('operation', types=str)
-
-        self.post_initialize()
-
-    def post_initialize(self):
-        pass
-
-    def pre_setup(self):
-        pass
+        self.options.declare('out_shape', types=tuple, default=None)
 
     # Add inputs and output, and declare partials
     def setup(self):
-        self.pre_setup()
         operation = self.options['operation']
 
         # Changes from a string to a list with one element if there was only one input
@@ -55,6 +48,7 @@ class EinsumComp(ExplicitComponent):
         in_names = self.options['in_names']
         in_shapes = self.options['in_shapes']
         out_name = self.options['out_name']
+        out_shape = self.options['out_shape']
 
         # Find unused characters in operation
         check_string = 'abcdefghijklmnopqrstuvwxyz'
@@ -74,22 +68,28 @@ class EinsumComp(ExplicitComponent):
             elif (char == ',' or char == '-'):
                 self.operation_aslist.append(tensor_rep)
                 tensor_rep = ''
-        self.operation_aslist.append(tensor_rep)
-        '''
-        String parse to find output shape
-        '''
-        out_shape = []
-        for char in self.operation_aslist[-1]:
-            i = -1
-            for tensor_rep in self.operation_aslist[:-1]:
-                i += 1
-                if (char in tensor_rep):
-                    shape_ind = tensor_rep.index(char)
-                    out_shape.append(in_shapes[i][shape_ind])
-                    break
-        self.out_shape = tuple(out_shape)
+        
+        # When output is a scalar
+        if operation[-1] == '>':
+            self.operation_aslist.append(tensor_rep)
 
-        self.add_output(out_name, shape=self.out_shape)
+        # When output is a tensor
+        else:
+            self.operation_aslist.append(tensor_rep)
+
+        # When output shape is not provided
+        if out_shape == None:
+            self.out_shape = compute_einsum_shape(
+                self.operation_aslist,
+                in_shapes,
+            )
+        else:
+            self.out_shape = out_shape
+
+        if self.out_shape == (1,):
+            self.add_output(out_name)
+        else:    
+            self.add_output(out_name, shape=self.out_shape)
 
         completed_in_names = []
         self.I = []
@@ -226,7 +226,6 @@ if __name__ == '__main__':
         out_name='f',
         operation='abc,ade,fae->bcdfa',
     )
-    # print(np.einsum('abc,ade,fae->abcdf', np.random.rand(*shape1), np.random.rand(*shape2), np.random.rand(*shape3)))
     prob.model.add_subsystem('comp', comp, promotes=['*'])
 
     start = time.time()
@@ -239,5 +238,5 @@ if __name__ == '__main__':
     # mem = h.heap()
     end = time.time()
 
-    print(end - start)
+    # print(end - start)
     # print(mem.size / 1024 / 1024)
