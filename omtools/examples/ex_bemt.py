@@ -35,6 +35,8 @@ class BEMTGroup(ot.ImplicitComponent):
             group.create_indep_var('Vx', val=50)
             group.create_indep_var('Vt', val=100.)
             group.create_indep_var('sigma', val=0.15)
+            group._root.print_dag()
+        self.group._root.print_dag()
 
         phi = g.create_implicit_output('phi', shape=shape)
 
@@ -47,6 +49,7 @@ class BEMTGroup(ot.ImplicitComponent):
             phi_ = group.declare_input('phi')
             alpha = twist - phi_
             group.register_output('alpha', alpha)
+            group._root.print_dag()
 
         alpha = g.declare_input('alpha')
 

@@ -30,7 +30,8 @@ class Example(ImplicitComponent):
 
 
 prob = Problem()
-prob.model = Example()
+prob.model = Group()
+prob.model.add_subsystem('example', Example(), promotes=['*'])
 prob.setup(force_alloc_complex=True)
 prob.run_model()
 print(prob['x'])
