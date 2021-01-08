@@ -29,13 +29,11 @@ class Example(ImplicitComponent):
         b = g.declare_input('b')
         y = g.create_implicit_output('y')
         z = a * y**2 + b * y + c
-        y.define_residual(
-            z,
-            linear_solver=ScipyKrylov(),
-            nonlinear_solver=NewtonSolver(
-                solve_subsystems=False,
-                maxiter=100,
-            ),
+        y.define_residual(z, )
+        self.linear_solver = ScipyKrylov()
+        self.nonlinear_solver = NewtonSolver(
+            solve_subsystems=False,
+            maxiter=100,
         )
 
 

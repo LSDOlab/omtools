@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from collections.abc import Iterable
 from typing import Callable, Dict, Tuple
 
@@ -149,12 +150,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         self._most_recently_added_subsystem: Subsystem = None
         self.res_out_map: Dict[str, str] = dict()
         self.brackets_map = None
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type, value, traceback):
-        pass
+        self.out_vals = dict()
 
     def initialize(self, *args, **kwargs):
         """
@@ -279,7 +275,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
             self,
             name: str,
             shape: Tuple[int] = (1, ),
-        # val=1,
+            val=1,
     ) -> ImplicitOutput:
         """
         Create a value that is computed implicitly
@@ -301,12 +297,13 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
             self,
             name,
             shape=shape,
-            # val=val,
+            val=val,
         )
         # self._root.add_predecessor_node(im)
         return im
 
-    def register_output(self, name: str, expr: Expression) -> Expression:
+    def register_output(self, name: str,
+                        expr: ExplicitOutput) -> ExplicitOutput:
         """
         Register ``expr`` as an output of the ``Group``.
         When adding subsystems, each of the subsystem's inputs requires
@@ -327,7 +324,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
             Expression that computes output
         """
         if isinstance(expr, Input):
-            raise TypeError("Cannot register " + expr + " as an output")
+            raise TypeError("Cannot register input " + expr + " as an output")
         expr.name = name
         self._root.add_predecessor_node(expr)
         return expr
@@ -336,9 +333,9 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         self,
         name: str,
         subsys: System,
-        promotes: Iterable = None,
-        promotes_inputs: Iterable = None,
-        promotes_outputs: Iterable = None,
+        promotes=None,
+        promotes_inputs=None,
+        promotes_outputs=None,
     ):
         """
         Add a subsystem to the ``Group``.
@@ -379,9 +376,12 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         self._root = new_root
         return subsys
 
+    @contextmanager
     def create_group(self, name: str):
-        group = Group()
-        # FIXME: promotes fails
-        # self.add_subsystem(name, group)
-        self.add_subsystem(name, group, promotes=['*'])
-        return group
+        try:
+            group = Group()
+            self.add_subsystem(name, group, promotes=['*'])
+            yield group
+        finally:
+            group.setup()
+            pass

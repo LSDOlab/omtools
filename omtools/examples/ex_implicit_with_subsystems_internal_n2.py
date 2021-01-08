@@ -36,12 +36,11 @@ class Example(ImplicitComponent):
                 solve_subsystems=False,
                 maxiter=100,
             ),
-            n2=True,
         )
 
 
 prob = Problem()
-prob.model = Example()
+prob.model = Example(n2=True)
 prob.setup(force_alloc_complex=True)
 prob.run_model()
 print(prob['y'])

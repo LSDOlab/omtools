@@ -13,7 +13,6 @@ class BEMTGroup(ot.ImplicitComponent):
         self.options.declare('Cd0', default=0.005)
         self.options.declare('Cd1', default=0.)
         self.options.declare('Cd2', default=0.5)
-        self.options.declare('n2', default=True)
 
     def setup(self):
         """
@@ -44,17 +43,17 @@ class BEMTGroup(ot.ImplicitComponent):
         sigma = g.declare_input('sigma')
 
         with g.create_group('alpha_group') as group:
-            group = g.create_group('alpha_group')
-            group._root.print_dag()
             twist = group.declare_input('twist')
             phi_ = group.declare_input('phi')
             alpha = twist - phi_
-            g.register_output('alpha', alpha)
+            group.register_output('alpha', alpha)
+
+        alpha = g.declare_input('alpha')
 
         Cl = Cl0 + Cl1 * alpha
         Cd = Cd0 + Cd1 * alpha + Cd2 * alpha**2
-        # group = QuadraticAirfoilGroup(shape=shape)
-        # g.add_subsystem('airfoil_group', group, promotes=['*'])
+        # # group = QuadraticAirfoilGroup(shape=shape)
+        # # g.add_subsystem('airfoil_group', group, promotes=['*'])
 
         # Cl = g.declare_input('Cl')
         # Cd = g.declare_input('Cd')
@@ -65,23 +64,18 @@ class BEMTGroup(ot.ImplicitComponent):
         term2 = Vx * (2 * ot.sin(2 * phi) + Ct * sigma)
         residual = term1 - term2
 
-        # ImplicitOutput needs knowledge of the internal Group object
-        # replace leaf nodes phi with Input objects
-        # register resdual as output in contained group
-        # collect inputs and outputs
         phi.define_residual(residual)
 
         self.linear_solver = ScipyKrylov()
-        self.nonlinear_solver = NewtonSolver()
-        # phi.define_residual_bracketed(
-        #     residual,
-        #     x1=0.,
-        #     x2=np.pi / 2.,
-        # )
+        self.nonlinear_solver = NewtonSolver(solve_subsystems=False)
+        # # phi.define_residual_bracketed(
+        # #     residual,
+        # #     x1=0.,
+        # #     x2=np.pi / 2.,
+        # # )
 
 
 prob = Problem()
 prob.model = BEMTGroup(shape=(1, ))
 prob.setup()
 prob.run_model()
-prob.list_outputs()

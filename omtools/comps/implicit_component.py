@@ -13,7 +13,6 @@ from omtools.core.input import Input
 from omtools.utils.collect_input_exprs import collect_input_exprs
 
 
-# TODO: get initial value for ImplicitOutput
 def _post_setup(func: Callable) -> Callable:
     def _build_problem(self):
         func(self)
@@ -58,14 +57,15 @@ def _post_setup(func: Callable) -> Callable:
                     wrt=out_name,
                 )
 
-                # TODO: necessary?
                 # set response and design variables to compute derivatives
                 # treat inputs and output as inputs to internal model
                 # treat residual as output of internal model
                 self.prob.model.add_constraint(res_expr.name)
                 for in_expr in in_exprs:
                     in_name = in_expr.name
-                    if in_name not in self.prob.model._design_vars and in_name not in self.prob.model._static_design_vars:
+                    if in_name in self.prob.model._design_vars or in_name in self.prob.model._static_design_vars:
+                        pass
+                    else:
                         self.prob.model.add_design_var(in_name)
                 if out_name in self.prob.model._design_vars or out_name in self.prob.model._static_design_vars:
                     pass
@@ -75,21 +75,22 @@ def _post_setup(func: Callable) -> Callable:
 
         # set initial values for inputs and output
         for res_expr in self.group._root.predecessors:
-            if isinstance(res_expr, Subsystem) == False and isinstance(
-                    res_expr, Input) == False:
+            if isinstance(res_expr, Subsystem) == False:
                 out_name = self.group.res_out_map[res_expr.name]
-                # TODO: where is initial value for ImplicitOutput?
-                self.prob[out_name] = res_expr.val
+                if len(self.group.out_vals) == 0:
+                    self.prob[out_name] = 1
+                else:
+                    self.prob[out_name] = self.group.out_vals[out_name]
                 for in_expr in self.all_inputs[out_name]:
                     self.prob[in_expr.name] = in_expr.val
 
         # create n2 diagram of internal model for debugging
-        # if self.options['n2'] == True:
-        # self.prob.run_model()
-        # self.prob.model.list_inputs()
-        # self.prob.model.list_outputs()
-        # from openmdao.api import n2
-        # n2(self.prob)
+        if self.n2 == True:
+            self.prob.run_model()
+            self.prob.model.list_inputs()
+            self.prob.model.list_outputs()
+            from openmdao.api import n2
+            n2(self.prob)
 
     return _build_problem
 
@@ -115,7 +116,7 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
         Object that represents an expression to compute the residual
 
     """
-    def __init__(self, **kwargs):
+    def __init__(self, n2=False, **kwargs):
         super().__init__(**kwargs)
         self._inst_functs = {
             name: getattr(self, name, None)
@@ -126,14 +127,13 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
         self.prob = Problem()
         self.prob.model = Group()
         self.group = self.prob.model
-        # TODO: modify ImplicitOutput to provide out_expr and brackets
         self.all_inputs: Dict[Set[Input]] = dict()
         self.all_outputs: Set[str] = set()
         self.derivs = dict()
+        self.n2 = n2
 
     def initialize(self):
         self.options.declare('maxiter', types=int, default=100)
-        self.options.declare('n2', types=bool, default=False)
 
     def _set_values(self, inputs, outputs):
         for res_expr in self.group._root.predecessors:
@@ -173,7 +173,6 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
             residuals[out_name] = np.array(prob[res_name])
 
     def solve_nonlinear(self, inputs, outputs):
-        # TODO: get brackets from ImplicitOutput exprs
         for res_expr in self.group._root.predecessors:
             if isinstance(res_expr, Subsystem) == False:
                 out_name = self.group.res_out_map[res_expr.name]
@@ -198,7 +197,6 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
 
                     for _ in range(self.options['maxiter']):
                         x = 0.5 * xp + 0.5 * xn
-                        # TODO: set values
                         r = self.run(inputs, outputs, out_name, x)
                         mask_p = r[out_name] >= 0
                         mask_n = r[out_name] < 0
