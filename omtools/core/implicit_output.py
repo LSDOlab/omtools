@@ -131,6 +131,7 @@ class ImplicitOutput(Output):
         replace_output_leaf_nodes(
             self,
             residual_expr,
+            Input(self.name, shape=self.shape, val=self.val),
         )
 
         # register expression that computes residual
