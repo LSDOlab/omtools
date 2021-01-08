@@ -1,5 +1,4 @@
 from omtools.core.group import Group
-from omtools.core.implicit_group import ImplicitGroup
 from omtools.std.arccos import arccos
 from omtools.std.arcsin import arcsin
 from omtools.std.arctan import arctan
@@ -31,4 +30,4 @@ from omtools.std.dot import dot
 from omtools.std.outer import outer
 from omtools.std.einsum import einsum
 from omtools.std.einsum_new_api import einsum_new_api
-
+from omtools.comps.implicit_component import ImplicitComponent
