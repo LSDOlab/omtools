@@ -148,6 +148,13 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         self._root = Expression()
         self._most_recently_added_subsystem: Subsystem = None
         self.res_out_map: Dict[str, str] = dict()
+        self.brackets_map = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        pass
 
     def initialize(self, *args, **kwargs):
         """

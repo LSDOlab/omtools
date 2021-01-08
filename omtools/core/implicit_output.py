@@ -118,58 +118,40 @@ class ImplicitOutput(Output):
         #     if 'maxiter' in self.nonlinear_solver.options._dict.keys():
         #         self._dag_cost += self.nonlinear_solver.options['maxiter']
 
-    # def define_residual_bracketed(
-    #     self,
-    #     residual_expr: Expression,
-    #     x1=0.,
-    #     x2=1.,
-    #     n2: bool = False,
-    # ):
-    #     """
-    #     Define the residual that must equal zero for this output to be
-    #     computed
+    def define_residual_bracketed(
+        self,
+        residual_expr: Expression,
+        x1=0.,
+        x2=1.,
+        n2: bool = False,
+    ):
+        """
+        Define the residual that must equal zero for this output to be
+        computed
 
-    #     Parameters
-    #     ----------
-    #     residual_expr: Expression
-    #         Residual expression
-    #     """
-    #     if residual_expr is self:
-    #         raise ValueError("Expression for residual of " + self.name +
-    #                          " cannot be self")
-    #     if self.defined == True:
-    #         raise ValueError("Expression for residual of " + self.name +
-    #                          " is already defined")
+        Parameters
+        ----------
+        residual_expr: Expression
+            Residual expression
+        """
+        # Replace leaf nodes of residual Expression object that
+        # correspond to this ImplicitOutput node with Input objects;
+        replace_output_leaf_nodes(
+            self,
+            residual_expr,
+        )
 
-    #     # Establish direct dependence of ImplicitOutput object on Input
-    #     # objects, which depend on most recently added subsystem
-    #     input_exprs = set(collect_input_exprs([], residual_expr))
-    #     for input_expr in input_exprs:
-    #         self.add_predecessor_node(input_expr)
-    #         input_expr.decr_num_successors()
+        # register expression that computes residual
+        self.group.register_output(
+            residual_expr.name,
+            residual_expr,
+        )
 
-    #     # Replace leaf nodes of residual Expression object that
-    #     # correspond to this ImplicitOutput node with Input objects;
-    #     # cannot be called before collect_input_exprs
-    #     replace_output_leaf_nodes(
-    #         self,
-    #         residual_expr,
-    #         Input(self.name, shape=self.shape, val=self.val),
-    #     )
-
-    #     def build(name: str):
-    #         comp = ImplicitComponent(
-    #             in_exprs=input_exprs,
-    #             out_expr=self,
-    #             res_expr=residual_expr,
-    #             x1=x1,
-    #             x2=x2,
-    #             n2=n2,
-    #         )
-    #         return comp
-
-    #     self.build = build
-    #     self.defined = True
+        # map residual name to user defined output name
+        self.group.res_out_map[residual_expr.name] = self.name
+        self.group.brackets_map = (dict(), dict())
+        self.group.brackets_map[0][self.name] = x1
+        self.group.brackets_map[1][self.name] = x2
 
     def __repr__(self):
         shape_str = "("

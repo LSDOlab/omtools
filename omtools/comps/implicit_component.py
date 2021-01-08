@@ -33,7 +33,6 @@ def _post_setup(func: Callable) -> Callable:
 
                 # add component output
                 # output is an input to internal problem
-                print('out', out_name)
                 self.add_output(
                     out_name,
                     shape=res_expr.shape,
@@ -43,7 +42,6 @@ def _post_setup(func: Callable) -> Callable:
                 # add inputs, declare partials (out wrt in)
                 for in_expr in in_exprs:
                     if in_expr.name != out_name:
-                        print('in', in_expr.name)
                         self.add_input(
                             in_expr.name,
                             shape=in_expr.shape,
@@ -98,7 +96,6 @@ def _post_setup(func: Callable) -> Callable:
 
 class _ProblemBuilder(type):
     def __new__(cls, name, bases, attr):
-        print('replacing setup for implicit comp')
         attr['setup'] = _post_setup(attr['setup'])
         return super(_ProblemBuilder, cls).__new__(cls, name, bases, attr)
 
@@ -118,7 +115,7 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
         Object that represents an expression to compute the residual
 
     """
-    def __init__(self, x1=0, x2=1, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._inst_functs = {
             name: getattr(self, name, None)
@@ -133,13 +130,9 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
         self.all_inputs: Dict[Set[Input]] = dict()
         self.all_outputs: Set[str] = set()
         self.derivs = dict()
-        self.x1 = x1
-        self.x2 = x2
 
     def initialize(self):
         self.options.declare('maxiter', types=int, default=100)
-        # self.options.declare('x1')
-        # self.options.declare('x2')
         self.options.declare('n2', types=bool, default=False)
 
     def _set_values(self, inputs, outputs):
@@ -159,19 +152,17 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
         self.group.add_subsystem(name, group, promotes=['*'])
         return group
 
-    def run(self, inputs, output):
-        in_exprs = self.options['in_exprs']
-        out_expr = self.options['out_expr']
-        res_expr = self.options['res_expr']
+    def run(self, inputs, outputs, out_name, bracket):
+        self._set_values(inputs, outputs)
         prob = self.prob
-
-        for in_expr in in_exprs:
-            prob[in_expr.name] = inputs[in_expr.name]
-        prob[out_expr.name] = output
-
+        prob[out_name] = bracket
         prob.run_model()
 
-        return np.array(prob[res_expr.name])
+        residuals = dict()
+        for res_name, out_name in self.group.res_out_map.items():
+            residuals[out_name] = np.array(prob[res_name])
+
+        return residuals
 
     def apply_nonlinear(self, inputs, outputs, residuals):
         self._set_values(inputs, outputs)
@@ -181,37 +172,40 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
         for res_name, out_name in self.group.res_out_map.items():
             residuals[out_name] = np.array(prob[res_name])
 
-    # def solve_nonlinear(self, inputs, outputs):
-    #     # TODO: get brackets from ImplicitOutput exprs
-    #     for res_expr in self.group._root.predecessors:
-    #         out_name = self.group.res_out_map[res_expr.name]
-    #         shape = res_expr.shape
+    def solve_nonlinear(self, inputs, outputs):
+        # TODO: get brackets from ImplicitOutput exprs
+        for res_expr in self.group._root.predecessors:
+            if isinstance(res_expr, Subsystem) == False:
+                out_name = self.group.res_out_map[res_expr.name]
+                shape = res_expr.shape
 
-    #         x1 = self.x1 * np.ones(shape)
-    #         x2 = self.x2 * np.ones(shape)
+                if self.group.brackets_map is not None:
+                    x1 = self.group.brackets_map[0][out_name] * np.ones(shape)
+                    x2 = self.group.brackets_map[1][out_name] * np.ones(shape)
 
-    #         r1 = self.run(inputs, x1)
-    #         r2 = self.run(inputs, x2)
-    #         mask1 = r1 >= r2
-    #         mask2 = r1 < r2
+                    r1 = self.run(inputs, outputs, out_name, x1)
+                    r2 = self.run(inputs, outputs, out_name, x2)
+                    mask1 = r1[out_name] >= r2[out_name]
+                    mask2 = r1[out_name] < r2[out_name]
 
-    #         xp = np.empty(shape)
-    #         xp[mask1] = x1[mask1]
-    #         xp[mask2] = x2[mask2]
+                    xp = np.empty(shape)
+                    xp[mask1] = x1[mask1]
+                    xp[mask2] = x2[mask2]
 
-    #         xn = np.empty(shape)
-    #         xn[mask1] = x2[mask1]
-    #         xn[mask2] = x1[mask2]
+                    xn = np.empty(shape)
+                    xn[mask1] = x2[mask1]
+                    xn[mask2] = x1[mask2]
 
-    #         for _ in range(self.options['maxiter']):
-    #             x = 0.5 * xp + 0.5 * xn
-    #             r = self.run(inputs, x)
-    #             mask_p = r >= 0
-    #             mask_n = r < 0
-    #             xp[mask_p] = x[mask_p]
-    #             xn[mask_n] = x[mask_n]
+                    for _ in range(self.options['maxiter']):
+                        x = 0.5 * xp + 0.5 * xn
+                        # TODO: set values
+                        r = self.run(inputs, outputs, out_name, x)
+                        mask_p = r[out_name] >= 0
+                        mask_n = r[out_name] < 0
+                        xp[mask_p] = x[mask_p]
+                        xn[mask_n] = x[mask_n]
 
-    #         outputs[out_name] = 0.5 * xp + 0.5 * xn
+                    outputs[out_name] = 0.5 * xp + 0.5 * xn
 
     def linearize(self, inputs, outputs, jacobian):
         self._set_values(inputs, outputs)

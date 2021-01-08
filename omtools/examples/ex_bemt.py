@@ -31,12 +31,11 @@ class BEMTGroup(ot.ImplicitComponent):
 
         g = self.group
 
-        # with g.create_group('inputs_group') as group:
-        group = g.create_group('inputs_group')
-        group.create_indep_var('twist', val=50. * np.pi / 180.)
-        group.create_indep_var('Vx', val=50)
-        group.create_indep_var('Vt', val=100.)
-        group.create_indep_var('sigma', val=0.15)
+        with g.create_group('inputs_group') as group:
+            group.create_indep_var('twist', val=50. * np.pi / 180.)
+            group.create_indep_var('Vx', val=50)
+            group.create_indep_var('Vt', val=100.)
+            group.create_indep_var('sigma', val=0.15)
 
         phi = g.create_implicit_output('phi', shape=shape)
 
@@ -44,16 +43,13 @@ class BEMTGroup(ot.ImplicitComponent):
         Vt = g.declare_input('Vt')
         sigma = g.declare_input('sigma')
 
-        # group = ot.Group()
-        # with g.create_group('alpha_group') as group:
-        group = g.create_group('alpha_group')
-        group._root.print_dag()
-        twist = group.declare_input('twist')
-        phi_ = group.declare_input('phi')
-        alpha = twist - phi_
-        group.register_output('alpha', alpha)
-        group._root.print_dag()
-        # g.add_subsystem('alpha_group', group)
+        with g.create_group('alpha_group') as group:
+            group = g.create_group('alpha_group')
+            group._root.print_dag()
+            twist = group.declare_input('twist')
+            phi_ = group.declare_input('phi')
+            alpha = twist - phi_
+            g.register_output('alpha', alpha)
 
         Cl = Cl0 + Cl1 * alpha
         Cd = Cd0 + Cd1 * alpha + Cd2 * alpha**2
