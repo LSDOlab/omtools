@@ -1,5 +1,5 @@
-Array Expansion and Contraction
-===============================
+expand
+======
 
 This expression can be used to turn a scalar into an array or an array
 of lower rank into an array of higher rank.

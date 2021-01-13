@@ -13,6 +13,9 @@ from omtools.core.input import Input
 from omtools.utils.collect_input_exprs import collect_input_exprs
 
 
+# TODO: make new Group class for ImplicitComponent
+# TODO: disallow independent variables
+# TODO: disallow implicit variables in main group class
 def _post_setup(func: Callable) -> Callable:
     def _build_problem(self):
         func(self)

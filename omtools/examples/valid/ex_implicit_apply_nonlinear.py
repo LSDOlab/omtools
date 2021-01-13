@@ -29,6 +29,3 @@ prob.model = Group()
 prob.model.add_subsystem('example', ExampleApplyNonlinear())
 prob.setup(force_alloc_complex=True)
 prob.run_model()
-
-print('x', prob['x'].shape)
-print(prob['x'])

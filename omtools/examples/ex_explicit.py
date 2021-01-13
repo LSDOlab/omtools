@@ -14,16 +14,6 @@ class ExampleLiterals(Group):
         self.register_output('y', y)
 
 
-class ExampleSimple(Group):
-    """
-    :param var: y
-    """
-    def setup(self):
-        x1 = self.create_indep_var('x1', val=10, dv=True)
-        x2 = self.declare_input('x2', val=3)
-        self.register_output('y', x1 + x2)
-
-
 class ExampleBinaryOperations(Group):
     """
     :param var: y1
@@ -146,6 +136,15 @@ class ExampleUnary(Group):
 
 
 class ExampleWithSubsystems(Group):
+    """
+    :param var: prod
+    :param var: y1
+    :param var: y2
+    :param var: y3
+    :param var: y4
+    :param var: y5
+    :param var: y6
+    """
     def setup(self):
         # Create independent variable
         x1 = self.create_indep_var('x1', val=40)

@@ -66,8 +66,7 @@ To build the documentation for `omtools` locally, run
 
 ```sh
 cd /path/to/omtools
-cd docs/
-make html
+make -C docs/ html
 ```
 
 Then open `/path/to/omtools/docs/_build/html/index.html`.
