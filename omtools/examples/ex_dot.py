@@ -40,12 +40,11 @@ class Example(Group):
         # Vector-Vector Dot Product
         self.register_output('VecVecDot', ot.dot(vec1, vec2))
 
-        # Tensor-Vector Dot Product specifying the first axis for Vector and Tensor
-        self.register_output('TenVecDot', ot.dot(ten1, vec1, axes=([0],[0])) )
+        # Tensor-Tensor Dot Product specifying the first axis
+        self.register_output('TenTenDotFirst', ot.dot(ten1, ten2, axis=0))
 
-        # Tensor-Tensor Dot Product specifying the first and last axes
-        self.register_output('TenTenDot', ot.dot(ten1, ten2, axes=([0,2],[0,2])) )
-
+        # Tensor-Tensor Dot Product specifying the last axis
+        self.register_output('TenTenDotLast', ot.dot(ten1, ten2, axis=2))
         
 
 prob = Problem()

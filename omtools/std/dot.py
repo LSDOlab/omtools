@@ -6,15 +6,16 @@ from typing import List
 import numpy as np
 
 class dot(Expression):
-    def initialize(self, expr1: Expression, expr2: Expression, axes=None):   
+    def initialize(self, expr1: Expression, expr2: Expression, axis=None):
+        if isinstance(expr1, Expression) and isinstance(expr2, Expression):
 
-        if isinstance(expr1, Expression) == False:
-            raise TypeError(expr1, " is not an Expression object")
-        elif isinstance(expr2, Expression) == False:
-            raise TypeError(expr2, " is not an Expression object")
+            self.add_predecessor_node(expr1)
+            self.add_predecessor_node(expr2)
 
-        self.add_predecessor_node(expr1)
-        self.add_predecessor_node(expr2)
+            if expr1.shape != expr2.shape:
+                raise Exception("The shapes of the inputs must match!")
+            else:
+                self.shape = expr1.shape
 
         if len(expr1.shape) == 1 and len(expr2.shape) == 1:
             self.build = lambda name: VectorInnerProductComp(
@@ -24,17 +25,16 @@ class dot(Expression):
             )
         
         else:
-            new_in0_shape = np.delete(list(expr1.shape), axes[0])
-            new_in1_shape = np.delete(list(expr2.shape), axes[1])
-            self.shape = tuple(np.append(new_in0_shape, new_in1_shape))
+            new_in1_shape = np.delete(list(expr1.shape), axis)
+            new_in2_shape = np.delete(list(expr2.shape), axis)
+            self.shape = tuple(np.append(new_in1_shape, new_in2_shape))
         
             self.build = lambda name: TensorInnerProductComp(
                     in_names=[expr1.name, expr2.name],
                     out_name= name,
                     in_shapes= [expr1.shape, expr2.shape],
-                    axes= axes,
+                    axes= ([axis], [axis]),
                     out_shape = self.shape,
                 )
-            
 
         

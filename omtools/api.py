@@ -28,7 +28,11 @@ from omtools.std.min import min
 from omtools.std.max import max
 from omtools.std.inner import inner
 from omtools.std.dot import dot
+from omtools.std.cross import cross
 from omtools.std.outer import outer
+from omtools.std.rotmat import rotmat
 from omtools.std.einsum import einsum
+from omtools.std.sum import sum
+from omtools.std.average import average
 from omtools.std.einsum_new_api import einsum_new_api
 from omtools.comps.implicit_component import ImplicitComponent

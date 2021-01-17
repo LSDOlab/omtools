@@ -32,20 +32,19 @@ def test_vecvec_dot():
     partials_error = example.prob.check_partials(includes=['comp_VecVecDot'], out_stream=None, compact_print=True)
     assert_check_partials(partials_error, atol=1.e-6, rtol=1.e-6)
 
-def test_tenvec_dot():
-
-    desired_output = np.tensordot(ten1, vec1, axes=([0],[0]))
-    np.testing.assert_almost_equal(example.prob['TenVecDot'], desired_output) 
-    
-    partials_error = example.prob.check_partials(includes=['comp_TenVecDot'], out_stream=None, compact_print=True)
-    assert_check_partials(partials_error, atol=1.e-6, rtol=1.e-6)
 
 def test_tenten_dot():
 
-    desired_output = np.tensordot(ten1, ten2, axes=([0,2],[0,2]))
-    np.testing.assert_almost_equal(example.prob['TenTenDot'], desired_output) 
+    desired_output = np.tensordot(ten1, ten2, axes=([0],[0]))
+    np.testing.assert_almost_equal(example.prob['TenTenDotFirst'], desired_output) 
     
-    partials_error = example.prob.check_partials(includes=['comp_TenTenDot'], out_stream=None, compact_print=True)
+    partials_error = example.prob.check_partials(includes=['comp_TenTenDotFirst'], out_stream=None, compact_print=True)
     assert_check_partials(partials_error, atol=1.e-4, rtol=1.e-4)
 
+
+    desired_output = np.tensordot(ten1, ten2, axes=([2],[2]))
+    np.testing.assert_almost_equal(example.prob['TenTenDotLast'], desired_output) 
+    
+    partials_error = example.prob.check_partials(includes=['comp_TenTenDotLast'], out_stream=None, compact_print=True)
+    assert_check_partials(partials_error, atol=1.e-4, rtol=1.e-4)
 
