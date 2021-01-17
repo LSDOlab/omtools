@@ -29,7 +29,11 @@ class expand(Expression):
         self.shape = shape
         self.add_predecessor_node(expr)
 
-        if not expr.shape == (1,):
+        expr_shape = expr.shape
+        if expr_shape == 1:
+            expr_shape = (1,)
+
+        if not expr_shape == (1,):
             if indices is None:
                 raise ValueError(
                     'If expanding something other than a scalar ' +
@@ -41,7 +45,7 @@ class expand(Expression):
                 in_shape, _, out_shape,
             ) = decompose_shape_tuple(shape, expand_indices)
 
-            if in_shape != expr.shape:
+            if in_shape != expr_shape:
                 raise ValueError(
                     'Shape or indices is invalid'
                 )
@@ -53,11 +57,11 @@ class expand(Expression):
                 out_name=name,
             )
         else:
-            if indices is not None:
-                raise ValueError(
-                    'If expanding a scalar ' +
-                    'indices must not be given'
-                )
+            # if indices is not None:
+            #     raise ValueError(
+            #         'If expanding a scalar ' +
+            #         'indices must not be given'
+            #     )
 
             self.build = lambda name: ScalarExpansionComp(
                 shape=shape,
