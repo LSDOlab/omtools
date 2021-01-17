@@ -7,4 +7,4 @@ The values of the smaller array are copied across all values of the
 indices in the added dimensions.
 
 .. jupyter-execute::
-  ../../../omtools/examples/ex_expand.py
+  ../../../omtools/examples/valid/ex_expand_simple.py

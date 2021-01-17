@@ -1,11 +1,11 @@
 Indexed Assignments (Multidimensional Indices)
 ==============================================
 
-``omtools`` supports specifing ranges along multiple axes as well as
+``omtools`` supports specifying ranges along multiple axes as well as
 individual indices and ranges to concatenate arrays.
 
 .. jupyter-execute::
-  ../../../omtools/examples/ex_multidimensional_index_assignment.py
+  ../../../omtools/examples/valid/ex_indices_multidimensional.py
 
 .. embed-n2 ::
-  ../omtools/examples/ex_multidimensional_index_assignment.py
+  ../omtools/examples/valid/ex_indices_multidimensional.py

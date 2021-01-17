@@ -1,10 +1,14 @@
 import omtools.api as ot
 from omtools.api import Group
-from openmdao.api import Problem
 import numpy as np
 
 
-class Example(Group):
+class ExampleSimple(Group):
+    """
+    :param var: scalar
+    :param var: expanded_scalar
+    :param var: expanded_array
+    """
     def setup(self):
         # Expanding a scalar into an array
         scalar = self.declare_input('scalar', val=1.)
@@ -21,19 +25,51 @@ class Example(Group):
         self.register_output('expanded_array', expanded_array)
 
 
-prob = Problem()
-prob.model = Example()
-prob.setup(force_alloc_complex=True)
-prob.run_model()
+class ErrorScalarIncorrectOrder(Group):
+    def setup(self):
+        scalar = self.declare_input('scalar', val=1.)
+        expanded_scalar = ot.expand((2, 3), scalar)
+        self.register_output('expanded_scalar', expanded_scalar)
 
-print('scalar', prob['scalar'].shape)
-print(prob['scalar'])
-print('expanded_scalar', prob['expanded_scalar'].shape)
-print(prob['expanded_scalar'])
 
-print()
+class ErrorScalarIndices(Group):
+    def setup(self):
+        scalar = self.declare_input('scalar', val=1.)
+        expanded_scalar = ot.expand(scalar, (2, 3), '->ij')
+        self.register_output('expanded_scalar', expanded_scalar)
 
-print('array', prob['array'].shape)
-print(prob['array'])
-print('expanded_array', prob['expanded_array'].shape)
-print(prob['expanded_array'])
+
+class ErrorArrayNoIndices(Group):
+    def setup(self):
+        # Test array expansion
+        val = np.array([
+            [1., 2., 3.],
+            [4., 5., 6.],
+        ])
+        array = self.declare_input('array', val=val)
+        expanded_array = ot.expand(array, (2, 4, 3, 1))
+        self.register_output('expanded_array', expanded_array)
+
+
+class ErrorArrayInvalidIndices1(Group):
+    def setup(self):
+        # Test array expansion
+        val = np.array([
+            [1., 2., 3.],
+            [4., 5., 6.],
+        ])
+        array = self.declare_input('array', val=val)
+        expanded_array = ot.expand(array, (2, 4, 3, 1), 'ij->iaj')
+        self.register_output('expanded_array', expanded_array)
+
+
+class ErrorArrayInvalidIndices2(Group):
+    def setup(self):
+        # Test array expansion
+        val = np.array([
+            [1., 2., 3.],
+            [4., 5., 6.],
+        ])
+        array = self.declare_input('array', val=val)
+        expanded_array = ot.expand(array, (2, 4, 3, 1), 'ij->ijab')
+        self.register_output('expanded_array', expanded_array)

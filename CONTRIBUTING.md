@@ -59,8 +59,8 @@ git push fork feature-name
 git checkout master
 # pull changes from collaborators just in case
 git pull upstream master
-# merge changes into master (use --squash option to merge as
-# single commit)
+# merge changes into master (RECOMMENDED: use --squash option to merge
+# as single commit)
 git merge feature-name
 # using a tool like VSCode, open the project and review merge
 # conflicts if any.
@@ -81,36 +81,49 @@ git push fork master
 generate documentation automatically.
 Sphinx uses `.rst` files to generate documentation.
 
+**Please review [Writing Tests](#writing-tests) and [Writing
+Examples](writing-examples) before contibuting to the docs.**
+
 The directive `jupyter-execute` is available for embedding a code
 module and output into documentation. See the documentation for
 [jupyter-sphinx](https://jupyter-sphinx.readthedocs.io/en/latest/) for
 details on how to use the directive.
 
 The directive `code-include` is available for embedding code for a class
-or function, as opposed to the entire module. See the dcumentation for
+or function, as opposed to the entire module. See the documentation for
 [sphinx-code-include](https://sphinx-code-include.readthedocs.io/en/latest/index.html)
 for more details on how to use the directive.
 
 It is recommended to write example code (see the `examples/` directory)
 each time a feature is added.
 Example scripts use the `ex_` prefix by convention.
-Use existing files in `docs/_src_docs/examples/` as a guide.
+Use existing files in `docs/_src_docs/examples/` as a guide for writing
+`.rst` files.
 
 To generate the docs, run `make html` in the `docs/` directory.
 
 ## Writing Examples
 
-All examples are located in the `examples/` directory.
+All example class definitions are located in the `examples/` directory.
 Each example script by convention uses the `ex_` prefix.
 
-Examples should run the model when they are imported.
-Do not include a `if __name__ == "__main__"` clause in your examples.
+`omtools` provides `utils/generate_exaple_scripts.py` for generating
+example run files from `ot.Group` or `ot.ImplicitComponent` class
+definitions in the `examples/` directory.
+The resulting run scripts are written to `examples/documented/` to make
+a distinction between files defining example classes to be used in
+documentation, and example classes to be used only for testing (e.g.
+classes that raise errors).
 
-Prefer checking the partial derivatives in the tests over the examples.
+When defining example classes, give the example class an upper camel
+case name that starts with `Example` if you intend to include it in
+the docs, and `Error` if you plan to test that Python raises an error
+appropriately.
 
 ## Writing Tests
 
-`omtools` uses [pytest](https://docs.pytest.org/en/latest/) to run tests.
+`omtools` uses [pytest](https://docs.pytest.org/en/latest/) to run
+tests.
 Tests for `Expression` subclasses are located in `tests/` and tests for
 stock `Component` subclasses are located in `comps/tests/`.
 
@@ -120,8 +133,9 @@ written in a file with the `test_` prefix.
 Each test within a test suite is defined as a function with the `test_`
 prefix as well.
 
-> NOTE: Not all example scripts must show up in the docs, but all
-> example scripts should have at least one test script.
+> NOTE: Not all example classes must show up in a run file that is
+> inluded in the docs, but all (generated)example scripts should have at
+> least one test script.
 
 A test suite with a single test looks as follows.
 
@@ -129,10 +143,11 @@ A test suite with a single test looks as follows.
 from openmdao.utils.assert_utils import assert_check_partials
 import numpy as np
 import pytest
+# Do not import an example script at the start of the file for a
+# test suite
 
-def test_example_script():
-    # Example script to use for test
-    import omtools.examples.ex_name_of_example as example
+def test_example_with_valid_output():
+    import omtools.examples.valid.ex_name_of_example as example
 
     # Test values
     np.testing.assert_approx_equal(example.prob['var.abs.name'], desired_val)
@@ -141,11 +156,22 @@ def test_example_script():
     # Test partials
     result = example.prob.check_partials(out_stream=None, compact_print=True)
     assert_check_partials(result, atol=1.e-8, rtol=1.e-8)
+
+def test_example_that_raises_error():
+    with pytest.raises(TypeError):
+        import omtools.examples.invalid.ex_name_of_example
 ```
 
 > NOTE: The example script defines a `Problem`, and runs the model upon
 > import. There is no `if __name__ == "__main__"` clause in the example
 > script.
+
+Tests (functions with the `test_` prefix) are designed so that importing
+a generated example script runs the example.
+There should be one test per example, so each test should import an
+example.
+Do not import an example script in a test suite (file with `test_`
+prefix).
 
 To test values, use
 [numpy.assert_approx_equal](https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_approx_equal.html)

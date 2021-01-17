@@ -5,3 +5,7 @@
 .jupyter_container .output {
   background-color: #c9c9c9;
 }
+
+.jupyter_container div.cell_output {
+  background-color: #c9c9c9;
+}
