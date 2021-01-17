@@ -32,3 +32,4 @@ from omtools.std.outer import outer
 from omtools.std.einsum import einsum
 from omtools.std.einsum_new_api import einsum_new_api
 from omtools.comps.implicit_component import ImplicitComponent
+from omtools.utils.options_dictionary import OptionsDictionary

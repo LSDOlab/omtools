@@ -30,8 +30,8 @@ class expand(Expression):
         self.add_predecessor_node(expr)
 
         expr_shape = expr.shape
-        if expr_shape == 1:
-            expr_shape = (1,)
+        if not isinstance(expr_shape, tuple):
+            expr_shape = (expr_shape,)
 
         if not expr_shape == (1,):
             if indices is None:
