@@ -22,12 +22,13 @@ Likewise, if the parent ``Group`` is to use an output registered in
 ``Group.declare_input`` after ``Group.add_subsystem`` for that variable.
 
 .. jupyter-execute::
-  ../../../omtools/examples/ex_simple_explicit_with_subsystems.py
+  ../../../omtools/examples/valid/ex_explicit_with_subsystems.py
 
-Below is an n2 diagram for a ``Group`` with simple binary expressions and a subsystem.
+Below is an n2 diagram for a ``Group`` with simple binary expressions
+and a subsystem.
 The ``Component`` objects added to the model are guaranteed to be
 connected such that there are no unnecessary feedbacks, regardless of
 the order in which each output is defined or registered.
 
 .. embed-n2::
-  ../omtools/examples/ex_simple_explicit_with_subsystems.py
+  ../omtools/examples/valid/ex_explicit_with_subsystems.py

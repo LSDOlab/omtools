@@ -1,11 +1,11 @@
 Indexed Assignments (One Dimensional Indices)
 =============================================
 
-``omtools`` supports specifing ranges as well as individual indices to
+``omtools`` supports specifying ranges as well as individual indices to
 concatenate arrays.
 
 .. jupyter-execute::
-  ../../../omtools/examples/ex_one_dimensional_index_assignment.py
+  ../../../omtools/examples/valid/ex_indices_one_dimensional.py
 
 .. embed-n2 ::
-  ../omtools/examples/ex_one_dimensional_index_assignment.py
+  ../omtools/examples/valid/ex_indices_one_dimensional.py
