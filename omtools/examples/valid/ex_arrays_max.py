@@ -11,9 +11,8 @@ class ExampleMax(Group):
         o = 4
         p = 5
         q = 6
-        """
-        Scalar and Axis-wise maximum of a tensor across the (1,3) axis
-        """
+
+        ## Scalar and Axis-wise maximum of a tensor across the (1,3) axis
 
         # Shape of a tensor
         tensor_shape = (m, n, o, p, q)
@@ -31,9 +30,9 @@ class ExampleMax(Group):
 
         # Computing the minimum across the entire tensor, returns single value
         self.register_output('ScalarMax', ot.max(ten1))
-        """
-        Element-wise minimum between three tensors
-        """
+
+        ## Element-wise minimum between three tensors
+
         m = 2
         n = 3
         # Shape of the three tensors is (2,3)
