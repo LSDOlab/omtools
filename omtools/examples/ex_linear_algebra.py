@@ -59,8 +59,8 @@ class ExampleTranspose(Group):
 class ExampleDot(Group):
     """
     :param var: VecVecDot
-    :param var: TensorVecDot
-    :param var: TenTenDot
+    :param var: TenTenDotFirst
+    :param var: TenTenDotLast
     """
     def setup(self):
 
@@ -96,15 +96,41 @@ class ExampleDot(Group):
         # Vector-Vector Dot Product
         self.register_output('VecVecDot', ot.dot(vec1, vec2))
 
-        # Tensor-Vector Dot Product specifying the first axis for Vector
-        # and Tensor
-        self.register_output('TensorVecDot', ot.dot(ten1,
-                                                    vec1,
-                                                    axes=([0], [0])))
+        # Tensor-Tensor Dot Product specifying the first axis
+        self.register_output('TenTenDotFirst', ot.dot(ten1, ten2, axis=0))
 
-        # Tensor-Tensor Dot Product specifying the first and last axes
-        self.register_output('TenTenDot',
-                             ot.dot(ten1, ten2, axes=([0, 2], [0, 2])))
+        # Tensor-Tensor Dot Product specifying the last axis
+        self.register_output('TenTenDotLast', ot.dot(ten1, ten2, axis=2))
+
+
+class ExampleCross(Group):
+    """
+    :param var: VecVecCross
+    :param var: TenTenCross
+    """
+    def setup(self):
+        # Creating two vectors
+        vecval1 = np.arange(3)
+        vecval2 = np.arange(3) + 1
+
+        vec1 = self.declare_input('vec1', val=vecval1)
+        vec2 = self.declare_input('vec2', val=vecval2)
+
+        # Vector-Vector Cross Product
+        self.register_output('VecVecCross', ot.cross(vec1, vec2, axis=0))
+
+        # Creating two tensors
+        shape = (2, 5, 4, 3)
+        num_elements = np.prod(shape)
+
+        tenval1 = np.arange(num_elements).reshape(shape)
+        tenval2 = np.arange(num_elements).reshape(shape) + 6
+
+        ten1 = self.declare_input('ten1', val=tenval1)
+        ten2 = self.declare_input('ten2', val=tenval2)
+
+        # Tensor-Tensor Dot Product specifying the last axis
+        self.register_output('TenTenCross', ot.cross(ten1, ten2, axis=3))
 
 
 class ExampleInnerProduct(Group):

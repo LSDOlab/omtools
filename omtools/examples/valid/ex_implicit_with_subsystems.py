@@ -39,6 +39,3 @@ prob.model = Group()
 prob.model.add_subsystem('example', ExampleWithSubsystems())
 prob.setup(force_alloc_complex=True)
 prob.run_model()
-
-print('y', prob['y'].shape)
-print(prob['y'])
