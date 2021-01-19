@@ -367,3 +367,23 @@ def test_rotation_matrix():
     partials_error = example.prob.check_partials(
         includes=['comp_tensor2_Rot_x'], out_stream=None, compact_print=True)
     assert_check_partials(partials_error, atol=1.e-5, rtol=1.e-5)
+
+
+def test_pnorm_type_not_positive():
+    with pytest.raises(Exception):
+        import omtools.examples.invalid.ex_linear_algebra_pnorm_type_not_positive as example
+
+
+def test_pnorm_type_not_even():
+    with pytest.raises(Exception):
+        import omtools.examples.invalid.ex_linear_algebra_pnorm_type_not_even as example
+
+
+def test_dot_vec_different_shapes():
+    with pytest.raises(Exception):
+        import omtools.examples.invalid.ex_linear_algebra_dot_vec_different_shapes as example
+
+
+def test_dot_ten_different_shapes():
+    with pytest.raises(Exception):
+        import omtools.examples.invalid.ex_linear_algebra_dot_ten_different_shapes as example
