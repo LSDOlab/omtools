@@ -323,3 +323,63 @@ class ExampleAverage(Group):
         # Output the elementwise average of the axiswise average of matrices M1 ad M2 along the rows
         self.register_output('multiple_matrix_average_along_1',
                              ot.average(M1, M2, axes=(1, )))
+
+
+class ErrorMinMultiInputsAndAxis(Group):
+    def setup(self):
+        # Creating the values for two tensors
+        val1 = np.array([[1, 5, -8], [10, -3, -5]])
+        val2 = np.array([[2, 6, 9], [-1, 2, 4]])
+
+        # Declaring the two input tensors
+        tensor1 = self.declare_input('tensor1', val=val1)
+        tensor2 = self.declare_input('tensor2', val=val2)
+
+        # Creating the output for matrix multiplication
+        self.register_output('ElementwiseMinWithAxis',
+                             ot.min(tensor1, tensor2, axis=0))
+
+
+class ErrorMinInputsNotSameSize(Group):
+    def setup(self):
+        # Creating the values for two tensors
+        val1 = np.array([[1, 5], [10, -3]])
+        val2 = np.array([[2, 6, 9], [-1, 2, 4]])
+
+        # Declaring the two input tensors
+        tensor1 = self.declare_input('tensor1', val=val1)
+        tensor2 = self.declare_input('tensor2', val=val2)
+
+        # Creating the output for matrix multiplication
+        self.register_output('ElementwiseMinWrongSize',
+                             ot.min(tensor1, tensor2))
+
+
+class ErrorMaxMultiInputsAndAxis(Group):
+    def setup(self):
+        # Creating the values for two tensors
+        val1 = np.array([[1, 5, -8], [10, -3, -5]])
+        val2 = np.array([[2, 6, 9], [-1, 2, 4]])
+
+        # Declaring the two input tensors
+        tensor1 = self.declare_input('tensor1', val=val1)
+        tensor2 = self.declare_input('tensor2', val=val2)
+
+        # Creating the output for matrix multiplication
+        self.register_output('ElementwiseMinWithAxis',
+                             ot.max(tensor1, tensor2, axis=0))
+
+
+class ErrorMaxInputsNotSameSize(Group):
+    def setup(self):
+        # Creating the values for two tensors
+        val1 = np.array([[1, 5], [10, -3]])
+        val2 = np.array([[2, 6, 9], [-1, 2, 4]])
+
+        # Declaring the two input tensors
+        tensor1 = self.declare_input('tensor1', val=val1)
+        tensor2 = self.declare_input('tensor2', val=val2)
+
+        # Creating the output for matrix multiplication
+        self.register_output('ElementwiseMinWrongSize',
+                             ot.max(tensor1, tensor2))

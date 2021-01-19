@@ -421,3 +421,23 @@ def test_average():
     assert_check_partials(partials_error_multiple_matrix_axis_1,
                           atol=1.e-6,
                           rtol=1.e-6)
+
+
+def test_min_multi_inputs_and_axis():
+    with pytest.raises(Exception):
+        import omtools.examples.invalid.ex_arrays_min_multi_inputs_and_axis as example
+
+
+def test_min_inputs_not_same_size():
+    with pytest.raises(Exception):
+        import omtools.examples.invalid.ex_arrays_min_inputs_not_same_size as example
+
+
+def test_max_multi_inputs_and_axis():
+    with pytest.raises(Exception):
+        import omtools.examples.invalid.ex_arrays_max_multi_inputs_and_axis as example
+
+
+def test_max_inputs_not_same_size():
+    with pytest.raises(Exception):
+        import omtools.examples.invalid.ex_arrays_max_inputs_not_same_size as example
