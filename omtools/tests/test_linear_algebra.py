@@ -387,3 +387,23 @@ def test_dot_vec_different_shapes():
 def test_dot_ten_different_shapes():
     with pytest.raises(Exception):
         import omtools.examples.invalid.ex_linear_algebra_dot_ten_different_shapes as example
+
+
+def test_cross_different_shapes():
+    with pytest.raises(Exception):
+        import omtools.examples.invalid.ex_linear_algebra_cross_different_shapes as example
+
+
+def test_cross_incorrect_axis_index():
+    with pytest.raises(Exception):
+        import omtools.examples.invalid.ex_linear_algebra_cross_incorrect_axis_index as example
+
+
+def test_matrix_vector_incompatible_shapes():
+    with pytest.raises(Exception):
+        import omtools.examples.invalid.ex_linear_algebra_matrix_vector_incompatible_shapes as example
+
+
+def test_matrix_matrix_incompatible_shapes():
+    with pytest.raises(Exception):
+        import omtools.examples.invalid.ex_linear_algebra_matrix_matrix_incompatible_shapes as example

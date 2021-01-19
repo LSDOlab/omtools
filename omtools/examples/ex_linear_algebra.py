@@ -426,3 +426,84 @@ class ErrorDotTenDifferentShapes(Group):
 
         # Tensor-Tensor Dot Product specifying the first axis
         self.register_output('TenTenDotFirst', ot.dot(ten1, ten2, axis=0))
+
+
+class ErrorCrossDifferentShapes(Group):
+    def setup(self):
+        # Creating two tensors
+        shape1 = (2, 5, 4, 3)
+        shape2 = (7, 5, 6, 3)
+        num_elements1 = np.prod(shape1)
+        num_elements2 = np.prod(shape2)
+
+        tenval1 = np.arange(num_elements1).reshape(shape1)
+        tenval2 = np.arange(num_elements2).reshape(shape2) + 6
+
+        ten1 = self.declare_input('ten1', val=tenval1)
+        ten2 = self.declare_input('ten2', val=tenval2)
+
+        # Tensor-Tensor Dot Product specifying the last axis
+        self.register_output('TenTenCross', ot.cross(ten1, ten2, axis=3))
+
+
+class ErrorCrossIncorrectAxisIndex(Group):
+    def setup(self):
+        # Creating two tensors
+        shape = (2, 5, 4, 3)
+        num_elements = np.prod(shape)
+
+        tenval1 = np.arange(num_elements).reshape(shape)
+        tenval2 = np.arange(num_elements).reshape(shape) + 6
+
+        ten1 = self.declare_input('ten1', val=tenval1)
+        ten2 = self.declare_input('ten2', val=tenval2)
+
+        # Tensor-Tensor Dot Product specifying the last axis
+        self.register_output('TenTenCross', ot.cross(ten1, ten2, axis=2))
+
+
+class ErrorMatrixVectorIncompatibleShapes(Group):
+    def setup(self):
+        m = 3
+        n = 4
+
+        # Shape of the first matrix (3,2)
+        shape1 = (m, n)
+
+        # Shape of the second matrix (2,4)
+        shape2 = (m, )
+
+        # Creating the values of both matrices
+        val1 = np.arange(m * n).reshape(shape1)
+        val2 = np.arange(n).reshape(shape2)
+
+        # Declaring the input matrix and input vector
+        mat1 = self.declare_input('mat1', val=val1)
+        vec1 = self.declare_input('vec1', val=val2)
+
+        # Creating the output for matrix-vector multiplication
+        self.register_output('MatVec', ot.matvec(mat1, vec1))
+
+
+class ErrorMatrixMatrixIncompatibleShapes(Group):
+    def setup(self):
+        m = 3
+        n = 2
+        p = 4
+
+        # Shape of the first matrix (3,2)
+        shape1 = (m, n)
+
+        # Shape of the second matrix (2,4)
+        shape2 = (p, p)
+
+        # Creating the values of both matrices
+        val1 = np.arange(m * n).reshape(shape1)
+        val2 = np.arange(n * p).reshape(shape2)
+
+        # Declaring the two input matrices as mat1 and mat2
+        mat1 = self.declare_input('mat1', val=val1)
+        mat2 = self.declare_input('mat2', val=val2)
+
+        # Creating the output for matrix multiplication
+        self.register_output('MatMat', ot.matmat(mat1, mat2))
