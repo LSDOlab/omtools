@@ -1,14 +1,16 @@
+from typing import Dict, List, Tuple, Union
+
+import numpy as np
+
 from omtools.core.expression import Expression
 from omtools.core.input import Input
 from omtools.core.output import Output
-from omtools.utils.replace_output_leaf_nodes import replace_output_leaf_nodes
-import numpy as np
-from typing import Union, Tuple, Dict, List
-from omtools.utils.slice_to_list import slice_to_list
+from omtools.utils.comps.array_comps.indexed_pass_through_comp import \
+    IndexedPassThroughComp
 from omtools.utils.comps.array_comps.pass_through_comp import PassThroughComp
-from omtools.utils.comps.array_comps.indexed_pass_through_comp import IndexedPassThroughComp
 from omtools.utils.get_shape_val import get_shape_val
-import numpy as np
+from omtools.utils.replace_output_leaf_nodes import replace_output_leaf_nodes
+from omtools.utils.slice_to_list import slice_to_list
 
 
 class ExplicitOutput(Output):
@@ -37,7 +39,7 @@ class ExplicitOutput(Output):
         self.shape, self.val = get_shape_val(shape, val)
         self.defined = False
         self.indexed_assignment = False
-        self.indices: Dict[Expression, List[int]] = {}
+        self._tgt_indices: Dict[str, List[int]] = {}
         self.checked_indices = set()
         self.overlapping_indices = set()
 
@@ -80,47 +82,61 @@ class ExplicitOutput(Output):
             name=name,
         )
 
+    # TODO: index by tuple, not expression
     def __setitem__(
         self,
-        key: Union[int, np.ndarray, slice, Tuple[slice]],
+        key: Union[int, slice, Tuple[slice]],
         expr: Expression,
     ):
         self.add_predecessor_node(expr)
-        flat_dest_indices = []
+        tgt_indices = []
         if isinstance(key, tuple):
-            slices = []
-            for s in key:
-                slices.append(s)
-            slices = [slice_to_list(s) for s in slices]
-            flat_dest_indices = np.ravel_multi_index(
+            slices = [
+                slice_to_list(
+                    s.start,
+                    s.stop,
+                    s.step,
+                ) for s in list(key)
+            ]
+            tgt_indices = np.ravel_multi_index(
                 tuple(np.array(np.meshgrid(*slices, indexing='ij'))),
                 self.shape,
             ).flatten()
         elif isinstance(key, slice):
-            flat_dest_indices = slice_to_list(key)
+            tgt_indices = slice_to_list(
+                key.start,
+                key.stop,
+                key.step,
+            )
         elif isinstance(key, int):
-            flat_dest_indices = [key]
+            tgt_indices = [key]
         else:
             raise TypeError(
-                "When assigning indices of an expression, key must be an int, a slice, or a tple of slices"
+                "When assigning indices of an expression, key must be an int, a slice, or a tuple of slices"
             )
 
         # Check size
-        if np.amax(flat_dest_indices) >= np.prod(self.shape):
+        if np.amax(tgt_indices) >= np.prod(self.shape):
             raise ValueError("Indices given are out of range for " +
                              self.__repr__())
-        self.indices[expr] = flat_dest_indices
+
+        if expr.name in self._tgt_indices.keys():
+            raise KeyError("Repeated use of expression " + expr.name +
+                           " in assignment to elements in " + self.name +
+                           ". Consider using omtools.expand")
+        self._tgt_indices[expr.name] = (expr.shape, tgt_indices)
 
         # Check for overlapping indices
         self.overlapping_indices = self.checked_indices.intersection(
-            flat_dest_indices)
-        self.checked_indices = self.checked_indices.union(flat_dest_indices)
+            tgt_indices)
+        self.checked_indices = self.checked_indices.union(tgt_indices)
         if len(self.overlapping_indices) > 0:
             raise ValueError("Indices used for assignment must not overlap")
 
         self.build = lambda name: IndexedPassThroughComp(
-            expr_indices=self.indices,
-            out_expr=self,
+            expr_indices=self._tgt_indices,
+            out_name=self.name,
+            out_shape=self.shape,
         )
         self.indexed_assignment = True
         self.defined = True

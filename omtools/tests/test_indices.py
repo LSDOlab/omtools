@@ -1,6 +1,6 @@
-from openmdao.utils.assert_utils import assert_check_partials
 import numpy as np
 import pytest
+from openmdao.utils.assert_utils import assert_check_partials
 
 
 def test_integer_index_assignement_overlap():
@@ -15,12 +15,26 @@ def test_integer_index_assignement_out_of_range():
 
 def test_integer_index_assignement():
     import omtools.examples.valid.ex_indices_integer as example
-    np.testing.assert_array_equal(
-        example.prob['x'],
-        np.array([0, 1, 2, 7.4, np.pi, 9, np.pi + 9]),
-    )
+    x = np.array([0, 1, 2, 7.4, np.pi, 9, np.pi + 9])
+    np.testing.assert_array_equal(example.prob['x'], x)
+    np.testing.assert_array_equal(example.prob['x0'], x[0])
+    np.testing.assert_array_equal(example.prob['x0_5'], x[0:5])
+    np.testing.assert_array_equal(example.prob['x3_'], x[3:])
+    np.testing.assert_array_equal(example.prob['x6'], x[6])
+    np.testing.assert_array_equal(example.prob['x2_4'], x[2:4])
+    np.testing.assert_array_equal(example.prob['z'], x[2])
     result = example.prob.check_partials(out_stream=None, compact_print=True)
     assert_check_partials(result, atol=1.e-8, rtol=1.e-8)
+
+
+def test_integer_index_integer_reuse():
+    with pytest.raises(KeyError):
+        import omtools.examples.invalid.ex_indices_integer_reuse as example
+
+
+def test_one_dimensional_index_reuse():
+    with pytest.raises(KeyError):
+        import omtools.examples.invalid.ex_indices_one_dimensional_reuse as example
 
 
 def test_one_dimensional_index_assignement_overlap():
@@ -48,7 +62,7 @@ def test_one_dimensional_index_assignement():
 
 
 def test_multidimensional_dimensional_index_assignement_overlap():
-    with pytest.raises(ValueError):
+    with pytest.raises(KeyError):
         import omtools.examples.invalid.ex_indices_multidimensional_overlap as example
 
 
