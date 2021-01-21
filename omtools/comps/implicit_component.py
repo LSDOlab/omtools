@@ -8,6 +8,7 @@ from openmdao.solvers.solver import Solver
 
 from omtools.core.subsystem import Subsystem
 from omtools.core.expression import Expression
+from omtools.core.explicit_output import ExplicitOutput
 from omtools.core.group import Group
 from omtools.core.input import Input
 from omtools.utils.collect_input_exprs import collect_input_exprs
@@ -23,7 +24,8 @@ def _post_setup(func: Callable) -> Callable:
         g = self.group
         for res_expr in g._root.predecessors:
             if isinstance(res_expr, Subsystem) == False and isinstance(
-                    res_expr, Input) == False:
+                    res_expr, Input) == False and isinstance(
+                        res_expr, ExplicitOutput) == False:
                 # inputs for this residual only
                 in_exprs = set(collect_input_exprs([], res_expr, res_expr))
                 # output corresponding to this residual
@@ -78,7 +80,8 @@ def _post_setup(func: Callable) -> Callable:
 
         # set initial values for inputs and output
         for res_expr in self.group._root.predecessors:
-            if isinstance(res_expr, Subsystem) == False:
+            if isinstance(res_expr, Subsystem) == False and isinstance(
+                    res_expr, ExplicitOutput) == False:
                 out_name = self.group.res_out_map[res_expr.name]
                 if len(self.group.out_vals) == 0:
                     self.prob[out_name] = 1
@@ -138,7 +141,8 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
 
     def _set_values(self, inputs, outputs):
         for res_expr in self.group._root.predecessors:
-            if isinstance(res_expr, Subsystem) == False:
+            if isinstance(res_expr, Subsystem) == False and isinstance(
+                    res_expr, ExplicitOutput) == False:
                 out_name = self.group.res_out_map[res_expr.name]
                 self.prob[out_name] = outputs[out_name]
                 for in_expr in self.all_inputs[out_name]:
@@ -175,7 +179,8 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
 
     def solve_nonlinear(self, inputs, outputs):
         for res_expr in self.group._root.predecessors:
-            if isinstance(res_expr, Subsystem) == False:
+            if isinstance(res_expr, Subsystem) == False and isinstance(
+                    res_expr, ExplicitOutput) == False:
                 out_name = self.group.res_out_map[res_expr.name]
                 shape = res_expr.shape
 

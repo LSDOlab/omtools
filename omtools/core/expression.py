@@ -5,9 +5,18 @@ import numpy as np
 
 from omtools.utils.api import LinearCombinationComp, PowerCombinationComp
 from omtools.utils.gen_hex_name import gen_hex_name
+from omtools.utils.slice_to_list import slice_to_list
 
 # from omtools.std.binops import (ElementwiseAddition, ElementwiseMultiplication,
 # ElementwisePower, ElementwiseSubtraction)
+
+
+def slice_to_tuple(key: slice, size: int) -> tuple:
+    if key.start is None:
+        key = slice(0, key.stop, key.step)
+    if key.stop is None:
+        key = slice(key.start, size, key.step)
+    return (key.start, key.stop, key.step)
 
 
 class Expression():
@@ -93,7 +102,15 @@ class Expression():
         return ElementwiseDivision(other, self)
 
     def initialize(self, *args, **kwargs):
-        pass
+        for k, v in kwargs.items():
+            if k == 'name':
+                self.name = _id
+            if k == 'shape':
+                self.shape = v
+            if k == 'val':
+                self.val = v
+            if k == 'units':
+                self.units = v
 
     def __init__(self, *args, **kwargs):
         Expression._count += 1
@@ -110,12 +127,76 @@ class Expression():
         self._dag_cost = 1
         self.is_residual: bool = False
         self.initialize(*args, **kwargs)
+        self._getitem_called = False
+        self._decomp = None
+        self.indexed_exprs = dict()
+        self.src_indices = dict()
 
     def __getitem__(
         self,
-        key: Union[int, np.ndarray, slice, Tuple[slice]],
+        key: Union[int, slice, Tuple[slice]],
     ):
-        raise NotImplementedError
+        if self._getitem_called == False:
+            self._getitem_called = True
+            self._decomp = Expression(shape=self.shape, val=self.val)
+            self._decomp.name = 'decompose_' + self.name
+            self._decomp.add_predecessor_node(self)
+
+        # store key as a tuple of tuples of ints
+        # no duplicate keys are stored
+        # NOTE: slices are unhashable, so we can't store slices directly
+        if isinstance(key, int):
+            key = ((key, key + 1, None), )
+        elif isinstance(key, slice):
+            key = (slice_to_tuple(
+                key,
+                np.prod(self.shape),
+            ), )
+        elif isinstance(key, tuple):
+            key = tuple([
+                slice_to_tuple(
+                    key[i],
+                    self.shape[i],
+                ) for i in range(len(key))
+            ], )
+        else:
+            raise TypeError("Key must be an int, slice, or tuple(slice)")
+
+        # return expression if reusing key
+        if key in self._decomp.indexed_exprs.keys():
+            print('key', key, 'used again')
+            print(self._decomp.indexed_exprs[key])
+            return self._decomp.indexed_exprs[key]
+
+        # Get flat indices from key to define corresponding component
+        slices = [slice_to_list(s[0], s[1], s[2]) for s in list(key)]
+        src_indices = np.ravel_multi_index(
+            tuple(np.array(np.meshgrid(*slices, indexing='ij'))),
+            self.shape,
+        ).flatten()
+
+        # Check size
+        if np.amax(src_indices) >= np.prod(self.shape):
+            raise ValueError("Indices given are out of range for " +
+                             self.__repr__())
+
+        # Create and store expression to return
+        val = self.val[tuple([slice(s[0], s[1], s[2]) for s in list(key)])]
+        expr = Expression(shape=val.shape, val=val)
+        if key not in self._decomp.indexed_exprs.keys():
+            print('key', key, 'first use')
+            print(expr)
+        self._decomp.indexed_exprs[key] = expr
+        expr.add_predecessor_node(self._decomp)
+        self._decomp.src_indices[expr] = src_indices
+
+        # store function to construct component
+        from omtools.comps.decompose_comp import DecomposeComp
+        self._decomp.build = lambda name: DecomposeComp(
+            in_name=self.name,
+            expr=self._decomp,
+        )
+        return expr
 
     def add_predecessor_node(self, predecessor):
         """
@@ -170,8 +251,9 @@ class Expression():
                         raise ValueError(
                             "Name collision (", node.name, ") between ",
                             nodes[node._id], " and ", node,
-                            "; check that calls to regiser_output and create_* do not give the same name to two outputs"
-                        )
+                            "; check that calls to regiser_output and ",
+                            "create_* do not give the same name to ",
+                            "two outputs")
             else:
                 # register node
                 nodes[node._id] = node
@@ -360,8 +442,11 @@ class ElementwiseAddition(Expression):
                 )
 
             else:
-                raise ValueError("Shapes for expressions ", expr1, " and ",
-                                 expr2, " do not match")
+                raise ValueError(
+                    "Shapes for expressions " + repr(expr1) + " and " +
+                    repr(expr2) +
+                    " do not match. If shapes are as intended (e.g. multiply scalar times array), use `omtools.expand` expression to mimick broadcasting."
+                )
 
         if isinstance(expr1, numbers.Number) and isinstance(expr2, Expression):
 
@@ -415,8 +500,11 @@ class ElementwiseSubtraction(Expression):
                 )
 
             else:
-                raise ValueError("Shapes for expressions ", expr1, " and ",
-                                 expr2, " do not match")
+                raise ValueError(
+                    "Shapes for expressions " + repr(expr1) + " and " +
+                    repr(expr2) +
+                    " do not match. If shapes are as intended (e.g. multiply scalar times array), use `omtools.expand` expression to mimick broadcasting."
+                )
 
         if isinstance(expr1, numbers.Number) and isinstance(expr2, Expression):
 
@@ -470,8 +558,11 @@ class ElementwiseMultiplication(Expression):
                 )
 
             else:
-                raise ValueError("Shapes for expressions ", expr1, " and ",
-                                 expr2, " do not match")
+                raise ValueError(
+                    "Shapes for expressions " + repr(expr1) + " and " +
+                    repr(expr2) +
+                    " do not match. If shapes are as intended (e.g. multiply scalar times array), use `omtools.expand` expression to mimick broadcasting."
+                )
 
         if isinstance(expr1, numbers.Number) and isinstance(expr2, Expression):
 
@@ -529,8 +620,11 @@ class ElementwiseDivision(Expression):
                 )
 
             else:
-                raise ValueError("Shapes for expressions ", expr1, " and ",
-                                 expr2, " do not match")
+                raise ValueError(
+                    "Shapes for expressions " + repr(expr1) + " and " +
+                    repr(expr2) +
+                    " do not match. If shapes are as intended (e.g. multiply scalar times array), use `omtools.expand` expression to mimick broadcasting."
+                )
 
         if isinstance(expr1, numbers.Number) and isinstance(expr2, Expression):
 

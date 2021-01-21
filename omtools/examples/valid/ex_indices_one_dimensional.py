@@ -1,6 +1,7 @@
 from openmdao.api import Problem
-from omtools.api import Group
 import numpy as np
+import omtools.api as ot
+from omtools.api import Group
 
 
 class ExampleOneDimensional(Group):

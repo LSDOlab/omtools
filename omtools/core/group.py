@@ -1,5 +1,5 @@
-from contextlib import contextmanager
 from collections.abc import Iterable
+from contextlib import contextmanager
 from typing import Callable, Dict, Tuple
 
 from openmdao.api import Group as OMGroup
@@ -325,6 +325,12 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         """
         if isinstance(expr, Input):
             raise TypeError("Cannot register input " + expr + " as an output")
+
+        if expr in self._root.predecessors:
+            raise ValueError(
+                "Cannot register output twice; attempting to register " +
+                expr.name + " as " + name)
+
         expr.name = name
         self._root.add_predecessor_node(expr)
         return expr
@@ -333,9 +339,9 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         self,
         name: str,
         subsys: System,
-        promotes=None,
-        promotes_inputs=None,
-        promotes_outputs=None,
+        promotes: Iterable = None,
+        promotes_inputs: Iterable = None,
+        promotes_outputs: Iterable = None,
     ):
         """
         Add a subsystem to the ``Group``.
@@ -378,6 +384,16 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
 
     @contextmanager
     def create_group(self, name: str):
+        """
+        Create a ``Group`` object and add as a subsystem, promoting all
+        inputs and outputs.
+        For use in ``with`` contexts.
+
+        Parameters
+        ----------
+        name: str
+            Name of new child ``Group`` object
+        """
         try:
             group = Group()
             self.add_subsystem(name, group, promotes=['*'])
