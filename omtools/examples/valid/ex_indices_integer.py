@@ -22,14 +22,9 @@ class ExampleInteger(Group):
         x[5] = f
         x[6] = g
 
-        # get value from indices
-        z = self.create_output('z', shape=(3, ))
-        z[0:3] = ot.expand(x[2], (3, ))
+        # Get value from indices
         self.register_output('x0', x[0])
-        self.register_output('x0_5', x[0:5])
-        self.register_output('x3_', x[3:])
         self.register_output('x6', x[6])
-        self.register_output('x2_4', x[2:4])
 
 
 prob = Problem()
@@ -41,13 +36,5 @@ print('x', prob['x'].shape)
 print(prob['x'])
 print('x0', prob['x0'].shape)
 print(prob['x0'])
-print('x0_5', prob['x0_5'].shape)
-print(prob['x0_5'])
-print('x3_', prob['x3_'].shape)
-print(prob['x3_'])
 print('x6', prob['x6'].shape)
 print(prob['x6'])
-print('x2_4', prob['x2_4'].shape)
-print(prob['x2_4'])
-print('z', prob['z'].shape)
-print(prob['z'])

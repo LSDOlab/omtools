@@ -8,11 +8,7 @@ class ExampleInteger(Group):
     """
     :param var: x
     :param var: x0
-    :param var: x0_5
-    :param var: x3_
     :param var: x6
-    :param var: x2_4
-    :param var: z
     """
     def setup(self):
         a = self.declare_input('a', val=0)
@@ -31,14 +27,9 @@ class ExampleInteger(Group):
         x[5] = f
         x[6] = g
 
-        # get value from indices
-        z = self.create_output('z', shape=(3, ))
-        z[0:3] = ot.expand(x[2], (3, ))
+        # Get value from indices
         self.register_output('x0', x[0])
-        self.register_output('x0_5', x[0:5])
-        self.register_output('x3_', x[3:])
         self.register_output('x6', x[6])
-        self.register_output('x2_4', x[2:4])
 
 
 class ErrorIntegerReuse(Group):
@@ -57,6 +48,10 @@ class ExampleOneDimensional(Group):
     """
     :param var: x
     :param var: y
+    :param var: z
+    :param var: x0_5
+    :param var: x3_
+    :param var: x2_4
     """
     def setup(self):
         n = 20
@@ -75,6 +70,13 @@ class ExampleOneDimensional(Group):
         y[0:n - 4] = 2 * (v + 1)
         y[n - 4:n] = w - 3
 
+        # Get value from indices
+        z = self.create_output('z', shape=(3, ))
+        z[0:3] = ot.expand(x[2], (3, ))
+        self.register_output('x0_5', x[0:5])
+        self.register_output('x3_', x[3:])
+        self.register_output('x2_4', x[2:4])
+
 
 class ErrorOneDimensionalReuse(Group):
     def setup(self):
@@ -91,6 +93,7 @@ class ExampleMultidimensional(Group):
     """
     :param var: x
     :param var: q
+    :param var: r
     """
     def setup(self):
         # Works with two dimensional arrays
@@ -106,6 +109,9 @@ class ExampleMultidimensional(Group):
                                val=np.arange(30).reshape((5, 2, 3)))
         q = self.create_output('q', shape=(5, 2, 3))
         q[0:5, 0:2, 0:3] = p
+
+        # Get value from indices
+        self.register_output('r', p[0, :, :])
 
 
 class ErrorIntegerOutOfRange(Group):
