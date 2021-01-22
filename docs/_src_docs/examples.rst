@@ -23,9 +23,7 @@ give an idea of how expressions are transformed to OpenMDAO
    examples/simple_explicit_with_subsystems.rst
    examples/ignored_outputs.rst
    examples/indep.rst
-   examples/indexed_assignments_integer.rst
-   examples/indexed_assignments_1d.rst
-   examples/indexed_assignments_nd.rst
+   examples/indexing.rst
    examples/implicit_relationships.rst
    examples/implicit_with_subsystems.rst
    examples/unary_exprs.rst

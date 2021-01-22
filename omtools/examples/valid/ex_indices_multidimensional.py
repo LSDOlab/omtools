@@ -20,6 +20,9 @@ class ExampleMultidimensional(Group):
         q = self.create_output('q', shape=(5, 2, 3))
         q[0:5, 0:2, 0:3] = p
 
+        # Get value from indices
+        self.register_output('r', p[0, :, :])
+
 
 prob = Problem()
 prob.model = ExampleMultidimensional()
@@ -30,3 +33,5 @@ print('x', prob['x'].shape)
 print(prob['x'])
 print('q', prob['q'].shape)
 print(prob['q'])
+print('r', prob['r'].shape)
+print(prob['r'])

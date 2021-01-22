@@ -153,19 +153,27 @@ class Expression():
                 np.prod(self.shape),
             ), )
         elif isinstance(key, tuple):
-            key = tuple([
-                slice_to_tuple(
-                    key[i],
-                    self.shape[i],
-                ) for i in range(len(key))
-            ], )
+            l = []
+            for i in range(len(key)):
+                if isinstance(key[i], slice):
+                    l.append(slice_to_tuple(
+                        key[i],
+                        self.shape[i],
+                    ))
+                elif isinstance(key[i], int):
+                    l.append(
+                        slice_to_tuple(
+                            slice(key[i], key[i] + 1, None),
+                            self.shape,
+                        ))
+            key = tuple(l)
         else:
-            raise TypeError("Key must be an int, slice, or tuple(slice)")
+            raise TypeError(
+                "Key must be an int, slice, or tuple object containing slice and/or int objects"
+            )
 
         # return expression if reusing key
         if key in self._decomp.indexed_exprs.keys():
-            print('key', key, 'used again')
-            print(self._decomp.indexed_exprs[key])
             return self._decomp.indexed_exprs[key]
 
         # Get flat indices from key to define corresponding component
@@ -183,9 +191,6 @@ class Expression():
         # Create and store expression to return
         val = self.val[tuple([slice(s[0], s[1], s[2]) for s in list(key)])]
         expr = Expression(shape=val.shape, val=val)
-        if key not in self._decomp.indexed_exprs.keys():
-            print('key', key, 'first use')
-            print(expr)
         self._decomp.indexed_exprs[key] = expr
         expr.add_predecessor_node(self._decomp)
         self._decomp.src_indices[expr] = src_indices
