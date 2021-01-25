@@ -28,4 +28,4 @@ give an idea of how expressions are transformed to OpenMDAO
    examples/implicit_with_subsystems.rst
    examples/unary_exprs.rst
    examples/cyclic_relationships.rst
-   examples/expand.rst
+   examples/expand/expand.rst
