@@ -10,7 +10,6 @@ Examples for all the possible use cases are provided below.
    :titlesonly:
 
    ex_matmat_mat_mat_product.rst
-   ex_matmat_mat_vec_product.rst
 
 
 

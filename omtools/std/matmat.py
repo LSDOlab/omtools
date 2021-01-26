@@ -10,7 +10,7 @@ class matmat(Expression):
             self.add_predecessor_node(mat1)
             self.add_predecessor_node(mat2)
 
-            if mat1.shape[1] == mat2.shape[0] and len(mat2.shape) > 1:
+            if mat1.shape[1] == mat2.shape[0] and len(mat2.shape) == 2:
                 # Compute the output shape if both inputs are matrices
                 self.shape = (mat1.shape[0], mat2.shape[1])
 
@@ -22,7 +22,7 @@ class matmat(Expression):
                 )
                          
             elif mat1.shape[1] == mat2.shape[0] and len(mat2.shape) == 1:
-                self.shape = (mat1.shape[0], )
+                self.shape = (mat1.shape[0], 1)
 
                 mat2_shape = (mat2.shape[0], 1)
 
