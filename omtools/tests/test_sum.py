@@ -46,9 +46,9 @@ def test_sum_single_tensor():
     import omtools.examples.valid.ex_sum_single_tensor as example
 
     n = 3
-    m = 6
-    p = 7
-    q = 10
+    m = 4
+    p = 5
+    q = 6
 
     T1 = np.arange(n * m * p * q).reshape((n, m, p, q))
 
@@ -61,7 +61,7 @@ def test_sum_single_tensor():
         includes=['comp_single_tensor_sum'],
         out_stream=None,
         compact_print=True)
-    # assert_check_partials(partials_error_tensor_sum, atol=1.e-6, rtol=1.e-6)
+    assert_check_partials(partials_error_tensor_sum, atol=1.e-5, rtol=1.e-5)
 
 
 def test_sum_multiple_vector():

@@ -7,9 +7,9 @@ import numpy as np
 class ExampleSingleTensor(Group):
     def setup(self):
         n = 3
-        m = 6
-        p = 7
-        q = 10
+        m = 4
+        p = 5
+        q = 6
 
         # Declare a tensor of shape 3x6x7x10 as input
         T1 = self.declare_input('T1',
