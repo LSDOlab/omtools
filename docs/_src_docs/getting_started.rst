@@ -17,7 +17,7 @@ give an idea of how expressions are transformed to OpenMDAO
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :titlesonly:
 
    examples/getting_started/basic_user_guide.rst

@@ -2,18 +2,6 @@ Additional Examples
 =====================
 
 
-Organizing Omtools Groups
---------------------------
-.. toctree::
-   :maxdepth: 1
-   :titlesonly:
-
-   ot_group_in_ot_group.rst
-   ot_group_in_om_group.rst
-   om_group_in_ot_group.rst
-
-
-
 Array Indexing
 ---------------
 .. toctree::
@@ -40,5 +28,15 @@ Cyclic Relationships
    :titlesonly:
    
    cyclic_relationships.rst
+
+Organizing Omtools Groups
+--------------------------
+.. toctree::
+   :maxdepth: 1
+   :titlesonly:
+
+   groups.rst
+
+
 
 

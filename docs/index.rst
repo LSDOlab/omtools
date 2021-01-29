@@ -43,7 +43,7 @@ Documentation
 -------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 5
    :titlesonly:
 
 

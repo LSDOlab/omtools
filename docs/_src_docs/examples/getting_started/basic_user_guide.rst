@@ -7,7 +7,7 @@ In ``Simple Explicit Expressions with Subsystems`` there is an example of how to
 
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :titlesonly:
 
    simple_explicit.rst
