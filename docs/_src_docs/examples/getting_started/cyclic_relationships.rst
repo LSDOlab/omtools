@@ -10,7 +10,7 @@ refer to different variables, depending on which subsystem they belong
 to.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_explicit_cycles.py
+  ../../../../omtools/examples/valid/ex_explicit_cycles.py
 
 .. embed-n2 ::
   ../omtools/examples/valid/ex_explicit_cycles.py

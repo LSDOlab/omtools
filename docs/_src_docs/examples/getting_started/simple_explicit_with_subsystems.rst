@@ -12,17 +12,17 @@ objects, the user is responsible for calling ``Group.add_subsystem``
 after the parent ``Group``'s outputs are registered, and before the
 parent ``Group``'s inputs are declared.
 
-In this example, ``'sys'`` declares ``'x1'`` as an input, so the user
+In this example, ``'subsystem'`` declares ``'x1'`` as an input, so the user
 must create an ``'x1'`` output in the parent ``Group`` prior to the call
 to ``Group.add_subsystem`` in order to update the input values in
 ``'sys'``.
 
 Likewise, if the parent ``Group`` is to use an output registered in
-``'sys'``, such as ``'x2'``, then the user must call
+``'subsystem'``, such as ``'x2'``, then the user must call
 ``Group.declare_input`` after ``Group.add_subsystem`` for that variable.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_explicit_with_subsystems.py
+  ../../../../omtools/examples/valid/ex_explicit_with_subsystems.py
 
 Below is an n2 diagram for a ``Group`` with simple binary expressions
 and a subsystem.

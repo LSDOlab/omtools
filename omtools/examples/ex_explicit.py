@@ -26,6 +26,7 @@ class ExampleBinaryOperations(Group):
     :param var: y8
     :param var: y9
     :param var: y10
+    :param var: y11
     """
     def setup(self):
         # declare inputs with default values
@@ -33,32 +34,43 @@ class ExampleBinaryOperations(Group):
         x2 = self.declare_input('x2', val=3)
         x3 = self.declare_input('x3', val=np.arange(7))
 
-        # Elementwise addition
-        y1 = x2 + x1
+        # Expressions with multiple binary operations
+        y1 = -2 * x1**2 + 4 * x2 + 3
         self.register_output('y1', y1)
 
+        # Elementwise addition
+        y2 = x2 + x1
+
         # Elementwise subtraction
-        self.register_output('y2', x2 - x1)
+        y3 = x2 - x1
 
         # Elementwise multitplication
-        self.register_output('y3', x1 * x2)
+        y4 = x1 * x2
 
         # Elementwise division
-        self.register_output('y4', x1 / x2)
-        self.register_output('y5', x1 / 3)
-        self.register_output('y6', 2 / x2)
+        y5 = x1 / x2
+        y6 = x1 / 3
+        y7 = 2 / x2
 
         # Elementwise Power
         y8 = x2**2
+        y9 = x1**2
+
+        self.register_output('y2', y2)
+        self.register_output('y3', y3)
+        self.register_output('y4', y4)
+        self.register_output('y5', y5)
+        self.register_output('y6', y6)
+        self.register_output('y7', y7)
         self.register_output('y8', y8)
-        self.register_output('y7', x1**2)
+        self.register_output('y9', y9)
 
         # Adding other expressions
-        self.register_output('y9', y1 + y8)
+        self.register_output('y10', y1 + y7)
 
         # Array of powers
-        y10 = x3**(2 * np.ones(7))
-        self.register_output('y10', y10)
+        y11 = x3**(2 * np.ones(7))
+        self.register_output('y11', y11)
 
 
 class ExampleCycles(Group):
@@ -154,15 +166,17 @@ class ExampleWithSubsystems(Group):
 
         # Create subsystem that depends on previously created
         # independent variable
-        group = Group()
-        # This value is overwritten by connection
-        a = group.declare_input('x1', val=2)
-        b = group.create_indep_var('x2', val=12)
-        group.register_output('prod', a * b)
-        self.add_subsystem('sys', group, promotes=['*'])
+        subgroup = Group()
+
+        # This value is overwritten by connection from the main group
+        a = subgroup.declare_input('x1', val=2)
+        b = subgroup.create_indep_var('x2', val=12)
+        subgroup.register_output('prod', a * b)
+        self.add_subsystem('subsystem', subgroup, promotes=['*'])
 
         # declare inputs with default values
         # This value is overwritten by connection
+        # from the subgroup
         x2 = self.declare_input('x2', val=3)
 
         # Simple addition

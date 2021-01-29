@@ -47,7 +47,7 @@ Documentation
    :titlesonly:
 
 
-   _src_docs/examples
+   _src_docs/getting_started.rst
    _src_docs/api/omtools_group.rst
    _src_docs/api/library_of_operations.rst
    _src_docs/api/omtools_backend.rst

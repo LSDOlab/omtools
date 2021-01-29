@@ -9,7 +9,7 @@ expressions/variables into one variable and extract values from a single
 variable representing an array.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_indices_integer.py
+  ../../../../omtools/examples/valid/ex_indices_integer.py
 
 Here is the n2 diagram:
 
@@ -20,7 +20,7 @@ Here is the n2 diagram:
 slice and concatenate arrays.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_indices_one_dimensional.py
+  ../../../../omtools/examples/valid/ex_indices_one_dimensional.py
 
 .. embed-n2 ::
   ../omtools/examples/valid/ex_indices_one_dimensional.py
@@ -29,7 +29,7 @@ slice and concatenate arrays.
 individual indices and ranges to slice and concatenate arrays.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_indices_multidimensional.py
+  ../../../../omtools/examples/valid/ex_indices_multidimensional.py
 
 .. embed-n2 ::
   ../omtools/examples/valid/ex_indices_multidimensional.py

@@ -10,7 +10,7 @@ diagram for this model, other than the ``Component`` objects that
 correspond to the outputs registered in ``'sys'``.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_explicit_no_registered_output.py
+  ../../../../omtools/examples/valid/ex_explicit_no_registered_output.py
 
 .. embed-n2 ::
   ../omtools/examples/valid/ex_explicit_no_registered_output.py

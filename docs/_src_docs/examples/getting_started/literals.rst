@@ -8,7 +8,7 @@ Then, the user forms an expression from the inputs and registers the
 output with ``Group.register_output``.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_explicit_literals.py
+  ../../../../omtools/examples/valid/ex_explicit_literals.py
 
 Below, we see how ``omtools`` directs ``OpenMDAO`` to construct a
 ``Component`` object for each operation.

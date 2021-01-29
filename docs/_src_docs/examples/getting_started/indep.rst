@@ -14,7 +14,7 @@ model even though there are no dependencies on the independent variable
 within the model.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_indep_var_simple.py
+  ../../../../omtools/examples/valid/ex_indep_var_simple.py
 
 .. embed-n2 ::
   ../omtools/examples/valid/ex_indep_var_simple.py

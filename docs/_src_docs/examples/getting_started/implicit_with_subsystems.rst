@@ -30,7 +30,7 @@ Both ``a`` and ``b`` are outputs of subsystems used to define the
 residual.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_implicit_with_subsystems.py
+  ../../../../omtools/examples/valid/ex_implicit_with_subsystems.py
 
 
 Note that calls to ``ImplicitComponent.add_subsystem`` result in adding
@@ -51,9 +51,9 @@ Just as with residuals that do not require subsystems to converge,
 bracketing solutions is an option as well.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_implicit_with_subsystems_bracketed_scalar.py
+  ../../../../omtools/examples/valid/ex_implicit_with_subsystems_bracketed_scalar.py
 
 Brackets may also be specified for multidimensional array values.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_implicit_with_subsystems_bracketed_array.py
+  ../../../../omtools/examples/valid/ex_implicit_with_subsystems_bracketed_array.py

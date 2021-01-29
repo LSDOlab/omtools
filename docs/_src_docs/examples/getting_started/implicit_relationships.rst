@@ -10,7 +10,7 @@ Depending on the starting value of the output variable, OpenMDAO will
 find one root or the other.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_implicit_apply_nonlinear.py
+  ../../../../omtools/examples/valid/ex_implicit_apply_nonlinear.py
   :hide-output:
 
 .. jupyter-execute::
@@ -43,9 +43,9 @@ multiple solutions, or where the residual is difficult to converge over
 some interval, ``omtools`` provides an API for bracketing solutions.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_implicit_bracketed_scalar.py
+  ../../../../omtools/examples/valid/ex_implicit_bracketed_scalar.py
 
 Brackets may also be specified for multidimensional array values.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_implicit_bracketed_array.py
+  ../../../../omtools/examples/valid/ex_implicit_bracketed_array.py

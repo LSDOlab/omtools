@@ -15,15 +15,17 @@ class ExampleWithSubsystems(Group):
 
         # Create subsystem that depends on previously created
         # independent variable
-        group = Group()
-        # This value is overwritten by connection
-        a = group.declare_input('x1', val=2)
-        b = group.create_indep_var('x2', val=12)
-        group.register_output('prod', a * b)
-        self.add_subsystem('sys', group, promotes=['*'])
+        subgroup = Group()
+
+        # This value is overwritten by connection from the main group
+        a = subgroup.declare_input('x1', val=2)
+        b = subgroup.create_indep_var('x2', val=12)
+        subgroup.register_output('prod', a * b)
+        self.add_subsystem('subsystem', subgroup, promotes=['*'])
 
         # declare inputs with default values
         # This value is overwritten by connection
+        # from the subgroup
         x2 = self.declare_input('x2', val=3)
 
         # Simple addition

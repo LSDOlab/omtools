@@ -11,7 +11,7 @@ expressions so that the ``Component`` objects do not have any
 unnecessary feedbacks.
 
 .. jupyter-execute::
-  ../../../omtools/examples/valid/ex_explicit_binary_operations.py
+  ../../../../omtools/examples/valid/ex_explicit_binary_operations.py
 
 The ``Component`` objects added to the model are guaranteed to be
 connected such that there are no unnecessary feedbacks, regardless of

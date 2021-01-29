@@ -1,5 +1,5 @@
-Getting Started with Examples
-=============================
+Getting Started 
+================
 
 The examples below will help get you started with ``omtools``.
 ``omtools`` provides its own ``Group`` class, which inherits from
@@ -14,18 +14,12 @@ The examples below include ``omtools`` expressions and n2 diagrams to
 give an idea of how expressions are transformed to OpenMDAO
 ``Component`` objects.
 
+
+
 .. toctree::
    :maxdepth: 2
    :titlesonly:
 
-   examples/literals.rst
-   examples/simple_explicit.rst
-   examples/simple_explicit_with_subsystems.rst
-   examples/ignored_outputs.rst
-   examples/indep.rst
-   examples/indexing.rst
-   examples/implicit_relationships.rst
-   examples/implicit_with_subsystems.rst
-   examples/unary_exprs.rst
-   examples/cyclic_relationships.rst
-   examples/expand/expand.rst
+   examples/getting_started/basic_user_guide.rst
+   examples/getting_started/additional_examples.rst
+
