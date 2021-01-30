@@ -6,7 +6,7 @@ implemented so far.
 
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :titlesonly:
 
    ../examples/library_of_operations/unary_expressions.rst
@@ -14,14 +14,14 @@ implemented so far.
 
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :titlesonly:
 
    ../examples/library_of_operations/array_operations.rst
 
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :titlesonly:
 
 
@@ -30,7 +30,7 @@ implemented so far.
    
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :titlesonly:
 
 
