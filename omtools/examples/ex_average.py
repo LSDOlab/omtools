@@ -4,6 +4,10 @@ import numpy as np
 
 
 class ExampleSingleVector(Group):
+    """
+    :param var: v1
+    :param var: single_vector_average
+    """
     def setup(self):
         n = 3
 
@@ -15,6 +19,10 @@ class ExampleSingleVector(Group):
 
 
 class ExampleSingleMatrix(Group):
+    """
+    :param var: M1
+    :param var: single_matrix_average
+    """
     def setup(self):
         n = 3
         m = 6
@@ -27,6 +35,10 @@ class ExampleSingleMatrix(Group):
 
 
 class ExampleSingleTensor(Group):
+    """
+    :param var: T1
+    :param var: single_tensor_average
+    """
     def setup(self):
         n = 3
         m = 6
@@ -43,6 +55,11 @@ class ExampleSingleTensor(Group):
 
 
 class ExampleMultipleVector(Group):
+    """
+    :param var: v1
+    :param var: v2
+    :param var: multiple_vector_average
+    """
     def setup(self):
         n = 3
 
@@ -57,6 +74,11 @@ class ExampleMultipleVector(Group):
 
 
 class ExampleMultipleMatrix(Group):
+    """
+    :param var: M1
+    :param var: M2
+    :param var: multiple_matrix_average
+    """
     def setup(self):
         n = 3
         m = 6
@@ -74,6 +96,11 @@ class ExampleMultipleMatrix(Group):
 
 
 class ExampleMultipleTensor(Group):
+    """
+    :param var: T1
+    :param var: T2
+    :param var: multiple_tensor_average
+    """
     def setup(self):
         n = 3
         m = 6
@@ -95,6 +122,10 @@ class ExampleMultipleTensor(Group):
 
 
 class ExampleSingleMatrixAlong0(Group):
+    """
+    :param var: M1
+    :param var: single_matrix_average_along_0
+    """
     def setup(self):
         n = 3
         m = 6
@@ -108,6 +139,10 @@ class ExampleSingleMatrixAlong0(Group):
 
 
 class ExampleSingleMatrixAlong1(Group):
+    """
+    :param var: M1
+    :param var: single_matrix_average_along_1
+    """
     def setup(self):
         n = 3
         m = 6
@@ -121,6 +156,11 @@ class ExampleSingleMatrixAlong1(Group):
 
 
 class ExampleMultipleMatrixAlong0(Group):
+    """
+    :param var: M1
+    :param var: M2
+    :param var: multiple_matrix_average_along_0
+    """
     def setup(self):
         n = 3
         m = 6
@@ -139,6 +179,11 @@ class ExampleMultipleMatrixAlong0(Group):
 
 
 class ExampleMultipleMatrixAlong1(Group):
+    """
+    :param var: M1
+    :param var: M2
+    :param var: multiple_matrix_average_along_1
+    """
     def setup(self):
         n = 3
         m = 6

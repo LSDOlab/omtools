@@ -20,3 +20,8 @@ prob = Problem()
 prob.model = ExampleSingleMatrix()
 prob.setup(force_alloc_complex=True)
 prob.run_model()
+
+print('M1', prob['M1'].shape)
+print(prob['M1'])
+print('single_matrix_average', prob['single_matrix_average'].shape)
+print(prob['single_matrix_average'])

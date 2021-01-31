@@ -21,3 +21,8 @@ prob = Problem()
 prob.model = ExampleSingleMatrixAlong0()
 prob.setup(force_alloc_complex=True)
 prob.run_model()
+
+print('M1', prob['M1'].shape)
+print(prob['M1'])
+print('single_matrix_average_along_0', prob['single_matrix_average_along_0'].shape)
+print(prob['single_matrix_average_along_0'])

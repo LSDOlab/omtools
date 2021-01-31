@@ -1,6 +1,6 @@
 Outer
 ======
-This function allows you to take the inner product. 
+This function allows you to take the outer product. 
 
 
 Examples for all the possible use cases are provided below.

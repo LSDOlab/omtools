@@ -2,13 +2,13 @@ Matrix-Vector Multiplication
 =============================
 This function allows you to compute matrix-vector multiplication.
 
-Examples for all the possible use cases are provided below.
+An example of how to use the operation is provided below.
 
-.. toctree::
-   :maxdepth: 1
-   :titlesonly:
+.. jupyter-execute::
+  ../../../../omtools/examples/valid/ex_matvec_mat_vec_product.py
 
-   ex_matvec_mat_vec_product.rst
+.. embed-n2 ::
+  ../omtools/examples/valid/ex_matvec_mat_vec_product.py
 
 
 

@@ -24,3 +24,8 @@ prob = Problem()
 prob.model = ExampleSingleTensor()
 prob.setup(force_alloc_complex=True)
 prob.run_model()
+
+print('T1', prob['T1'].shape)
+print(prob['T1'])
+print('single_tensor_average', prob['single_tensor_average'].shape)
+print(prob['single_tensor_average'])

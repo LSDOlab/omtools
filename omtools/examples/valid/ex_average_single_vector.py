@@ -19,3 +19,8 @@ prob = Problem()
 prob.model = ExampleSingleVector()
 prob.setup(force_alloc_complex=True)
 prob.run_model()
+
+print('v1', prob['v1'].shape)
+print(prob['v1'])
+print('single_vector_average', prob['single_vector_average'].shape)
+print(prob['single_vector_average'])

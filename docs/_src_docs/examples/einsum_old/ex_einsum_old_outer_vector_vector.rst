@@ -2,7 +2,7 @@ Vector-Vector Outer Product using Einsum
 =========================================
 
 This is an example of how to properly use the einsum function 
-to compute a vector-vector inner product.
+to compute a vector-vector outer product.
 
 .. jupyter-execute::
   ../../../../omtools/examples/valid/ex_einsum_old_outer_vector_vector.py

@@ -1,6 +1,6 @@
 Cross
 ======
-This function allows you to take the dot product. 
+This function allows you to take the cross product. 
 
 
 Examples for all the possible use cases are provided below.
