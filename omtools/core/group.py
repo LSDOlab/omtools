@@ -233,6 +233,12 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
             An object to use in expressions
         """
         indep = Indep(name, shape=shape, val=val, dv=False)
+
+        # Ensure that independent variables are always at the top of n2
+        # diagram
+        if self._most_recently_added_subsystem is not None:
+            self._most_recently_added_subsystem.add_predecessor_node(indep)
+
         # NOTE: We choose to always include IndepVarComp objects, even
         # if they are not used by other Component objects
         self.register_output(name, indep)
@@ -374,6 +380,13 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
             promotes_inputs=promotes_inputs,
             promotes_outputs=promotes_outputs,
         )
+        # Ensure that independent variables are always at the top of n2
+        # diagram
+        for pred in self._root.predecessors:
+            if isinstance(pred, Indep):
+                self._most_recently_added_subsystem.add_predecessor_node(pred)
+
+        # Add subystem to DAG
         self._root.add_predecessor_node(self._most_recently_added_subsystem)
         return subsys
 
