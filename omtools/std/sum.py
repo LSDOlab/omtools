@@ -4,8 +4,9 @@ from omtools.core.expression import Expression
 from typing import List
 import numpy as np
 
+
 class sum(Expression):
-    def initialize(self, *summands: List[Expression], axes = None):   
+    def initialize(self, *summands: List[Expression], axes=None):
         for expr in summands:
             if isinstance(expr, Expression) == False:
                 raise TypeError(expr, " is not an Expression object")
@@ -14,35 +15,35 @@ class sum(Expression):
 
         if axes == None:
             if len(summands) == 1:
-                self.build = lambda name: SingleTensorSumComp(
+                self.build = lambda: SingleTensorSumComp(
                     in_name=expr.name,
-                    shape = expr.shape,
-                    out_name = name,
+                    shape=expr.shape,
+                    out_name=self.name,
                 )
             else:
                 self.shape = expr.shape
-                self.build = lambda name: MultipleTensorSumComp(
+                self.build = lambda: MultipleTensorSumComp(
                     in_names=[expr.name for expr in summands],
-                    shape = expr.shape,
-                    out_name = name,
+                    shape=expr.shape,
+                    out_name=self.name,
                 )
         else:
             output_shape = np.delete(expr.shape, axes)
             self.shape = tuple(output_shape)
 
             if len(summands) == 1:
-                self.build = lambda name: SingleTensorSumComp(
+                self.build = lambda: SingleTensorSumComp(
                     in_name=expr.name,
-                    shape = expr.shape,
-                    out_name = name,
-                    out_shape = self.shape,
-                    axes = axes,
+                    shape=expr.shape,
+                    out_name=self.name,
+                    out_shape=self.shape,
+                    axes=axes,
                 )
             else:
-                self.build = lambda name: MultipleTensorSumComp(
+                self.build = lambda: MultipleTensorSumComp(
                     in_names=[expr.name for expr in summands],
-                    shape = expr.shape,
-                    out_name = name,
-                    out_shape = self.shape,
-                    axes = axes,
-                )            
+                    shape=expr.shape,
+                    out_name=self.name,
+                    out_shape=self.shape,
+                    axes=axes,
+                )

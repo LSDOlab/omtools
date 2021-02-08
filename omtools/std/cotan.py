@@ -8,10 +8,10 @@ class cotan(Expression):
             self.shape = expr.shape
             self.add_predecessor_node(expr)
 
-            self.build = lambda name: CotanComp(
+            self.build = lambda: CotanComp(
                 shape=expr.shape,
                 in_name=expr.name,
-                out_name=name,
+                out_name=self.name,
             )
 
         else:

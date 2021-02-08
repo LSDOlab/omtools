@@ -77,9 +77,9 @@ class ExplicitOutput(Output):
             Input(self.name, shape=self.shape, val=self.val),
         )
 
-        self.build = lambda name: PassThroughComp(
+        self.build = lambda: PassThroughComp(
             expr=expr,
-            name=name,
+            name=self.name,
         )
 
     # TODO: index by tuple, not expression
@@ -133,7 +133,7 @@ class ExplicitOutput(Output):
         if len(self.overlapping_indices) > 0:
             raise ValueError("Indices used for assignment must not overlap")
 
-        self.build = lambda name: IndexedPassThroughComp(
+        self.build = lambda: IndexedPassThroughComp(
             expr_indices=self._tgt_indices,
             out_name=self.name,
             out_shape=self.shape,

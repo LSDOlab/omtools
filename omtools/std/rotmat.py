@@ -14,10 +14,10 @@ class rotmat(Expression):
             else:
                 self.shape = angle.shape + (3, 3)
 
-            self.build = lambda name: RotationMatrixComp(
+            self.build = lambda: RotationMatrixComp(
                 shape=angle.shape,
                 in_name=angle.name,
-                out_name=name,
+                out_name=self.name,
                 axis=axis,
             )
 

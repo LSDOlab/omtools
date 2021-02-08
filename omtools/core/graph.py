@@ -74,16 +74,17 @@ def topological_sort(node: Expression) -> List[Expression]:
         # Use <= instead of < to ensure that the root node (with zero
         # successors) is visited; otherwise, no nodes will be added to
         # the list of sorted nodes
-        if v.times_visited <= v.num_successors:
+        if v.times_visited <= v.get_num_successors():
             # Iterative Depth First Search (DFS) for a DAG, but node is
-            # considered visited/discovered only if all of its parents
-            # have been visited/discovered; the >= condition ensures
-            # that a node with no successors is never added
+            # added to the list of sorted nodes only if all of its parents
+            # have been added to the list of sorted nodes;
+            # the >= condition ensures that a node with no successors is
+            # never added
             v.incr_times_visited()
-            if v.times_visited >= v.num_successors:
+            if v.times_visited >= v.get_num_successors():
                 for w in v.predecessors:
                     stack.append(w)
 
-            if v.is_discovered() == True:
+            if v.times_visited == v.get_num_successors():
                 sorted_nodes.append(v)
     return sorted_nodes

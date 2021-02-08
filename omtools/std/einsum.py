@@ -6,7 +6,10 @@ from typing import List
 
 
 class einsum(Expression):
-    def initialize(self, *operands: List[Expression], subscripts: str, partial_format = 'dense'):
+    def initialize(self,
+                   *operands: List[Expression],
+                   subscripts: str,
+                   partial_format='dense'):
 
         for expr in operands:
             if isinstance(expr, Expression) == False:
@@ -14,22 +17,23 @@ class einsum(Expression):
             self.add_predecessor_node(expr)
 
         operation_aslist = einsum_subscripts_tolist(subscripts)
-        shape = compute_einsum_shape(operation_aslist, [expr.shape for expr in operands])
+        shape = compute_einsum_shape(operation_aslist,
+                                     [expr.shape for expr in operands])
         self.shape = shape
 
-        if partial_format == 'dense' :
-            self.build = lambda name: EinsumComp(
+        if partial_format == 'dense':
+            self.build = lambda: EinsumComp(
                 in_names=[expr.name for expr in operands],
                 in_shapes=[expr.shape for expr in operands],
-                out_name=name,
+                out_name=self.name,
                 operation=subscripts,
                 out_shape=shape,
             )
-        elif partial_format == 'sparse' :
-            self.build = lambda name: SparsePartialEinsumComp(
+        elif partial_format == 'sparse':
+            self.build = lambda: SparsePartialEinsumComp(
                 in_names=[expr.name for expr in operands],
                 in_shapes=[expr.shape for expr in operands],
-                out_name=name,
+                out_name=self.name,
                 operation=subscripts,
                 out_shape=shape,
             )

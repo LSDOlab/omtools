@@ -14,27 +14,25 @@ class matmat(Expression):
                 # Compute the output shape if both inputs are matrices
                 self.shape = (mat1.shape[0], mat2.shape[1])
 
-                self.build = lambda name: MatMatComp(
+                self.build = lambda: MatMatComp(
                     in_names=[mat1.name, mat2.name],
-                    out_name=name,
+                    out_name=self.name,
                     in_shapes=[mat1.shape, mat2.shape],
-
                 )
-                         
+
             elif mat1.shape[1] == mat2.shape[0] and len(mat2.shape) == 1:
                 self.shape = (mat1.shape[0], 1)
 
                 mat2_shape = (mat2.shape[0], 1)
 
-                self.build = lambda name: MatMatComp(
+                self.build = lambda: MatMatComp(
                     in_names=[mat1.name, mat2.name],
-                    out_name=name,
+                    out_name=self.name,
                     in_shapes=[mat1.shape, mat2_shape],
-
                 )
             else:
-                raise Exception ("Cannot multiply: ", mat1.shape, "by", mat2.shape)
-
+                raise Exception("Cannot multiply: ", mat1.shape, "by",
+                                mat2.shape)
 
         else:
             raise TypeError(expr, " is not an Expression object")

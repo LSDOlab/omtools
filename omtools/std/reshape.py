@@ -8,10 +8,10 @@ class reshape(Expression):
             self.shape = new_shape
             self.add_predecessor_node(expr)
 
-            self.build = lambda name: ReshapeComp(
+            self.build = lambda: ReshapeComp(
                 shape=expr.shape,
                 in_name=expr.name,
-                out_name=name,
+                out_name=self.name,
                 new_shape=self.shape,
             )
 

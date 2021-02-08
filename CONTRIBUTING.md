@@ -244,7 +244,7 @@ class snake_case_expression(Expression):
         # Fourth, define the function that Group calls after user defined
         # Group.setup method is called. This function requires a name
         # argument
-        self.build = lambda name : CorrespondingComponent(
+        self.build = lambda: CorrespondingComponent(
             # CorrespondingComponent options defined in
             # CorrespondingComponent.initialize
         )

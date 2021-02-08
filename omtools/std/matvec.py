@@ -14,16 +14,15 @@ class matvec(Expression):
 
                 self.shape = (mat1.shape[0], )
 
-                self.build = lambda name: MatVecComp(
+                self.build = lambda: MatVecComp(
                     in_names=[mat1.name, vec1.name],
-                    out_name=name,
+                    out_name=self.name,
                     in_shapes=[mat1.shape, vec1.shape],
-
                 )
-                         
-            else:
-                raise Exception ("Cannot multiply: ", mat1.shape, "by", vec1.shape)
 
+            else:
+                raise Exception("Cannot multiply: ", mat1.shape, "by",
+                                vec1.shape)
 
         else:
             raise TypeError(expr, " is not an Expression object")

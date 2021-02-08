@@ -8,10 +8,10 @@ class tanh(Expression):
             self.shape = expr.shape
             self.add_predecessor_node(expr)
 
-            self.build = lambda name: TanhComp(
+            self.build = lambda: TanhComp(
                 shape=expr.shape,
                 in_name=expr.name,
-                out_name=name,
+                out_name=self.name,
             )
 
         else:

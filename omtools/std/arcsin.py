@@ -8,10 +8,10 @@ class arcsin(Expression):
             self.shape = expr.shape
             self.add_predecessor_node(expr)
 
-            self.build = lambda name: ArcsinComp(
+            self.build = lambda: ArcsinComp(
                 shape=expr.shape,
                 in_name=expr.name,
-                out_name=name,
+                out_name=self.name,
             )
 
         else:

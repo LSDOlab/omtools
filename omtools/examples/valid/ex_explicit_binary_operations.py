@@ -46,9 +46,13 @@ class ExampleBinaryOperations(Group):
         # Adding other expressions
         self.register_output('y10', y1 + y7)
 
-        # Array of powers
-        y11 = x3**(2 * np.ones(7))
+        # Array with scalar power
+        y11 = x3**2
         self.register_output('y11', y11)
+
+        # Array with array of powers
+        y12 = x3**(2 * np.ones(7))
+        self.register_output('y12', y12)
 
 
 prob = Problem()
@@ -78,3 +82,5 @@ print('y10', prob['y10'].shape)
 print(prob['y10'])
 print('y11', prob['y11'].shape)
 print(prob['y11'])
+print('y12', prob['y12'].shape)
+print(prob['y12'])

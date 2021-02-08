@@ -6,33 +6,33 @@ import numpy as np
 
 
 class pnorm(Expression):
-    def initialize(self, expr, pnorm_type, axis = None):
+    def initialize(self, expr, pnorm_type, axis=None):
         if isinstance(expr, Expression):
             self.add_predecessor_node(expr)
 
-            if pnorm_type%2 != 0 or pnorm_type <= 0:
+            if pnorm_type % 2 != 0 or pnorm_type <= 0:
                 raise Exception(pnorm_type, " is not positive OR is not even")
 
             else:
                 if axis == None:
-                    self.build = lambda name: VectorizedPnormComp(
-                        shape = expr.shape,
-                        in_name = expr.name,
-                        out_name = name,
-                        pnorm_type = pnorm_type,
+                    self.build = lambda: VectorizedPnormComp(
+                        shape=expr.shape,
+                        in_name=expr.name,
+                        out_name=self.name,
+                        pnorm_type=pnorm_type,
                     )
                 else:
                     output_shape = np.delete(expr.shape, axis)
                     self.shape = tuple(output_shape)
 
-                    self.build = lambda name: VectorizedAxisWisePnormComp(
-                        shape = expr.shape,
-                        in_name = expr.name,
-                        out_shape = self.shape,
-                        out_name = name,
-                        pnorm_type = pnorm_type,
-                        axis = axis,
-                    )               
+                    self.build = lambda: VectorizedAxisWisePnormComp(
+                        shape=expr.shape,
+                        in_name=expr.name,
+                        out_shape=self.shape,
+                        out_name=self.name,
+                        pnorm_type=pnorm_type,
+                        axis=axis,
+                    )
 
         else:
             raise TypeError(expr, " is not an Expression object")

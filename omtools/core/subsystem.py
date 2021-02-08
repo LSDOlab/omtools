@@ -22,9 +22,8 @@ class Subsystem(Expression):
         self.promotes = promotes
         self.promotes_inputs = promotes_inputs
         self.promotes_outputs = promotes_outputs
-        self.num_inputs = 0
 
-        self.build = lambda name: subsys
+        self.build = lambda: subsys
 
     def __repr__(self):
         shape_str = "("

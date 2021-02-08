@@ -27,6 +27,7 @@ class ExampleBinaryOperations(Group):
     :param var: y9
     :param var: y10
     :param var: y11
+    :param var: y12
     """
     def setup(self):
         # declare inputs with default values
@@ -68,9 +69,13 @@ class ExampleBinaryOperations(Group):
         # Adding other expressions
         self.register_output('y10', y1 + y7)
 
-        # Array of powers
-        y11 = x3**(2 * np.ones(7))
+        # Array with scalar power
+        y11 = x3**2
         self.register_output('y11', y11)
+
+        # Array with array of powers
+        y12 = x3**(2 * np.ones(7))
+        self.register_output('y12', y12)
 
 
 class ExampleCycles(Group):

@@ -12,16 +12,18 @@ def test_literals():
 
 def test_simple_binary():
     import omtools.examples.valid.ex_explicit_binary_operations as example
-    np.testing.assert_approx_equal(example.prob['y1'], 5.)
-    np.testing.assert_approx_equal(example.prob['y2'], 1.)
-    np.testing.assert_approx_equal(example.prob['y3'], 6.)
-    np.testing.assert_approx_equal(example.prob['y4'], 2 / 3.)
-    np.testing.assert_approx_equal(example.prob['y5'], 2 / 3.)
-    np.testing.assert_approx_equal(example.prob['y6'], 2 / 3.)
-    np.testing.assert_approx_equal(example.prob['y7'], 4.)
+    np.testing.assert_approx_equal(example.prob['y1'], 7.)
+    np.testing.assert_approx_equal(example.prob['y2'], 5.)
+    np.testing.assert_approx_equal(example.prob['y3'], 1.)
+    np.testing.assert_approx_equal(example.prob['y4'], 6.)
+    np.testing.assert_approx_equal(example.prob['y5'], 2. / 3.)
+    np.testing.assert_approx_equal(example.prob['y6'], 2. / 3.)
+    np.testing.assert_approx_equal(example.prob['y7'], 2. / 3.)
     np.testing.assert_approx_equal(example.prob['y8'], 9.)
-    np.testing.assert_approx_equal(example.prob['y9'], 14.)
-    np.testing.assert_array_almost_equal(example.prob['y10'], np.arange(7)**2)
+    np.testing.assert_approx_equal(example.prob['y9'], 4.)
+    np.testing.assert_array_almost_equal(example.prob['y10'], 7 + 2. / 3.)
+    np.testing.assert_array_almost_equal(example.prob['y11'], np.arange(7)**2)
+    np.testing.assert_array_almost_equal(example.prob['y12'], np.arange(7)**2)
     result = example.prob.check_partials(out_stream=None, compact_print=True)
     assert_check_partials(result, atol=1.e-8, rtol=1.e-8)
 

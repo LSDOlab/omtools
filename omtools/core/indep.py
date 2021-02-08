@@ -33,15 +33,11 @@ class Indep(Expression):
         self.shape, self.val = get_shape_val(shape, val)
         self.dv = dv
 
-        def build(name: str):
-            indep = IndepVarComp(
-                name=name,
-                shape=self.shape,
-                val=self.val,
-            )
-            return indep
-
-        self.build = build
+        self.build = lambda: IndepVarComp(
+            name=name,
+            shape=self.shape,
+            val=self.val,
+        )
 
     def __repr__(self):
         shape_str = "("

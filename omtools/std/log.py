@@ -8,10 +8,10 @@ class log(Expression):
             self.shape = expr.shape
             self.add_predecessor_node(expr)
 
-            self.build = lambda name: LogComp(
+            self.build = lambda: LogComp(
                 shape=expr.shape,
                 in_name=expr.name,
-                out_name=name,
+                out_name=self.name,
             )
 
         else:

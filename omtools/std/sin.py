@@ -12,10 +12,10 @@ class sin(Expression):
             self.shape = expr.shape
             self.add_predecessor_node(expr)
 
-            self.build = lambda name: SinComp(
+            self.build = lambda: SinComp(
                 shape=expr.shape,
                 in_name=expr.name,
-                out_name=name,
+                out_name=self.name,
             )
 
         else:

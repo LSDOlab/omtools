@@ -14,8 +14,6 @@ from omtools.core.indep import Indep
 from omtools.core.input import Input
 from omtools.core.output import Output
 from omtools.core.subsystem import Subsystem
-from omtools.utils.ensure_subsystems_are_added import \
-    ensure_subsystems_are_added
 
 
 def _post_setup(func: Callable) -> Callable:
@@ -43,17 +41,21 @@ def _post_setup(func: Callable) -> Callable:
         # Create a record of all nodes in DAG
         self._root.register_nodes(self.nodes)
 
-        # Ensure that all subsystems that registerd outputs depend on
-        # are considered in topological sort
-        for registered_output in self._root.predecessors:
-            ensure_subsystems_are_added(registered_output)
-        for node in self.nodes.values():
-            node.times_visited = 0
-
         # Clean up graph, removing dependencies that do not constrain
         # execution order
         for node in self.nodes.values():
             remove_indirect_predecessors(node)
+
+        # add forward edges
+        self._root.add_fwd_edges()
+
+        # remove unused expressions
+        keys = []
+        for name, node in self.nodes.items():
+            if len(node.successors) == 0:
+                keys.append(name)
+        for name in keys:
+            del node[name]
 
         # Compute branch costs and sort branches to get desired sparsity
         # pattern in system jacobian
@@ -79,7 +81,7 @@ def _post_setup(func: Callable) -> Callable:
             # Input objects and root Expression object do not have
             # a build method defined.
             if expr.build is not None:
-                sys = expr.build(expr.name)
+                sys = expr.build()
                 pfx = 'comp_'
                 promotes = ['*']
                 promotes_inputs = None
@@ -199,10 +201,6 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         )
         if self._most_recently_added_subsystem is not None:
             inp.add_predecessor_node(self._most_recently_added_subsystem)
-            # This is to guarantee that the subsystem is added even if
-            # outputs that depend on the subsystem are not registered
-            self._most_recently_added_subsystem.decr_num_successors()
-            self._most_recently_added_subsystem.num_inputs += 1
         return inp
 
     def create_indep_var(
@@ -376,10 +374,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
             promotes_inputs=promotes_inputs,
             promotes_outputs=promotes_outputs,
         )
-        self._most_recently_added_subsystem.add_predecessor_node(self._root)
-        new_root = Expression()
-        new_root.add_predecessor_node(self._most_recently_added_subsystem)
-        self._root = new_root
+        self._root.add_predecessor_node(self._most_recently_added_subsystem)
         return subsys
 
     @contextmanager

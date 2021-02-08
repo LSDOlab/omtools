@@ -29,38 +29,37 @@ class expand(Expression):
         self.shape = shape
         self.add_predecessor_node(expr)
 
-        if not expr.shape == (1,):
+        if not expr.shape == (1, ):
             if indices is None:
                 raise ValueError(
                     'If expanding something other than a scalar ' +
-                    'indices must be given'
-                )
+                    'indices must be given')
 
             (
-                _, _, _,
-                in_shape, _, out_shape,
+                _,
+                _,
+                _,
+                in_shape,
+                _,
+                out_shape,
             ) = decompose_shape_tuple(shape, expand_indices)
 
             if in_shape != expr.shape:
-                raise ValueError(
-                    'Shape or indices is invalid'
-                )
+                raise ValueError('Shape or indices is invalid')
 
-            self.build = lambda name: ArrayExpansionComp(
+            self.build = lambda: ArrayExpansionComp(
                 shape=shape,
                 expand_indices=expand_indices,
                 in_name=expr.name,
-                out_name=name,
+                out_name=self.name,
             )
         else:
             if indices is not None:
-                raise ValueError(
-                    'If expanding a scalar ' +
-                    'indices must not be given'
-                )
+                raise ValueError('If expanding a scalar ' +
+                                 'indices must not be given')
 
-            self.build = lambda name: ScalarExpansionComp(
+            self.build = lambda: ScalarExpansionComp(
                 shape=shape,
                 in_name=expr.name,
-                out_name=name,
+                out_name=self.name,
             )

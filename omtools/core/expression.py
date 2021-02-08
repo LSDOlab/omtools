@@ -121,9 +121,9 @@ class Expression():
         self.val = 1,
         self.units = None
         self.predecessors: list = []
+        self.successors: list = []
         self.build = None
         self.times_visited = 0
-        self.num_successors = 0
         self._dag_cost = 1
         self.is_residual: bool = False
         self.initialize(*args, **kwargs)
@@ -197,11 +197,20 @@ class Expression():
 
         # store function to construct component
         from omtools.comps.decompose_comp import DecomposeComp
-        self._decomp.build = lambda name: DecomposeComp(
+        self._decomp.build = lambda: DecomposeComp(
             in_name=self.name,
             expr=self._decomp,
         )
         return expr
+
+    def add_fwd_edges(self):
+        for pred in self.predecessors:
+            pred.add_successor_node(self)
+            pred.add_fwd_edges()
+
+    def add_successor_node(self, successor):
+        self.successors.append(successor)
+        self.successors = list(set(self.successors))
 
     def add_predecessor_node(self, predecessor):
         """
@@ -224,18 +233,9 @@ class Expression():
                 predecessor.name +
                 " already used as residual; cannot use in another expression")
 
-        # Get number of predecessors
-        num_predecessors = len(self.predecessors)
-
         # Add predecessor
         self.predecessors.append(predecessor)
         self._dedup_predecessors()
-        new_predecessor_is_duplicate = num_predecessors >= len(
-            self.predecessors)
-
-        # Ensure additional predecessor is not a duplicate
-        if new_predecessor_is_duplicate == False:
-            predecessor.incr_num_successors()
 
     def register_nodes(self, nodes: dict):
         """
@@ -264,21 +264,6 @@ class Expression():
                 nodes[node._id] = node
                 node.register_nodes(nodes)
 
-    def is_discovered(self) -> bool:
-        """
-        In a ``topological_sort`` on a DAG, a node is marked discovered if
-        it is visited once. In our modified ``topological_sort``, where
-        additional requirements are placed on the final ordering, a node
-        is not marked discovered until all of its parents have been
-        traversed.
-
-        Returns
-        -------
-        bool
-            If ``True``, then node is discovered.
-        """
-        return self.times_visited == self.num_successors
-
     def incr_times_visited(self):
         """
         Increment number of times a node is visited during ``topological_sort``.
@@ -286,14 +271,6 @@ class Expression():
         execution order for expressions.
         """
         self.times_visited += 1
-
-    def decr_num_successors(self):
-        """
-        Decrement number of successors. This is necessary for
-        ``topological_sort`` to determine execution order for
-        expressions.
-        """
-        self.num_successors -= 1
 
     def get_predecessor_index(self, candidate) -> Optional[int]:
         """
@@ -332,7 +309,6 @@ class Expression():
             removed might be
         """
         if index < len(self.predecessors):
-            self.predecessors[index].decr_num_successors()
             self.predecessors.remove(self.predecessors[index])
 
     def compute_dag_cost(self) -> int:
@@ -381,14 +357,6 @@ class Expression():
             reverse=reverse_branch_sorting,
         )
 
-    def incr_num_successors(self):
-        """
-        Increment number of successors. This is necessary for
-        ``topological_sort`` to determine execution order for
-        expressions.
-        """
-        self.num_successors += 1
-
     def _dedup_predecessors(self):
         """
         Remove duplicate predecessors. Used when adding a predecessor.
@@ -410,17 +378,22 @@ class Expression():
         if index is not None:
             self.remove_predecessor_by_index(index)
 
-    def print_dag(self, all=True):
+    def print_dag(self, depth=-1, indent=''):
         """
         Print the graph starting at this node (debugging tool)
         """
-        print(id(self), self.name, self.num_successors, self.times_visited,
-              self)
+        print(indent, id(self), self.name, len(self.successors),
+              self.times_visited, self)
         if len(self.predecessors) == 0:
             print(self.name, 'has no predecessors')
-        if all == True:
+        if depth > 0:
+            depth -= 1
+        if depth != 0:
             for pred in self.predecessors:
-                pred.print_dag()
+                pred.print_dag(depth=depth, indent=indent + ' ')
+
+    def get_num_successors(self):
+        return len(self.successors)
 
 
 class ElementwiseAddition(Expression):
@@ -439,9 +412,9 @@ class ElementwiseAddition(Expression):
             if expr1.shape == expr2.shape:
                 self.shape = expr1.shape
 
-                self.build = lambda name: LinearCombinationComp(
+                self.build = lambda: LinearCombinationComp(
                     shape=expr1.shape,
-                    out_name=name,
+                    out_name=self.name,
                     in_names=[expr1.name, expr2.name],
                     coeffs=1,
                 )
@@ -453,21 +426,23 @@ class ElementwiseAddition(Expression):
                     " do not match. If shapes are as intended (e.g. multiply scalar times array), use `omtools.expand` expression to mimick broadcasting."
                 )
 
-        if isinstance(expr1, numbers.Number) and isinstance(expr2, Expression):
+        if (isinstance(expr1, numbers.Number) or isinstance(
+                expr1, np.ndarray)) and isinstance(expr2, Expression):
 
-            self.build = lambda name: LinearCombinationComp(
+            self.build = lambda: LinearCombinationComp(
                 shape=expr2.shape,
-                out_name=name,
+                out_name=self.name,
                 in_names=[expr2.name],
                 coeffs=1,
                 constant=expr1,
             )
 
-        if isinstance(expr2, numbers.Number) and isinstance(expr1, Expression):
+        if (isinstance(expr2, numbers.Number) or isinstance(
+                expr2, np.ndarray)) and isinstance(expr1, Expression):
 
-            self.build = lambda name: LinearCombinationComp(
+            self.build = lambda: LinearCombinationComp(
                 shape=expr1.shape,
-                out_name=name,
+                out_name=self.name,
                 in_names=[expr1.name],
                 coeffs=1,
                 constant=expr2,
@@ -497,9 +472,9 @@ class ElementwiseSubtraction(Expression):
             if expr1.shape == expr2.shape:
                 self.shape = expr1.shape
 
-                self.build = lambda name: LinearCombinationComp(
+                self.build = lambda: LinearCombinationComp(
                     shape=expr1.shape,
-                    out_name=name,
+                    out_name=self.name,
                     in_names=[expr1.name, expr2.name],
                     coeffs=[1, -1],
                 )
@@ -511,21 +486,23 @@ class ElementwiseSubtraction(Expression):
                     " do not match. If shapes are as intended (e.g. multiply scalar times array), use `omtools.expand` expression to mimick broadcasting."
                 )
 
-        if isinstance(expr1, numbers.Number) and isinstance(expr2, Expression):
+        if (isinstance(expr1, numbers.Number) or isinstance(
+                expr1, np.ndarray)) and isinstance(expr2, Expression):
 
-            self.build = lambda name: LinearCombinationComp(
+            self.build = lambda: LinearCombinationComp(
                 shape=expr2.shape,
-                out_name=name,
+                out_name=self.name,
                 in_names=[expr2.name],
                 coeffs=-1,
                 constant=expr1,
             )
 
-        if isinstance(expr2, numbers.Number) and isinstance(expr1, Expression):
+        if (isinstance(expr2, numbers.Number) or isinstance(
+                expr2, np.ndarray)) and isinstance(expr1, Expression):
 
-            self.build = lambda name: LinearCombinationComp(
+            self.build = lambda: LinearCombinationComp(
                 shape=expr1.shape,
-                out_name=name,
+                out_name=self.name,
                 in_names=[expr1.name],
                 coeffs=1,
                 constant=-expr2,
@@ -555,9 +532,9 @@ class ElementwiseMultiplication(Expression):
             if expr1.shape == expr2.shape:
                 self.shape = expr1.shape
 
-                self.build = lambda name: PowerCombinationComp(
+                self.build = lambda: PowerCombinationComp(
                     shape=expr1.shape,
-                    out_name=name,
+                    out_name=self.name,
                     in_names=[expr1.name, expr2.name],
                     powers=1,
                 )
@@ -569,25 +546,27 @@ class ElementwiseMultiplication(Expression):
                     " do not match. If shapes are as intended (e.g. multiply scalar times array), use `omtools.expand` expression to mimick broadcasting."
                 )
 
-        if isinstance(expr1, numbers.Number) and isinstance(expr2, Expression):
+        if (isinstance(expr1, numbers.Number) or isinstance(
+                expr1, np.ndarray)) and isinstance(expr2, Expression):
 
             self.shape = expr2.shape
 
-            self.build = lambda name: PowerCombinationComp(
+            self.build = lambda: PowerCombinationComp(
                 shape=expr2.shape,
-                out_name=name,
+                out_name=self.name,
                 in_names=[expr2.name],
                 coeff=expr1,
                 powers=1,
             )
 
-        if isinstance(expr2, numbers.Number) and isinstance(expr1, Expression):
+        if (isinstance(expr2, numbers.Number) or isinstance(
+                expr2, np.ndarray)) and isinstance(expr1, Expression):
 
             self.shape = expr1.shape
 
-            self.build = lambda name: PowerCombinationComp(
+            self.build = lambda: PowerCombinationComp(
                 shape=expr1.shape,
-                out_name=name,
+                out_name=self.name,
                 in_names=[expr1.name],
                 coeff=expr2,
                 powers=1,
@@ -617,9 +596,9 @@ class ElementwiseDivision(Expression):
             if expr1.shape == expr2.shape:
                 self.shape = expr1.shape
 
-                self.build = lambda name: PowerCombinationComp(
+                self.build = lambda: PowerCombinationComp(
                     shape=expr1.shape,
-                    out_name=name,
+                    out_name=self.name,
                     in_names=[expr1.name, expr2.name],
                     powers=[1, -1],
                 )
@@ -631,27 +610,29 @@ class ElementwiseDivision(Expression):
                     " do not match. If shapes are as intended (e.g. multiply scalar times array), use `omtools.expand` expression to mimick broadcasting."
                 )
 
-        if isinstance(expr1, numbers.Number) and isinstance(expr2, Expression):
+        if (isinstance(expr1, numbers.Number) or isinstance(
+                expr1, np.ndarray)) and isinstance(expr2, Expression):
 
             self.shape = expr2.shape
 
-            self.build = lambda name: PowerCombinationComp(
+            self.build = lambda: PowerCombinationComp(
                 shape=expr2.shape,
-                out_name=name,
+                out_name=self.name,
                 in_names=[expr2.name],
                 coeff=expr1,
                 powers=-1,
             )
 
-        if isinstance(expr2, numbers.Number) and isinstance(expr1, Expression):
+        if (isinstance(expr2, numbers.Number) or isinstance(
+                expr2, np.ndarray)) and isinstance(expr1, Expression):
             if expr2 == 0:
                 raise ValueError("Cannot divide by zero")
 
             self.shape = expr1.shape
 
-            self.build = lambda name: PowerCombinationComp(
+            self.build = lambda: PowerCombinationComp(
                 shape=expr1.shape,
-                out_name=name,
+                out_name=self.name,
                 in_names=[expr1.name],
                 coeff=1 / expr2,
                 powers=1,
@@ -678,9 +659,9 @@ class ElementwisePower(Expression):
         if isinstance(expr2, numbers.Number):
             self.shape = expr1.shape
 
-            self.build = lambda name: PowerCombinationComp(
+            self.build = lambda: PowerCombinationComp(
                 shape=expr1.shape,
-                out_name=name,
+                out_name=self.name,
                 in_names=[expr1.name],
                 powers=expr2,
             )
@@ -689,9 +670,9 @@ class ElementwisePower(Expression):
                 raise ValueError("Shape mismatch between base and power array")
             self.shape = expr1.shape
 
-            self.build = lambda name: PowerCombinationComp(
+            self.build = lambda: PowerCombinationComp(
                 shape=expr1.shape,
-                out_name=name,
+                out_name=self.name,
                 in_names=[expr1.name],
                 powers=expr2,
             )

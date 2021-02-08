@@ -6,6 +6,7 @@ from omtools.core.expression import Expression
 
 import numpy as np
 
+
 class min(Expression):
     def initialize(self, *exprs, axis=None, rho=20.):
         for expr in exprs:
@@ -18,11 +19,11 @@ class min(Expression):
             output_shape = np.delete(expr.shape, axis)
             self.shape = tuple(output_shape)
 
-            self.build = lambda name: AxisMinComp(
+            self.build = lambda: AxisMinComp(
                 shape=expr.shape,
                 in_name=expr.name,
                 axis=axis,
-                out_name=name,
+                out_name=self.name,
                 rho=rho,
             )
 
@@ -31,24 +32,23 @@ class min(Expression):
             shape = exprs[0].shape
             for expr in exprs:
                 if shape != expr.shape:
-                    raise Exception("The shapes of the inputs must match!") 
-            
+                    raise Exception("The shapes of the inputs must match!")
 
             self.shape = expr.shape
 
-            self.build = lambda name: ElementwiseMinComp(
+            self.build = lambda: ElementwiseMinComp(
                 shape=expr.shape,
-                in_names= [expr.name for expr in exprs],
-                out_name=name,
+                in_names=[expr.name for expr in exprs],
+                out_name=self.name,
                 rho=rho,
             )
 
         elif len(exprs) == 1 and axis == None:
 
-            self.build = lambda name: ScalarExtremumComp(
+            self.build = lambda: ScalarExtremumComp(
                 shape=expr.shape,
                 in_name=expr.name,
-                out_name=name,
+                out_name=self.name,
                 rho=rho,
                 lower_flag=True,
             )
