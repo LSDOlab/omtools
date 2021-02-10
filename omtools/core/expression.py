@@ -120,8 +120,8 @@ class Expression():
         self.shape = (1, )
         self.val = 1,
         self.units = None
-        self.predecessors: list = []
-        self.successors: list = []
+        self.dependencies: list = []
+        self.dependents: list = []
         self.build = None
         self.times_visited = 0
         self._dag_cost = 1
@@ -140,7 +140,7 @@ class Expression():
             self._getitem_called = True
             self._decomp = Expression(shape=self.shape, val=self.val)
             self._decomp.name = 'decompose_' + self.name
-            self._decomp.add_predecessor_node(self)
+            self._decomp.add_dependency_node(self)
 
         # store key as a tuple of tuples of ints
         # no duplicate keys are stored
@@ -192,7 +192,7 @@ class Expression():
         val = self.val[tuple([slice(s[0], s[1], s[2]) for s in list(key)])]
         expr = Expression(shape=val.shape, val=val)
         self._decomp.indexed_exprs[key] = expr
-        expr.add_predecessor_node(self._decomp)
+        expr.add_dependency_node(self._decomp)
         self._decomp.src_indices[expr] = src_indices
 
         # store function to construct component
@@ -204,23 +204,23 @@ class Expression():
         return expr
 
     def add_fwd_edges(self):
-        for pred in self.predecessors:
-            pred.add_successor_node(self)
-            pred.add_fwd_edges()
+        for dependency in self.dependencies:
+            dependency.add_dependent_node(self)
+            dependency.add_fwd_edges()
 
-    def add_successor_node(self, successor):
-        self.successors.append(successor)
-        self.successors = list(set(self.successors))
+    def add_dependent_node(self, dependent):
+        self.dependents.append(dependent)
+        self.dependents = list(set(self.dependents))
 
-    def add_predecessor_node(self, predecessor):
+    def add_dependency_node(self, dependency):
         """
-        Add a predecessor node to the DAG representing the computation
+        Add a dependency node to the DAG representing the computation
         that OpenMDAO will perform during model evaluation. Each
         ``Expression`` object represents some computation that returns a
-        value. The number of predecessor nodes of an ``Expression``
+        value. The number of dependency nodes of an ``Expression``
         object is the number of arguments required to return a value.
         for example, in ``c = a + b``, the object ``c`` has two
-        predecessors: ``a`` and ``b``.
+        dependencies: ``a`` and ``b``.
 
         Parameters
         ----------
@@ -228,14 +228,14 @@ class Expression():
             An Expression object upon which this Expression object
             depends
         """
-        if predecessor.is_residual == True:
+        if dependency.is_residual == True:
             raise ValueError(
-                predecessor.name +
+                dependency.name +
                 " already used as residual; cannot use in another expression")
 
-        # Add predecessor
-        self.predecessors.append(predecessor)
-        self._dedup_predecessors()
+        # Add dependency
+        self.dependencies.append(dependency)
+        self._dedup_dependencies()
 
     def register_nodes(self, nodes: dict):
         """
@@ -246,7 +246,7 @@ class Expression():
         nodes: dict[Expression]
             Dictionary of nodes registered so far
         """
-        for node in self.predecessors:
+        for node in self.dependencies:
             # Check for name collisions
             if node._id in nodes.keys():
                 if nodes[node._id] is not None:
@@ -272,44 +272,44 @@ class Expression():
         """
         self.times_visited += 1
 
-    def get_predecessor_index(self, candidate) -> Optional[int]:
+    def get_dependency_index(self, candidate) -> Optional[int]:
         """
-        Get index of predecessor in ``self.predecessors``. Used for
-        removing indirect predecessors that woud otherwise affect the
+        Get index of dependency in ``self.dependencies``. Used for
+        removing indirect dependencies that woud otherwise affect the
         cost of branches in the DAG, which would affect execution order,
         even with the sme constraints on execution order.
 
         Parameters
         ----------
         candidate: Expression
-            The candidate predecessor node
+            The candidate dependency node
 
         Returns
         -------
         Optional[int]
-            If ``pred`` is a predecessor of ``self``, then the index of
-            ``pred`` in ``self.predecessors`` is returned. Otherwise,
+            If ``dependency`` is a dependency of ``self``, then the index of
+            ``dependency`` in ``self.dependencies`` is returned. Otherwise,
             ``None`` is returned.
         """
-        for index in range(len(self.predecessors)):
-            if self.predecessors[index] is candidate:
+        for index in range(len(self.dependencies)):
+            if self.dependencies[index] is candidate:
                 return index
         return None
 
-    def remove_predecessor_by_index(self, index):
+    def remove_dependency_by_index(self, index):
         """
-        Remove predecessor node, given its index. does nothing if
+        Remove dependency node, given its index. does nothing if
         ``index`` is out of range. See
-        ``Expression.remove_predecessor``.
+        ``Expression.remove_dependency``.
 
         Parameters
         ----------
         index: int
-            Index within ``self.predecessors`` where the node to be
+            Index within ``self.dependencies`` where the node to be
             removed might be
         """
-        if index < len(self.predecessors):
-            self.predecessors.remove(self.predecessors[index])
+        if index < len(self.dependencies):
+            self.dependencies.remove(self.dependencies[index])
 
     def compute_dag_cost(self) -> int:
         """
@@ -322,7 +322,7 @@ class Expression():
         ----------
         branch: set[Expression]
             Set of all Expression objects traversed so far in current
-            branch. If a predecessor is in ``branch``, then
+            branch. If a dependency is in ``branch``, then
             ``compute_dag_cost`` will terminate and return a value. If
             ``self`` is a leaf node, then ``compute_dag_cost`` will
             terminate.
@@ -332,13 +332,13 @@ class Expression():
         int
            Cost of traversing DAG starting with ``self``
         """
-        for pred in self.predecessors:
-            self._dag_cost += pred.compute_dag_cost()
+        for dependency in self.dependencies:
+            self._dag_cost += dependency.compute_dag_cost()
         return self._dag_cost
 
-    def sort_predecessor_branches(self, reverse_branch_sorting=False):
+    def sort_dependency_branches(self, reverse_branch_sorting=False):
         """
-        Sort predecessors by DAG cost so that branches with higher cost
+        Sort dependencies by DAG cost so that branches with higher cost
         (``Expression._dag_cost``) appear before shorter branches
         ("critical path" sorting). User can set flag to force branches
         with lower cost to appear before branches with hgiher cost ("low
@@ -351,49 +351,49 @@ class Expression():
             Reverse branch sorting to produce "low hanging fruit"
             sorting.
         """
-        self.predecessors = sorted(
-            self.predecessors,
+        self.dependencies = sorted(
+            self.dependencies,
             key=lambda x: x._dag_cost,
             reverse=reverse_branch_sorting,
         )
 
-    def _dedup_predecessors(self):
+    def _dedup_dependencies(self):
         """
-        Remove duplicate predecessors. Used when adding a predecessor.
+        Remove duplicate dependencies. Used when adding a dependency.
         """
-        self.predecessors = list(set(self.predecessors))
+        self.dependencies = list(set(self.dependencies))
 
-    def remove_predecessor_node(self, candidate):
+    def remove_dependency_node(self, candidate):
         """
-        Remove predecessor node. Does nothing if `candidate` is not a
-        predecessor. Used for removing indirect predecessors and
+        Remove dependency node. Does nothing if `candidate` is not a
+        dependency. Used for removing indirect dependencies and
         preventing cycles from forming in DAG.
 
         Parameters
         ----------
         candidate: Expression
-            Node to remove from ``self.predecessors``
+            Node to remove from ``self.dependencies``
         """
-        index = self.get_predecessor_index(candidate)
+        index = self.get_dependency_index(candidate)
         if index is not None:
-            self.remove_predecessor_by_index(index)
+            self.remove_dependency_by_index(index)
 
     def print_dag(self, depth=-1, indent=''):
         """
         Print the graph starting at this node (debugging tool)
         """
-        print(indent, id(self), self.name, len(self.successors),
+        print(indent, id(self), self.name, len(self.dependents),
               self.times_visited, self)
-        if len(self.predecessors) == 0:
-            print(self.name, 'has no predecessors')
+        if len(self.dependencies) == 0:
+            print(self.name, 'has no dependencies')
         if depth > 0:
             depth -= 1
         if depth != 0:
-            for pred in self.predecessors:
-                pred.print_dag(depth=depth, indent=indent + ' ')
+            for dependency in self.dependencies:
+                dependency.print_dag(depth=depth, indent=indent + ' ')
 
-    def get_num_successors(self):
-        return len(self.successors)
+    def get_num_dependents(self):
+        return len(self.dependents)
 
 
 class ElementwiseAddition(Expression):
@@ -404,10 +404,10 @@ class ElementwiseAddition(Expression):
     def initialize(self, expr1, expr2):
         if isinstance(expr1, Expression):
             self.shape = expr1.shape
-            self.add_predecessor_node(expr1)
+            self.add_dependency_node(expr1)
         if isinstance(expr2, Expression):
             self.shape = expr2.shape
-            self.add_predecessor_node(expr2)
+            self.add_dependency_node(expr2)
         if isinstance(expr1, Expression) and isinstance(expr2, Expression):
             if expr1.shape == expr2.shape:
                 self.shape = expr1.shape
@@ -464,10 +464,10 @@ class ElementwiseSubtraction(Expression):
     def initialize(self, expr1, expr2):
         if isinstance(expr1, Expression):
             self.shape = expr1.shape
-            self.add_predecessor_node(expr1)
+            self.add_dependency_node(expr1)
         if isinstance(expr2, Expression):
             self.shape = expr2.shape
-            self.add_predecessor_node(expr2)
+            self.add_dependency_node(expr2)
         if isinstance(expr1, Expression) and isinstance(expr2, Expression):
             if expr1.shape == expr2.shape:
                 self.shape = expr1.shape
@@ -524,10 +524,10 @@ class ElementwiseMultiplication(Expression):
     def initialize(self, expr1, expr2):
         if isinstance(expr1, Expression):
             self.shape = expr1.shape
-            self.add_predecessor_node(expr1)
+            self.add_dependency_node(expr1)
         if isinstance(expr2, Expression):
             self.shape = expr2.shape
-            self.add_predecessor_node(expr2)
+            self.add_dependency_node(expr2)
         if isinstance(expr1, Expression) and isinstance(expr2, Expression):
             if expr1.shape == expr2.shape:
                 self.shape = expr1.shape
@@ -588,10 +588,10 @@ class ElementwiseDivision(Expression):
     def initialize(self, expr1, expr2):
         if isinstance(expr1, Expression):
             self.shape = expr1.shape
-            self.add_predecessor_node(expr1)
+            self.add_dependency_node(expr1)
         if isinstance(expr2, Expression):
             self.shape = expr2.shape
-            self.add_predecessor_node(expr2)
+            self.add_dependency_node(expr2)
         if isinstance(expr1, Expression) and isinstance(expr2, Expression):
             if expr1.shape == expr2.shape:
                 self.shape = expr1.shape
@@ -653,7 +653,7 @@ class ElementwisePower(Expression):
     """
     def initialize(self, expr1, expr2):
         if isinstance(expr1, Expression):
-            self.add_predecessor_node(expr1)
+            self.add_dependency_node(expr1)
         else:
             raise TypeError(expr1, " is not an Expression object or literal")
         if isinstance(expr2, numbers.Number):

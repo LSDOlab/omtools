@@ -2,18 +2,16 @@ from omtools.comps.reshape_comp import ReshapeComp
 from omtools.core.expression import Expression
 
 
-class reshape(Expression):
-    def initialize(self, expr, new_shape):
-        if isinstance(expr, Expression):
-            self.shape = new_shape
-            self.add_predecessor_node(expr)
-
-            self.build = lambda: ReshapeComp(
-                shape=expr.shape,
-                in_name=expr.name,
-                out_name=self.name,
-                new_shape=self.shape,
-            )
-
-        else:
-            raise TypeError(expr, " is not an Expression object")
+def reshape(expr, new_shape):
+    if not isinstance(expr, Expression):
+        raise TypeError(expr, " is not an Expression object")
+    out = Expression()
+    out.shape = new_shape
+    out.add_dependency_node(expr)
+    out.build = lambda: ReshapeComp(
+        shape=expr.shape,
+        in_name=expr.name,
+        out_name=out.name,
+        new_shape=out.shape,
+    )
+    return out

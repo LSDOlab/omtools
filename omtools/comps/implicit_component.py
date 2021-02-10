@@ -22,7 +22,7 @@ def _post_setup(func: Callable) -> Callable:
         func(self)
         # setup internal problem
         g = self.group
-        for res_expr in g._root.predecessors:
+        for res_expr in g._root.dependencies:
             if isinstance(res_expr, Subsystem) == False and isinstance(
                     res_expr, Input) == False and isinstance(
                         res_expr, ExplicitOutput) == False:
@@ -79,7 +79,7 @@ def _post_setup(func: Callable) -> Callable:
         self.prob.setup()
 
         # set initial values for inputs and output
-        for res_expr in self.group._root.predecessors:
+        for res_expr in self.group._root.dependencies:
             if isinstance(res_expr, Subsystem) == False and isinstance(
                     res_expr, ExplicitOutput) == False:
                 out_name = self.group.res_out_map[res_expr.name]
@@ -140,7 +140,7 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
         self.n2 = n2
 
     def _set_values(self, inputs, outputs):
-        for res_expr in self.group._root.predecessors:
+        for res_expr in self.group._root.dependencies:
             if isinstance(res_expr, Subsystem) == False and isinstance(
                     res_expr, ExplicitOutput) == False:
                 out_name = self.group.res_out_map[res_expr.name]
@@ -178,7 +178,7 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
             residuals[out_name] = np.array(prob[res_name])
 
     def solve_nonlinear(self, inputs, outputs):
-        for res_expr in self.group._root.predecessors:
+        for res_expr in self.group._root.dependencies:
             if isinstance(res_expr, Subsystem) == False and isinstance(
                     res_expr, ExplicitOutput) == False:
                 out_name = self.group.res_out_map[res_expr.name]
@@ -224,7 +224,7 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
             wrt=[in_expr.name for in_expr in list(in_exprs)] + out_names,
         )
 
-        for res_expr in self.group._root.predecessors:
+        for res_expr in self.group._root.dependencies:
             if isinstance(res_expr, Subsystem) == False:
                 res_name = res_expr.name
                 out_name = self.group.res_out_map[res_name]

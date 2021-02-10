@@ -70,7 +70,7 @@ class ExplicitOutput(Output):
             )
         self.defined = True
 
-        self.add_predecessor_node(expr)
+        self.add_dependency_node(expr)
         replace_output_leaf_nodes(
             self,
             self,
@@ -88,7 +88,7 @@ class ExplicitOutput(Output):
         key: Union[int, slice, Tuple[slice]],
         expr: Expression,
     ):
-        self.add_predecessor_node(expr)
+        self.add_dependency_node(expr)
         tgt_indices = []
         if isinstance(key, tuple):
             slices = [

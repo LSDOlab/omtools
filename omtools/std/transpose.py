@@ -4,18 +4,16 @@ from typing import List
 import numpy as np
 
 
-class transpose(Expression):
-    def initialize(self, expr: Expression):
-
-        if isinstance(expr, Expression) == False:
-            raise TypeError(expr, " is not an Expression object")
-
-        self.add_predecessor_node(expr)
-
-        self.shape = expr.shape[::-1]
-        self.build = lambda: TransposeComp(
-            in_name=expr.name,
-            in_shape=expr.shape,
-            out_name=self.name,
-            out_shape=self.shape,
-        )
+def transpose(expr: Expression):
+    if not isinstance(expr, Expression):
+        raise TypeError(expr, " is not an Expression object")
+    out = Expression()
+    out.add_dependency_node(expr)
+    out.shape = expr.shape[::-1]
+    out.build = lambda: TransposeComp(
+        in_name=expr.name,
+        in_shape=expr.shape,
+        out_name=out.name,
+        out_shape=out.shape,
+    )
+    return out

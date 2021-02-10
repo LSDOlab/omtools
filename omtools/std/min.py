@@ -7,51 +7,51 @@ from omtools.core.expression import Expression
 import numpy as np
 
 
-class min(Expression):
-    def initialize(self, *exprs, axis=None, rho=20.):
+def min(*exprs, axis=None, rho=20.):
+    out = Expression()
+    for expr in exprs:
+        if not isinstance(expr, Expression):
+            raise TypeError(expr, " is not an Expression object")
+        out.add_dependency_node(expr)
+
+    if len(exprs) == 1 and axis != None:
+        output_shape = np.delete(expr.shape, axis)
+        out.shape = tuple(output_shape)
+
+        out.build = lambda: AxisMinComp(
+            shape=expr.shape,
+            in_name=expr.name,
+            axis=axis,
+            out_name=out.name,
+            rho=rho,
+        )
+
+    elif len(exprs) > 1 and axis == None:
+
+        shape = exprs[0].shape
         for expr in exprs:
-            if isinstance(expr, Expression):
-                self.add_predecessor_node(expr)
-            else:
-                raise TypeError(expr, " is not an Expression object")
+            if shape != expr.shape:
+                raise Exception("The shapes of the inputs must match!")
 
-        if len(exprs) == 1 and axis != None:
-            output_shape = np.delete(expr.shape, axis)
-            self.shape = tuple(output_shape)
+        out.shape = expr.shape
 
-            self.build = lambda: AxisMinComp(
-                shape=expr.shape,
-                in_name=expr.name,
-                axis=axis,
-                out_name=self.name,
-                rho=rho,
-            )
+        out.build = lambda: ElementwiseMinComp(
+            shape=expr.shape,
+            in_names=[expr.name for expr in exprs],
+            out_name=out.name,
+            rho=rho,
+        )
 
-        elif len(exprs) > 1 and axis == None:
+    elif len(exprs) == 1 and axis == None:
 
-            shape = exprs[0].shape
-            for expr in exprs:
-                if shape != expr.shape:
-                    raise Exception("The shapes of the inputs must match!")
+        out.build = lambda: ScalarExtremumComp(
+            shape=expr.shape,
+            in_name=expr.name,
+            out_name=out.name,
+            rho=rho,
+            lower_flag=True,
+        )
 
-            self.shape = expr.shape
-
-            self.build = lambda: ElementwiseMinComp(
-                shape=expr.shape,
-                in_names=[expr.name for expr in exprs],
-                out_name=self.name,
-                rho=rho,
-            )
-
-        elif len(exprs) == 1 and axis == None:
-
-            self.build = lambda: ScalarExtremumComp(
-                shape=expr.shape,
-                in_name=expr.name,
-                out_name=self.name,
-                rho=rho,
-                lower_flag=True,
-            )
-
-        else:
-            raise Exception("Do not give multiple inputs and an axis")
+    else:
+        raise Exception("Do not give multiple inputs and an axis")
+    return out

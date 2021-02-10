@@ -24,18 +24,20 @@ def replace_input_leaf_nodes(
     graphs for residuals so that ``ImplicitComponent`` objects do
     not include subsystems.
     """
-    for pred in node.predecessors:
-        if isinstance(pred, Input):
-            if len(pred.predecessors) > 0:
-                node.remove_predecessor_node(pred)
-                if pred._id in leaves.keys():
-                    node.add_predecessor_node(leaves[pred._id])
+    for dependency in node.dependencies:
+        if isinstance(dependency, Input):
+            if len(dependency.dependencies) > 0:
+                node.remove_dependency_node(dependency)
+                if dependency._id in leaves.keys():
+                    node.add_dependency_node(leaves[dependency._id])
                 else:
-                    leaf = Input(pred.name, shape=pred.shape, val=pred.val)
-                    leaf._id = pred._id
-                    node.add_predecessor_node(leaf)
-                    leaves[pred._id] = leaf
-        replace_input_leaf_nodes(pred, leaves)
+                    leaf = Input(dependency.name,
+                                 shape=dependency.shape,
+                                 val=dependency.val)
+                    leaf._id = dependency._id
+                    node.add_dependency_node(leaf)
+                    leaves[dependency._id] = leaf
+        replace_input_leaf_nodes(dependency, leaves)
 
 
 class ImplicitOutput(Output):

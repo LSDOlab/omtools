@@ -223,7 +223,7 @@ class snake_case_expression(Expression):
 
         # Second, establish dependence of this Expression on other
         # Expression objects
-        self.add_predecessor_node(expr)
+        self.add_dependency_node(expr)
 
         # First and second steps for variable number of Expression
         # objects
@@ -231,7 +231,7 @@ class snake_case_expression(Expression):
             if isinstance(arg, Expression) == False
                 raise TypeError(arg, " is not an Expression object")
             # don't worry about an arg used multiple times
-            self.add_predecessor_node(arg)
+            self.add_dependency_node(arg)
 
         # Third, extract options for the Component subclass that will
         # be constructed from this Expression

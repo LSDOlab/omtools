@@ -5,45 +5,45 @@ from typing import List
 import numpy as np
 
 
-class sum(Expression):
-    def initialize(self, *summands: List[Expression], axes=None):
-        for expr in summands:
-            if isinstance(expr, Expression) == False:
-                raise TypeError(expr, " is not an Expression object")
+def sum(*summands: List[Expression], axes=None):
+    out = Expression()
+    for expr in summands:
+        if not isinstance(expr, Expression):
+            raise TypeError(expr, " is not an Expression object")
+        out.add_dependency_node(expr)
 
-            self.add_predecessor_node(expr)
-
-        if axes == None:
-            if len(summands) == 1:
-                self.build = lambda: SingleTensorSumComp(
-                    in_name=expr.name,
-                    shape=expr.shape,
-                    out_name=self.name,
-                )
-            else:
-                self.shape = expr.shape
-                self.build = lambda: MultipleTensorSumComp(
-                    in_names=[expr.name for expr in summands],
-                    shape=expr.shape,
-                    out_name=self.name,
-                )
+    if axes == None:
+        if len(summands) == 1:
+            out.build = lambda: SingleTensorSumComp(
+                in_name=expr.name,
+                shape=expr.shape,
+                out_name=out.name,
+            )
         else:
-            output_shape = np.delete(expr.shape, axes)
-            self.shape = tuple(output_shape)
+            out.shape = expr.shape
+            out.build = lambda: MultipleTensorSumComp(
+                in_names=[expr.name for expr in summands],
+                shape=expr.shape,
+                out_name=out.name,
+            )
+    else:
+        output_shape = np.delete(expr.shape, axes)
+        out.shape = tuple(output_shape)
 
-            if len(summands) == 1:
-                self.build = lambda: SingleTensorSumComp(
-                    in_name=expr.name,
-                    shape=expr.shape,
-                    out_name=self.name,
-                    out_shape=self.shape,
-                    axes=axes,
-                )
-            else:
-                self.build = lambda: MultipleTensorSumComp(
-                    in_names=[expr.name for expr in summands],
-                    shape=expr.shape,
-                    out_name=self.name,
-                    out_shape=self.shape,
-                    axes=axes,
-                )
+        if len(summands) == 1:
+            out.build = lambda: SingleTensorSumComp(
+                in_name=expr.name,
+                shape=expr.shape,
+                out_name=out.name,
+                out_shape=out.shape,
+                axes=axes,
+            )
+        else:
+            out.build = lambda: MultipleTensorSumComp(
+                in_names=[expr.name for expr in summands],
+                shape=expr.shape,
+                out_name=out.name,
+                out_shape=out.shape,
+                axes=axes,
+            )
+    return out

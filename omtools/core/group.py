@@ -8,7 +8,7 @@ from openmdao.core.system import System
 # from omtools.core._group import _Group
 from omtools.core.explicit_output import ExplicitOutput
 from omtools.core.expression import Expression
-from omtools.core.graph import remove_indirect_predecessors, topological_sort
+from omtools.core.graph import remove_indirect_dependencies, topological_sort
 from omtools.core.implicit_output import ImplicitOutput
 from omtools.core.indep import Indep
 from omtools.core.input import Input
@@ -44,7 +44,7 @@ def _post_setup(func: Callable) -> Callable:
         # Clean up graph, removing dependencies that do not constrain
         # execution order
         for node in self.nodes.values():
-            remove_indirect_predecessors(node)
+            remove_indirect_dependencies(node)
 
         # add forward edges
         self._root.add_fwd_edges()
@@ -52,7 +52,7 @@ def _post_setup(func: Callable) -> Callable:
         # remove unused expressions
         keys = []
         for name, node in self.nodes.items():
-            if len(node.successors) == 0:
+            if len(node.dependents) == 0:
                 keys.append(name)
         for name in keys:
             del node[name]
@@ -61,7 +61,7 @@ def _post_setup(func: Callable) -> Callable:
         # pattern in system jacobian
         self._root.compute_dag_cost()
         for node in self.nodes.values():
-            node.sort_predecessor_branches(
+            node.sort_dependency_branches(
                 reverse_branch_sorting=self.reverse_branch_sorting)
 
         # Sort expressions, preventing unnecessary feedbacks (i.e.
@@ -200,7 +200,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
             # units=units,
         )
         if self._most_recently_added_subsystem is not None:
-            inp.add_predecessor_node(self._most_recently_added_subsystem)
+            inp.add_dependency_node(self._most_recently_added_subsystem)
         return inp
 
     def create_indep_var(
@@ -237,7 +237,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         # Ensure that independent variables are always at the top of n2
         # diagram
         if self._most_recently_added_subsystem is not None:
-            self._most_recently_added_subsystem.add_predecessor_node(indep)
+            self._most_recently_added_subsystem.add_dependency_node(indep)
 
         # NOTE: We choose to always include IndepVarComp objects, even
         # if they are not used by other Component objects
@@ -272,7 +272,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
             shape=shape,
             val=val,
         )
-        self._root.add_predecessor_node(ex)
+        self._root.add_dependency_node(ex)
         return ex
 
     def create_implicit_output(
@@ -303,7 +303,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
             shape=shape,
             val=val,
         )
-        # self._root.add_predecessor_node(im)
+        # self._root.add_dependency_node(im)
         return im
 
     def register_output(self, name: str,
@@ -330,13 +330,13 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         if isinstance(expr, Input):
             raise TypeError("Cannot register input " + expr + " as an output")
 
-        if expr in self._root.predecessors:
+        if expr in self._root.dependencies:
             raise ValueError(
                 "Cannot register output twice; attempting to register " +
                 expr.name + " as " + name)
 
         expr.name = name
-        self._root.add_predecessor_node(expr)
+        self._root.add_dependency_node(expr)
         return expr
 
     def add_subsystem(
@@ -382,12 +382,13 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         )
         # Ensure that independent variables are always at the top of n2
         # diagram
-        for pred in self._root.predecessors:
-            if isinstance(pred, Indep):
-                self._most_recently_added_subsystem.add_predecessor_node(pred)
+        for dependency in self._root.dependencies:
+            if isinstance(dependency, Indep):
+                self._most_recently_added_subsystem.add_dependency_node(
+                    dependency)
 
         # Add subystem to DAG
-        self._root.add_predecessor_node(self._most_recently_added_subsystem)
+        self._root.add_dependency_node(self._most_recently_added_subsystem)
         return subsys
 
     @contextmanager

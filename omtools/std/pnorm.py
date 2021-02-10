@@ -5,34 +5,33 @@ from typing import List
 import numpy as np
 
 
-class pnorm(Expression):
-    def initialize(self, expr, pnorm_type, axis=None):
-        if isinstance(expr, Expression):
-            self.add_predecessor_node(expr)
+def pnorm(expr, pnorm_type, axis=None):
+    if not isinstance(expr, Expression):
+        raise TypeError(expr, " is not an Expression object")
+    out = Expression()
+    out.add_dependency_node(expr)
 
-            if pnorm_type % 2 != 0 or pnorm_type <= 0:
-                raise Exception(pnorm_type, " is not positive OR is not even")
+    if pnorm_type % 2 != 0 or pnorm_type <= 0:
+        raise Exception(pnorm_type, " is not positive OR is not even")
 
-            else:
-                if axis == None:
-                    self.build = lambda: VectorizedPnormComp(
-                        shape=expr.shape,
-                        in_name=expr.name,
-                        out_name=self.name,
-                        pnorm_type=pnorm_type,
-                    )
-                else:
-                    output_shape = np.delete(expr.shape, axis)
-                    self.shape = tuple(output_shape)
-
-                    self.build = lambda: VectorizedAxisWisePnormComp(
-                        shape=expr.shape,
-                        in_name=expr.name,
-                        out_shape=self.shape,
-                        out_name=self.name,
-                        pnorm_type=pnorm_type,
-                        axis=axis,
-                    )
-
+    else:
+        if axis == None:
+            out.build = lambda: VectorizedPnormComp(
+                shape=expr.shape,
+                in_name=expr.name,
+                out_name=out.name,
+                pnorm_type=pnorm_type,
+            )
         else:
-            raise TypeError(expr, " is not an Expression object")
+            output_shape = np.delete(expr.shape, axis)
+            out.shape = tuple(output_shape)
+
+            out.build = lambda: VectorizedAxisWisePnormComp(
+                shape=expr.shape,
+                in_name=expr.name,
+                out_shape=out.shape,
+                out_name=out.name,
+                pnorm_type=pnorm_type,
+                axis=axis,
+            )
+    return out
