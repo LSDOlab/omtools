@@ -1,15 +1,15 @@
 from omtools.comps.single_tensor_sum_comp import SingleTensorSumComp
 from omtools.comps.multiple_tensor_sum_comp import MultipleTensorSumComp
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from typing import List
 import numpy as np
 
 
-def sum(*summands: List[Expression], axes=None):
-    out = Expression()
+def sum(*summands: List[Variable], axes=None):
+    out = Variable()
     for expr in summands:
-        if not isinstance(expr, Expression):
-            raise TypeError(expr, " is not an Expression object")
+        if not isinstance(expr, Variable):
+            raise TypeError(expr, " is not an Variable object")
         out.add_dependency_node(expr)
 
     if axes == None:

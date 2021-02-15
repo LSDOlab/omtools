@@ -1,5 +1,5 @@
 from omtools.api import Group
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from omtools.core.subsystem import Subsystem
 from omtools.core.input import Input
 from omtools.core.explicit_output import ExplicitOutput
@@ -15,9 +15,9 @@ from copy import deepcopy
 class ConditionalComponent(ExplicitComponent):
     def initialize(self):
         self.options.declare('out_name', types=str)
-        self.options.declare('condition', types=Expression)
-        self.options.declare('expr_true', types=Expression)
-        self.options.declare('expr_false', types=Expression)
+        self.options.declare('condition', types=Variable)
+        self.options.declare('expr_true', types=Variable)
+        self.options.declare('expr_false', types=Variable)
         self.options.declare('n2', types=bool, default=False)
         self.condition = Problem()
         self.condition.model = Group()
@@ -43,17 +43,17 @@ class ConditionalComponent(ExplicitComponent):
         expr_true = self.options['expr_true']
         if isinstance(expr_true, Input):
             raise TypeError(
-                "Expression object to evaluate when condition is TRUE must not be an Input object"
+                "Variable object to evaluate when condition is TRUE must not be an Input object"
             )
         expr_false = self.options['expr_false']
         if isinstance(expr_false, Input):
             raise TypeError(
-                "Expression object to evaluate when condition is FALSE must not be an Input object"
+                "Variable object to evaluate when condition is FALSE must not be an Input object"
             )
 
         if expr_true.shape != expr_false.shape:
             raise ValueError(
-                "Expression shapes must be the same for Expression objects for both branches of execution"
+                "Variable shapes must be the same for Variable objects for both branches of execution"
             )
 
         self.add_output(

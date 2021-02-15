@@ -1,10 +1,10 @@
 Working with Literal Values
 ===========================
 
-This example shows how to create a very simple expression.
+This example shows how to create a very simple variable.
 First, the user declares an input with the ``Group.declare_input``
 method.
-Then, the user forms an expression from the inputs and registers the
+Then, the user forms an variable from the inputs and registers the
 output with ``Group.register_output``.
 
 .. jupyter-execute::

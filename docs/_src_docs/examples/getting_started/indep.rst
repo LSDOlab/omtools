@@ -2,8 +2,8 @@ Independent Variables
 =====================
 
 Creating an independent variable always registers that variable as an
-output, regardless of whether it is used in an expression, or whether
-any expression that uses the independent variable is registered as an
+output, regardless of whether it is used in an variable, or whether
+any variable that uses the independent variable is registered as an
 output.
 
 This means that all independent variables are available to parent

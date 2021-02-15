@@ -7,7 +7,7 @@ from openmdao.core.system import System
 
 # from omtools.core._group import _Group
 from omtools.core.explicit_output import ExplicitOutput
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from omtools.core.graph import remove_indirect_dependencies, topological_sort
 from omtools.core.implicit_output import ImplicitOutput
 from omtools.core.indep import Indep
@@ -76,9 +76,9 @@ def _post_setup(func: Callable) -> Callable:
                 if expr.defined == False:
                     raise ValueError("Output not defined for ", expr)
 
-            # Construct Component object corresponding to Expression
+            # Construct Component object corresponding to Variable
             # object, if applicable.
-            # Input objects and root Expression object do not have
+            # Input objects and root Variable object do not have
             # a build method defined.
             if expr.build is not None:
                 sys = expr.build()
@@ -148,7 +148,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         self.input_vals: dict = {}
         self.sorted_builders = []
         self.reverse_branch_sorting: bool = False
-        self._root = Expression()
+        self._root = Variable()
         self._most_recently_added_subsystem: Subsystem = None
         self.res_out_map: Dict[str, str] = dict()
         self.brackets_map = None
@@ -319,13 +319,13 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         name: str
             Name of variable in OpenMDAO
 
-        expr: Expression
-            Expression that computes output
+        expr: Variable
+            Variable that computes output
 
         Returns
         -------
-        Expression
-            Expression that computes output
+        Variable
+            Variable that computes output
         """
         if isinstance(expr, Input):
             raise TypeError("Cannot register input " + expr + " as an output")

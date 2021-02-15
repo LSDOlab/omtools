@@ -1,17 +1,17 @@
 from omtools.comps.einsum_comp_dense_derivs import EinsumComp
 from omtools.comps.einsum_comp_sparse_derivs import SparsePartialEinsumComp
 from omtools.utils.einsum_utils import compute_einsum_shape, new_einsum_subscripts_to_string_and_list
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from typing import List
 
 
-def einsum_new_api(*operands: List[Expression],
+def einsum_new_api(*operands: List[Variable],
                    operation: List[tuple],
                    partial_format='dense'):
-    out = Expression()
+    out = Variable()
     for expr in operands:
-        if not isinstance(expr, Expression):
-            raise TypeError(expr, " is not an Expression object")
+        if not isinstance(expr, Variable):
+            raise TypeError(expr, " is not an Variable object")
         out.add_dependency_node(expr)
     scalar_output = False
     if len(operands) == len(operation):

@@ -1,11 +1,11 @@
 import numpy as np
 from openmdao.api import ExplicitComponent
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 
 
 class PassThroughComp(ExplicitComponent):
     def initialize(self):
-        self.options.declare('expr', types=Expression)
+        self.options.declare('expr', types=Variable)
         self.options.declare('name', types=str)
 
     def setup(self):

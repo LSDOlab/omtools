@@ -1,7 +1,7 @@
 Array Indexing
 ==============
 
-``omtools`` supports indexing into ``Expression`` objects for explicit
+``omtools`` supports indexing into ``Variable`` objects for explicit
 outputs.
 
 In this example, integer indices are used to concatenate multiple

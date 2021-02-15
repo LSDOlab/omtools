@@ -1,15 +1,15 @@
 from omtools.comps.tensor_inner_product_comp import TensorInnerProductComp
 from omtools.comps.vector_inner_product_comp import VectorInnerProductComp
 
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from typing import List
 import numpy as np
 
 
-def dot(expr1: Expression, expr2: Expression, axis=None):
-    if not (isinstance(expr1, Expression) and isinstance(expr2, Expression)):
-        raise TypeError("Arguments must both be Expression objects")
-    out = Expression()
+def dot(expr1: Variable, expr2: Variable, axis=None):
+    if not (isinstance(expr1, Variable) and isinstance(expr2, Variable)):
+        raise TypeError("Arguments must both be Variable objects")
+    out = Variable()
     out.add_dependency_node(expr1)
     out.add_dependency_node(expr2)
 

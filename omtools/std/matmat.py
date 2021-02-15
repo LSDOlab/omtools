@@ -1,13 +1,13 @@
 from omtools.comps.matmat_comp import MatMatComp
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from typing import List
 import numpy as np
 
 
 def matmat(mat1, mat2):
-    if not (isinstance(mat1, Expression) and isinstance(mat2, Expression)):
-        raise TypeError("Arguments must both be Expression objects")
-    out = Expression()
+    if not (isinstance(mat1, Variable) and isinstance(mat2, Variable)):
+        raise TypeError("Arguments must both be Variable objects")
+    out = Variable()
     out.add_dependency_node(mat1)
     out.add_dependency_node(mat2)
 

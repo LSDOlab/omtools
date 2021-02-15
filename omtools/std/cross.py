@@ -1,11 +1,11 @@
 from omtools.comps.cross_product_comp import CrossProductComp
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 
 
 def cross(in1, in2, axis: int):
-    if not (isinstance(in1, Expression) and isinstance(in2, Expression)):
-        raise TypeError("Arguments must both be Expression objects")
-    out = Expression()
+    if not (isinstance(in1, Variable) and isinstance(in2, Variable)):
+        raise TypeError("Arguments must both be Variable objects")
+    out = Variable()
     out.add_dependency_node(in1)
     out.add_dependency_node(in2)
 

@@ -2,7 +2,7 @@ Implicit Relationships
 ======================
 
 It is possible to compute outputs implicitly by defining a residual
-expression in terms of the output and inputs.
+variable in terms of the output and inputs.
 
 In the first example, we solve a quadratic equation.
 This quadratic has two solutions: ``1`` and ``3``.

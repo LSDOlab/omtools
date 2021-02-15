@@ -1,7 +1,7 @@
 Implicit Relationships with Subsystems
 ======================================
 
-Residual expressions may depend on the result of a subsystem.
+Residual variables may depend on the result of a subsystem.
 For example, the solution to a quadratic equation depends on the
 coefficients, but one of those coefficients may not be constant, and may
 depend on a subsystem.

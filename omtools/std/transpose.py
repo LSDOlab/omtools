@@ -1,13 +1,13 @@
 from omtools.comps.transpose_comp import TransposeComp
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from typing import List
 import numpy as np
 
 
-def transpose(expr: Expression):
-    if not isinstance(expr, Expression):
-        raise TypeError(expr, " is not an Expression object")
-    out = Expression()
+def transpose(expr: Variable):
+    if not isinstance(expr, Variable):
+        raise TypeError(expr, " is not an Variable object")
+    out = Variable()
     out.add_dependency_node(expr)
     out.shape = expr.shape[::-1]
     out.build = lambda: TransposeComp(

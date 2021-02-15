@@ -1,7 +1,7 @@
 import numpy as np
 from openmdao.api import ExplicitComponent
 
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 
 
 class IndexedPassThroughComp(ExplicitComponent):

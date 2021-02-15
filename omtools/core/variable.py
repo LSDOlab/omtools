@@ -20,18 +20,18 @@ def slice_to_tuple(key: slice, size: int) -> tuple:
     return (key.start, key.stop, key.step)
 
 
-class Expression():
+class Variable():
     """
-    The ``Expression`` class is a base type for nodes in a Directed
+    The ``Variable`` class is a base type for nodes in a Directed
     Acyclic Graph (DAG) that represents the computation to be performed
     during model evaluation.
 
-    Each ``Expression`` object stores a function that constructs an
+    Each ``Variable`` object stores a function that constructs an
     OpenMDAO ``Component`` object corresponding to the computation that
-    the ``Expression`` object represents.
+    the ``Variable`` object represents.
     """
 
-    # A counter for all Expression objects created so far
+    # A counter for all Variable objects created so far
     _count = -1
 
     def __pos__(self):
@@ -75,7 +75,7 @@ class Expression():
         Represent addition between two expressions
         """
         if isinstance(other, numbers.Number) == False:
-            raise TypeError(other, " is not an Expression object or literal")
+            raise TypeError(other, " is not an Variable object or literal")
         return ElementwiseAddition(other, self)
 
     def __rsub__(self, other):
@@ -83,7 +83,7 @@ class Expression():
         Represent subtraction between two expressions
         """
         if isinstance(other, numbers.Number) == False:
-            raise TypeError(other, " is not an Expression object or literal")
+            raise TypeError(other, " is not an Variable object or literal")
         return ElementwiseSubtraction(other, self)
 
     def __rmul__(self, other):
@@ -91,7 +91,7 @@ class Expression():
         Represent multiplication between two expressions
         """
         if isinstance(other, numbers.Number) == False:
-            raise TypeError(other, " is not an Expression or a literal value")
+            raise TypeError(other, " is not an Variable or a literal value")
         return ElementwiseMultiplication(other, self)
 
     def __rtruediv__(self, other):
@@ -99,7 +99,7 @@ class Expression():
         Represent division between two expressions
         """
         if isinstance(other, numbers.Number) == False:
-            raise TypeError(other, " is not an Expression or a literal value")
+            raise TypeError(other, " is not an Variable or a literal value")
         return ElementwiseDivision(other, self)
 
     def initialize(self, *args, **kwargs):
@@ -114,8 +114,8 @@ class Expression():
                 self.units = v
 
     def __init__(self, *args, **kwargs):
-        Expression._count += 1
-        _id = gen_hex_name(Expression._count)
+        Variable._count += 1
+        _id = gen_hex_name(Variable._count)
         self._id = _id
         self.name = _id
         self.shape = (1, )
@@ -139,7 +139,7 @@ class Expression():
     ):
         if self._getitem_called == False:
             self._getitem_called = True
-            self._decomp = Expression(shape=self.shape, val=self.val[key])
+            self._decomp = Variable(shape=self.shape, val=self.val[key])
             self._decomp.name = 'decompose_' + self.name
             self._decomp.add_dependency_node(self)
 
@@ -191,7 +191,7 @@ class Expression():
 
         # Create and store expression to return
         val = self.val[tuple([slice(s[0], s[1], s[2]) for s in list(key)])]
-        expr = Expression(shape=val.shape, val=val)
+        expr = Variable(shape=val.shape, val=val)
         self._decomp.indexed_exprs[key] = expr
         expr.add_dependency_node(self._decomp)
         self._decomp.src_indices[expr] = src_indices
@@ -218,16 +218,16 @@ class Expression():
         """
         Add a dependency node to the DAG representing the computation
         that OpenMDAO will perform during model evaluation. Each
-        ``Expression`` object represents some computation that returns a
-        value. The number of dependency nodes of an ``Expression``
+        ``Variable`` object represents some computation that returns a
+        value. The number of dependency nodes of an ``Variable``
         object is the number of arguments required to return a value.
         for example, in ``c = a + b``, the object ``c`` has two
         dependencies: ``a`` and ``b``.
 
         Parameters
         ----------
-        predecesor: Expression
-            An Expression object upon which this Expression object
+        predecesor: Variable
+            An Variable object upon which this Variable object
             depends
         """
         if dependency.is_residual == True:
@@ -245,7 +245,7 @@ class Expression():
 
         Parameters
         ----------
-        nodes: dict[Expression]
+        nodes: dict[Variable]
             Dictionary of nodes registered so far
         """
         for node in self.dependencies:
@@ -283,7 +283,7 @@ class Expression():
 
         Parameters
         ----------
-        candidate: Expression
+        candidate: Variable
             The candidate dependency node
 
         Returns
@@ -302,7 +302,7 @@ class Expression():
         """
         Remove dependency node, given its index. does nothing if
         ``index`` is out of range. See
-        ``Expression.remove_dependency``.
+        ``Variable.remove_dependency``.
 
         Parameters
         ----------
@@ -322,8 +322,8 @@ class Expression():
 
         Parameters
         ----------
-        branch: set[Expression]
-            Set of all Expression objects traversed so far in current
+        branch: set[Variable]
+            Set of all Variable objects traversed so far in current
             branch. If a dependency is in ``branch``, then
             ``compute_dag_cost`` will terminate and return a value. If
             ``self`` is a leaf node, then ``compute_dag_cost`` will
@@ -341,7 +341,7 @@ class Expression():
     def sort_dependency_branches(self, reverse_branch_sorting=False):
         """
         Sort dependencies by DAG cost so that branches with higher cost
-        (``Expression._dag_cost``) appear before shorter branches
+        (``Variable._dag_cost``) appear before shorter branches
         ("critical path" sorting). User can set flag to force branches
         with lower cost to appear before branches with hgiher cost ("low
         hanging fruit" sorting).
@@ -373,7 +373,7 @@ class Expression():
 
         Parameters
         ----------
-        candidate: Expression
+        candidate: Variable
             Node to remove from ``self.dependencies``
         """
         index = self.get_dependency_index(candidate)
@@ -398,19 +398,19 @@ class Expression():
         return len(self.dependents)
 
 
-class ElementwiseAddition(Expression):
+class ElementwiseAddition(Variable):
     """
-    ``Expression`` object used to create a LinearCombinationComp for
+    ``Variable`` object used to create a LinearCombinationComp for
     addition
     """
     def initialize(self, expr1, expr2):
-        if isinstance(expr1, Expression):
+        if isinstance(expr1, Variable):
             self.shape = expr1.shape
             self.add_dependency_node(expr1)
-        if isinstance(expr2, Expression):
+        if isinstance(expr2, Variable):
             self.shape = expr2.shape
             self.add_dependency_node(expr2)
-        if isinstance(expr1, Expression) and isinstance(expr2, Expression):
+        if isinstance(expr1, Variable) and isinstance(expr2, Variable):
             if expr1.shape == expr2.shape:
                 self.shape = expr1.shape
 
@@ -430,7 +430,7 @@ class ElementwiseAddition(Expression):
                 )
 
         if (isinstance(expr1, numbers.Number) or isinstance(
-                expr1, np.ndarray)) and isinstance(expr2, Expression):
+                expr1, np.ndarray)) and isinstance(expr2, Variable):
 
             self.build = lambda: LinearCombinationComp(
                 shape=expr2.shape,
@@ -442,7 +442,7 @@ class ElementwiseAddition(Expression):
             )
 
         if (isinstance(expr2, numbers.Number) or isinstance(
-                expr2, np.ndarray)) and isinstance(expr1, Expression):
+                expr2, np.ndarray)) and isinstance(expr1, Variable):
 
             self.build = lambda: LinearCombinationComp(
                 shape=expr1.shape,
@@ -461,19 +461,19 @@ class ElementwiseAddition(Expression):
         return "ElementwiseAddition (" + shape_str + ")"
 
 
-class ElementwiseSubtraction(Expression):
+class ElementwiseSubtraction(Variable):
     """
-    ``Expression`` object used to create a LinearCombinationComp for
+    ``Variable`` object used to create a LinearCombinationComp for
     subtraction
     """
     def initialize(self, expr1, expr2):
-        if isinstance(expr1, Expression):
+        if isinstance(expr1, Variable):
             self.shape = expr1.shape
             self.add_dependency_node(expr1)
-        if isinstance(expr2, Expression):
+        if isinstance(expr2, Variable):
             self.shape = expr2.shape
             self.add_dependency_node(expr2)
-        if isinstance(expr1, Expression) and isinstance(expr2, Expression):
+        if isinstance(expr1, Variable) and isinstance(expr2, Variable):
             if expr1.shape == expr2.shape:
                 self.shape = expr1.shape
 
@@ -493,7 +493,7 @@ class ElementwiseSubtraction(Expression):
                 )
 
         if (isinstance(expr1, numbers.Number) or isinstance(
-                expr1, np.ndarray)) and isinstance(expr2, Expression):
+                expr1, np.ndarray)) and isinstance(expr2, Variable):
 
             self.build = lambda: LinearCombinationComp(
                 shape=expr2.shape,
@@ -505,7 +505,7 @@ class ElementwiseSubtraction(Expression):
             )
 
         if (isinstance(expr2, numbers.Number) or isinstance(
-                expr2, np.ndarray)) and isinstance(expr1, Expression):
+                expr2, np.ndarray)) and isinstance(expr1, Variable):
 
             self.build = lambda: LinearCombinationComp(
                 shape=expr1.shape,
@@ -524,19 +524,19 @@ class ElementwiseSubtraction(Expression):
         return "ElementwiseSubtraction (" + shape_str + ")"
 
 
-class ElementwiseMultiplication(Expression):
+class ElementwiseMultiplication(Variable):
     """
-    ``Expression`` object used to create a PowerCombinationComp for
+    ``Variable`` object used to create a PowerCombinationComp for
     multiplication
     """
     def initialize(self, expr1, expr2):
-        if isinstance(expr1, Expression):
+        if isinstance(expr1, Variable):
             self.shape = expr1.shape
             self.add_dependency_node(expr1)
-        if isinstance(expr2, Expression):
+        if isinstance(expr2, Variable):
             self.shape = expr2.shape
             self.add_dependency_node(expr2)
-        if isinstance(expr1, Expression) and isinstance(expr2, Expression):
+        if isinstance(expr1, Variable) and isinstance(expr2, Variable):
             if expr1.shape == expr2.shape:
                 self.shape = expr1.shape
 
@@ -556,7 +556,7 @@ class ElementwiseMultiplication(Expression):
                 )
 
         if (isinstance(expr1, numbers.Number) or isinstance(
-                expr1, np.ndarray)) and isinstance(expr2, Expression):
+                expr1, np.ndarray)) and isinstance(expr2, Variable):
 
             self.shape = expr2.shape
 
@@ -570,7 +570,7 @@ class ElementwiseMultiplication(Expression):
             )
 
         if (isinstance(expr2, numbers.Number) or isinstance(
-                expr2, np.ndarray)) and isinstance(expr1, Expression):
+                expr2, np.ndarray)) and isinstance(expr1, Variable):
 
             self.shape = expr1.shape
 
@@ -591,19 +591,19 @@ class ElementwiseMultiplication(Expression):
         return "ElementwiseMultiplication (" + shape_str + ")"
 
 
-class ElementwiseDivision(Expression):
+class ElementwiseDivision(Variable):
     """
-    ``Expression`` object used to create a PowerCombinationComp for
+    ``Variable`` object used to create a PowerCombinationComp for
     multiplication
     """
     def initialize(self, expr1, expr2):
-        if isinstance(expr1, Expression):
+        if isinstance(expr1, Variable):
             self.shape = expr1.shape
             self.add_dependency_node(expr1)
-        if isinstance(expr2, Expression):
+        if isinstance(expr2, Variable):
             self.shape = expr2.shape
             self.add_dependency_node(expr2)
-        if isinstance(expr1, Expression) and isinstance(expr2, Expression):
+        if isinstance(expr1, Variable) and isinstance(expr2, Variable):
             if expr1.shape == expr2.shape:
                 self.shape = expr1.shape
 
@@ -623,7 +623,7 @@ class ElementwiseDivision(Expression):
                 )
 
         if (isinstance(expr1, numbers.Number) or isinstance(
-                expr1, np.ndarray)) and isinstance(expr2, Expression):
+                expr1, np.ndarray)) and isinstance(expr2, Variable):
 
             self.shape = expr2.shape
 
@@ -637,7 +637,7 @@ class ElementwiseDivision(Expression):
             )
 
         if (isinstance(expr2, numbers.Number) or isinstance(
-                expr2, np.ndarray)) and isinstance(expr1, Expression):
+                expr2, np.ndarray)) and isinstance(expr1, Variable):
             if expr2 == 0:
                 raise ValueError("Cannot divide by zero")
 
@@ -660,16 +660,16 @@ class ElementwiseDivision(Expression):
         return "ElementwiseDivision (" + shape_str + ")"
 
 
-class ElementwisePower(Expression):
+class ElementwisePower(Variable):
     """
-    ``Expression`` object used to create a PowerCombinationComp for
+    ``Variable`` object used to create a PowerCombinationComp for
     scalar exponent
     """
     def initialize(self, expr1, expr2):
-        if isinstance(expr1, Expression):
+        if isinstance(expr1, Variable):
             self.add_dependency_node(expr1)
         else:
-            raise TypeError(expr1, " is not an Expression object or literal")
+            raise TypeError(expr1, " is not an Variable object or literal")
         if isinstance(expr2, numbers.Number):
             self.shape = expr1.shape
 

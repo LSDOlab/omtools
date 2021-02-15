@@ -33,7 +33,7 @@ How it Works
 ------------
 
 ``omtools`` stores a graph of nodes and edges representing
-expressions and their dependencies, analyzing the graph, and directing
+variables and their dependencies, analyzing the graph, and directing
 OpenMDAO to construct corresponding ``Component`` objects and issuing
 the necessary connections.
 
@@ -51,4 +51,3 @@ Documentation
    _src_docs/api/omtools_group.rst
    _src_docs/api/library_of_operations.rst
    _src_docs/api/omtools_backend.rst
-   

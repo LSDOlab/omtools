@@ -1,14 +1,14 @@
 from omtools.comps.reorder_axes_comp import ReorderAxesComp
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from typing import List
 import numpy as np
 from omtools.utils.reorder_axes_utils import compute_new_axes_locations
 
 
-def reorder_axes(expr: Expression, operation: str):
-    if not isinstance(expr, Expression):
-        raise TypeError(expr, " is not an Expression object")
-    out = Expression()
+def reorder_axes(expr: Variable, operation: str):
+    if not isinstance(expr, Variable):
+        raise TypeError(expr, " is not an Variable object")
+    out = Variable()
     out.add_dependency_node(expr)
 
     # Computing out_shape

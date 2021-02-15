@@ -2,7 +2,7 @@ from typing import Dict, List, Tuple, Union
 
 import numpy as np
 
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from omtools.core.input import Input
 from omtools.core.output import Output
 from omtools.comps.indexed_pass_through_comp import \
@@ -44,7 +44,7 @@ class ExplicitOutput(Output):
         self.overlapping_indices = set()
         self._tgt_vals = dict()
 
-    def define(self, expr: Expression):
+    def define(self, expr: Variable):
         """
         Define expression (in terms of ``self``) that computes value for
         this output. This method defines a cyclic relationship, which
@@ -52,21 +52,21 @@ class ExplicitOutput(Output):
 
         Parameters
         ----------
-        expr: Expression
+        expr: Variable
             The expression to compute iteratively until convergence
         """
         if expr is self:
-            raise ValueError("Expression for output " + self.name +
+            raise ValueError("Variable for output " + self.name +
                              " cannot be self")
         if self.indexed_assignment == True and self.defined == True:
             raise ValueError(
-                "Expression for output " + self.name +
+                "Variable for output " + self.name +
                 " is already defined using indexed assignment; use index assignment to concatenate expression outputs"
             )
 
         if self.defined == True:
             raise ValueError(
-                "Expression for output " + self.name +
+                "Variable for output " + self.name +
                 ", which forms a cycle to be computed iteratively, is already defined"
             )
         self.defined = True
@@ -88,7 +88,7 @@ class ExplicitOutput(Output):
     def __setitem__(
         self,
         key: Union[int, slice, Tuple[slice]],
-        expr: Expression,
+        expr: Variable,
     ):
         self.add_dependency_node(expr)
         tgt_indices = []

@@ -1,12 +1,12 @@
 from omtools.comps.array_expansion_comp import ArrayExpansionComp
 from omtools.comps.scalar_expansion_comp import ScalarExpansionComp
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from omtools.utils.decompose_shape_tuple import decompose_shape_tuple
 
 
-def expand(expr: Expression, shape: tuple, indices=None):
-    if not isinstance(expr, Expression):
-        raise TypeError(expr, " is not an Expression object")
+def expand(expr: Variable, shape: tuple, indices=None):
+    if not isinstance(expr, Variable):
+        raise TypeError(expr, " is not an Variable object")
 
     if indices is not None:
         if not isinstance(indices, str):
@@ -24,7 +24,7 @@ def expand(expr: Expression, shape: tuple, indices=None):
             if index not in in_indices:
                 expand_indices.append(i)
 
-    out = Expression()
+    out = Variable()
     out.shape = shape
     out.add_dependency_node(expr)
 

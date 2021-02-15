@@ -1,18 +1,18 @@
 from omtools.comps.tensor_inner_product_comp import TensorInnerProductComp
 from omtools.comps.vector_inner_product_comp import VectorInnerProductComp
 
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from typing import List
 import numpy as np
 
 
-def inner(expr1: Expression, expr2: Expression, axes=None):
-    if not isinstance(expr1, Expression):
-        raise TypeError(expr1, " is not an Expression object")
-    elif not isinstance(expr2, Expression):
-        raise TypeError(expr2, " is not an Expression object")
+def inner(expr1: Variable, expr2: Variable, axes=None):
+    if not isinstance(expr1, Variable):
+        raise TypeError(expr1, " is not an Variable object")
+    elif not isinstance(expr2, Variable):
+        raise TypeError(expr2, " is not an Variable object")
 
-    out = Expression()
+    out = Variable()
     out.add_dependency_node(expr1)
     out.add_dependency_node(expr2)
 

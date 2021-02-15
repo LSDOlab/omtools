@@ -1,11 +1,11 @@
 from openmdao.api import IndepVarComp
 
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from omtools.utils.get_shape_val import get_shape_val
 import numpy as np
 
 
-class Indep(Expression):
+class Indep(Variable):
     """
     Container for creating a value that is constant during model
     evaluation; i.e. independent variable, or design variable

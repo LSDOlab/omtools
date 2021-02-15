@@ -1,13 +1,13 @@
 from omtools.comps.matvec_comp import MatVecComp
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from typing import List
 import numpy as np
 
 
 def matvec(mat1, vec1):
-    if not (isinstance(mat1, Expression) and isinstance(vec1, Expression)):
-        raise TypeError("Arguments must both be Expression objects")
-    out = Expression()
+    if not (isinstance(mat1, Variable) and isinstance(vec1, Variable)):
+        raise TypeError("Arguments must both be Variable objects")
+    out = Variable()
     out.add_dependency_node(mat1)
     out.add_dependency_node(vec1)
 

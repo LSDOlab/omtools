@@ -1,14 +1,14 @@
 from omtools.comps.vectorized_pnorm_comp import VectorizedPnormComp
 from omtools.comps.vectorized_axiswise_pnorm_comp import VectorizedAxisWisePnormComp
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from typing import List
 import numpy as np
 
 
 def pnorm(expr, pnorm_type, axis=None):
-    if not isinstance(expr, Expression):
-        raise TypeError(expr, " is not an Expression object")
-    out = Expression()
+    if not isinstance(expr, Variable):
+        raise TypeError(expr, " is not an Variable object")
+    out = Variable()
     out.add_dependency_node(expr)
 
     if pnorm_type % 2 != 0 or pnorm_type <= 0:

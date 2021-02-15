@@ -1,15 +1,15 @@
 from omtools.comps.single_tensor_average_comp import SingleTensorAverageComp
 from omtools.comps.multiple_tensor_average_comp import MultipleTensorAverageComp
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from typing import List
 import numpy as np
 
 
-def average(*operands: List[Expression], axes=None):
-    out = Expression()
+def average(*operands: List[Variable], axes=None):
+    out = Variable()
     for expr in operands:
-        if not isinstance(expr, Expression):
-            raise TypeError(expr, " is not an Expression object")
+        if not isinstance(expr, Variable):
+            raise TypeError(expr, " is not an Variable object")
         out.add_dependency_node(expr)
 
     if axes == None:

@@ -1,11 +1,11 @@
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from omtools.core.input import Input
 from omtools.core.output import Output
 
 
 def replace_output_leaf_nodes(
     root: Output,
-    node: Expression,
+    node: Variable,
     leaf: Input,
 ):
     """

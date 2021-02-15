@@ -2,16 +2,16 @@ from omtools.comps.axiswise_min_comp import AxisMinComp
 from omtools.comps.elementwise_min_comp import ElementwiseMinComp
 from omtools.comps.scalar_extremum_comp import ScalarExtremumComp
 
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 
 import numpy as np
 
 
 def min(*exprs, axis=None, rho=20.):
-    out = Expression()
+    out = Variable()
     for expr in exprs:
-        if not isinstance(expr, Expression):
-            raise TypeError(expr, " is not an Expression object")
+        if not isinstance(expr, Variable):
+            raise TypeError(expr, " is not an Variable object")
         out.add_dependency_node(expr)
 
     if len(exprs) == 1 and axis != None:

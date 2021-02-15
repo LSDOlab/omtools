@@ -1,13 +1,13 @@
 import numpy as np
 from openmdao.api import ExplicitComponent
 
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 
 
 class DecomposeComp(ExplicitComponent):
     def initialize(self):
         self.options.declare('in_name', types=str)
-        self.options.declare('expr', types=Expression)
+        self.options.declare('expr', types=Variable)
         self.options.declare('val', types=np.ndarray)
 
     def setup(self):

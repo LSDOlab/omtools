@@ -4,7 +4,7 @@ from typing import Dict, Tuple
 import numpy as np
 
 # from omtools.comps.implicit_component import ImplicitComponent
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from omtools.core.input import Input
 from omtools.core.output import Output
 from omtools.core.subsystem import Subsystem
@@ -15,7 +15,7 @@ from omtools.utils.replace_output_leaf_nodes import replace_output_leaf_nodes
 
 
 def replace_input_leaf_nodes(
-    node: Expression,
+    node: Variable,
     leaves: Dict[str, Input],
 ):
     """
@@ -70,7 +70,7 @@ class ImplicitOutput(Output):
 
     def define_residual(
         self,
-        residual_expr: Expression,
+        residual_expr: Variable,
     ):
         """
         Define the residual that must equal zero for this output to be
@@ -78,16 +78,16 @@ class ImplicitOutput(Output):
 
         Parameters
         ----------
-        residual_expr: Expression
+        residual_expr: Variable
             Residual expression
         """
         if residual_expr is self:
-            raise ValueError("Expression for residual of " + self.name +
+            raise ValueError("Variable for residual of " + self.name +
                              " cannot be self")
         if self.defined == True:
-            raise ValueError("Expression for residual of " + self.name +
+            raise ValueError("Variable for residual of " + self.name +
                              " is already defined")
-        # Replace leaf nodes of residual Expression object that
+        # Replace leaf nodes of residual Variable object that
         # correspond to this ImplicitOutput node with Input objects;
         replace_output_leaf_nodes(
             self,
@@ -109,7 +109,7 @@ class ImplicitOutput(Output):
 
     def define_residual_bracketed(
         self,
-        residual_expr: Expression,
+        residual_expr: Variable,
         x1=0.,
         x2=1.,
     ):
@@ -119,16 +119,16 @@ class ImplicitOutput(Output):
 
         Parameters
         ----------
-        residual_expr: Expression
+        residual_expr: Variable
             Residual expression
         """
         if residual_expr is self:
-            raise ValueError("Expression for residual of " + self.name +
+            raise ValueError("Variable for residual of " + self.name +
                              " cannot be self")
         if self.defined == True:
-            raise ValueError("Expression for residual of " + self.name +
+            raise ValueError("Variable for residual of " + self.name +
                              " is already defined")
-        # Replace leaf nodes of residual Expression object that
+        # Replace leaf nodes of residual Variable object that
         # correspond to this ImplicitOutput node with Input objects;
         replace_output_leaf_nodes(
             self,

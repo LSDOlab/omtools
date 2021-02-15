@@ -1,8 +1,8 @@
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from typing import List
 
 
-def remove_indirect_dependencies(node: Expression):
+def remove_indirect_dependencies(node: Variable):
     """
     Remove the dependencies that do not constrin execution order. That
     is, if C depends on B and A, and B depends on A, then the execution
@@ -10,7 +10,7 @@ def remove_indirect_dependencies(node: Expression):
 
     Parameters
     ----------
-    node: Expression
+    node: Variable
         The node to treat as "root". In ``omtools.group``,
         ``Group._root`` is treated as the "root" node.
     """
@@ -33,7 +33,7 @@ def remove_indirect_dependencies(node: Expression):
             node.remove_dependency_by_index(i)
 
 
-def topological_sort(node: Expression) -> List[Expression]:
+def topological_sort(node: Variable) -> List[Variable]:
     """
     Perform a topological sort on the Directed Acyclic Graph (DAG).
     If any cycles are detected when traversing the graph,
@@ -46,14 +46,14 @@ def topological_sort(node: Expression) -> List[Expression]:
 
     Parameters
     ----------
-    node: Expression
+    node: Variable
         The node to treat as "root". In ``omtools.group``,
         ``Group._root`` is treated as the "root" node.
 
     Returns
     -------
-    list[Expression]
-        List of ``Expression`` objects sorted from root to leaf. When
+    list[Variable]
+        List of ``Variable`` objects sorted from root to leaf. When
         overriding ``omtools.Group.setup``, the first node will be
         ``Group._root``, and the last will be an ``Input``,
         ``ExplicitOutput``, ``ImplicitOutput``, or ``IndepVar``.

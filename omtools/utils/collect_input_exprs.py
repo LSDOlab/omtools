@@ -1,14 +1,14 @@
 from typing import List
 
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from omtools.core.input import Input
 
 
 def collect_input_exprs(
     inputs: list,
-    root: Expression,
-    expr: Expression,
-) -> List[Expression]:
+    root: Variable,
+    expr: Variable,
+) -> List[Variable]:
     """
     Collect input nodes so that the resulting ``ImplicitComponent`` has
     access to inputs outside of itself.

@@ -1,11 +1,11 @@
 from omtools.comps.coseccomp import CosecComp
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 
 
 def cosec(expr):
-    if not isinstance(expr, Expression):
-        raise TypeError(expr, " is not an Expression object")
-    out = Expression()
+    if not isinstance(expr, Variable):
+        raise TypeError(expr, " is not an Variable object")
+    out = Variable()
     out.shape = expr.shape
     out.add_dependency_node(expr)
 

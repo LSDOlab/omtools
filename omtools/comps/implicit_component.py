@@ -7,7 +7,7 @@ from openmdao.api import ImplicitComponent as OMImplicitComponent
 from openmdao.solvers.solver import Solver
 
 from omtools.core.subsystem import Subsystem
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from omtools.core.explicit_output import ExplicitOutput
 from omtools.core.group import Group
 from omtools.core.input import Input
@@ -118,7 +118,7 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
         Object that represents the output of the
         ``CompositeImplicitComp``
 
-    res_expr: Expression
+    res_expr: Variable
         Object that represents an expression to compute the residual
 
     """

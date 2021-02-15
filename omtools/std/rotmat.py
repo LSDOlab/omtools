@@ -1,11 +1,11 @@
 from omtools.comps.rotation_matrix_comp import RotationMatrixComp
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 
 
-def rotmat(expr: Expression, axis: str):
-    if not isinstance(expr, Expression):
-        raise TypeError(expr, " is not an Expression object")
-    out = Expression()
+def rotmat(expr: Variable, axis: str):
+    if not isinstance(expr, Variable):
+        raise TypeError(expr, " is not an Variable object")
+    out = Variable()
     out.add_dependency_node(expr)
 
     if expr.shape == (1, ):
