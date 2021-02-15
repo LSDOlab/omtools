@@ -24,5 +24,7 @@ def cross(in1, in2, axis: int):
         in2_name=in2.name,
         out_name=out.name,
         axis=axis,
+        in1_val=in1.val,
+        in2_val=in2.val,
     )
     return out

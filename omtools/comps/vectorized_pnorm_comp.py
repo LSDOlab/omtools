@@ -4,15 +4,15 @@ from openmdao.api import ExplicitComponent
 
 class VectorizedPnormComp(ExplicitComponent):
     """
-    This is a component that computes the p-norm of a vectorized tensor. 
-    This is exclusively for p-norms that are greater than 0 and even. 
+    This is a component that computes the p-norm of a vectorized tensor.
+    This is exclusively for p-norms that are greater than 0 and even.
     The output is a scalar.
 
     Options
     -------
     in_name: str
-        Name of the input 
-    
+        Name of the input
+
     out_name: str
         Name of the output
 
@@ -28,16 +28,17 @@ class VectorizedPnormComp(ExplicitComponent):
         self.options.declare('out_name', types=str)
         self.options.declare('shape', types=tuple)
         self.options.declare('pnorm_type', types=int, default=2)
+        self.options.declare('val', types=np.ndarray)
 
     def setup(self):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
         shape = self.options['shape']
         pnorm_type = self.options['pnorm_type']
+        val = self.options['val']
 
-        self.add_input(in_name, shape=shape)
+        self.add_input(in_name, shape=shape, val=val)
         self.add_output(out_name)
-
 
         self.declare_partials(out_name, in_name)
 
@@ -46,16 +47,16 @@ class VectorizedPnormComp(ExplicitComponent):
         out_name = self.options['out_name']
         pnorm_type = self.options['pnorm_type']
 
-        self.outputs = outputs[out_name] = np.linalg.norm(inputs[in_name].flatten(), ord=pnorm_type)
-    
+        self.outputs = outputs[out_name] = np.linalg.norm(
+            inputs[in_name].flatten(), ord=pnorm_type)
 
     def compute_partials(self, inputs, partials):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
         pnorm_type = self.options['pnorm_type']
 
-        partials[out_name, in_name] = self.outputs**(1 - pnorm_type) * inputs[in_name] ** (pnorm_type - 1)
-    
+        partials[out_name, in_name] = self.outputs**(
+            1 - pnorm_type) * inputs[in_name]**(pnorm_type - 1)
 
 
 if __name__ == "__main__":
@@ -63,8 +64,8 @@ if __name__ == "__main__":
     n = 2
     m = 3
     p = 10
-    shape = (n,m,p)
-    val = np.random.rand(n,m,p)
+    shape = (n, m, p)
+    val = np.random.rand(n, m, p)
     indeps = IndepVarComp()
     indeps.add_output(
         'x',
@@ -80,11 +81,12 @@ if __name__ == "__main__":
     )
     prob.model.add_subsystem(
         'vectorized_pnorm',
-        VectorizedPnormComp(in_name='x', out_name='y', shape=shape, pnorm_type=2),
+        VectorizedPnormComp(in_name='x',
+                            out_name='y',
+                            shape=shape,
+                            pnorm_type=2),
         promotes=['*'],
     )
     prob.setup()
     prob.check_partials(compact_print=True)
     prob.run_model()
-
- 

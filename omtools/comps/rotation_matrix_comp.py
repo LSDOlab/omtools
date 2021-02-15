@@ -6,6 +6,7 @@ from openmdao.api import ExplicitComponent
 class RotationMatrixComp(ExplicitComponent):
     def initialize(self):
         self.options.declare('shape', types=tuple)
+        self.options.declare('val', types=np.ndarray)
         self.options.declare('axis', types=str)
         self.options.declare('in_name',
                              types=str,
@@ -16,6 +17,7 @@ class RotationMatrixComp(ExplicitComponent):
 
     def setup(self):
         shape = self.options['shape']
+        val = self.options['val']
         if shape == (1, ):
             output_shape = (3, 3)
 
@@ -26,7 +28,7 @@ class RotationMatrixComp(ExplicitComponent):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
 
-        self.add_input(in_name, shape=shape)
+        self.add_input(in_name, shape=shape, val=val)
         self.add_output(out_name, shape=output_shape)
 
         rows = np.arange(np.prod(output_shape))

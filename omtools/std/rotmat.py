@@ -2,22 +2,23 @@ from omtools.comps.rotation_matrix_comp import RotationMatrixComp
 from omtools.core.expression import Expression
 
 
-def rotmat(angle, axis: str):
-    if not isinstance(angle, Expression):
-        raise TypeError(angle, " is not an Expression object")
+def rotmat(expr: Expression, axis: str):
+    if not isinstance(expr, Expression):
+        raise TypeError(expr, " is not an Expression object")
     out = Expression()
-    out.add_dependency_node(angle)
+    out.add_dependency_node(expr)
 
-    if angle.shape == (1, ):
+    if expr.shape == (1, ):
         out.shape = (3, 3)
 
     else:
-        out.shape = angle.shape + (3, 3)
+        out.shape = expr.shape + (3, 3)
 
     out.build = lambda: RotationMatrixComp(
-        shape=angle.shape,
-        in_name=angle.name,
+        shape=expr.shape,
+        in_name=expr.name,
         out_name=out.name,
         axis=axis,
+        val=expr.val,
     )
     return out

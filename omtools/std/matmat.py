@@ -19,6 +19,7 @@ def matmat(mat1, mat2):
             in_names=[mat1.name, mat2.name],
             out_name=out.name,
             in_shapes=[mat1.shape, mat2.shape],
+            in_vals=[mat1.val, mat2.val],
         )
 
     elif mat1.shape[1] == mat2.shape[0] and len(mat2.shape) == 1:
@@ -30,6 +31,7 @@ def matmat(mat1, mat2):
             in_names=[mat1.name, mat2.name],
             out_name=out.name,
             in_shapes=[mat1.shape, mat2_shape],
+            in_vals=[mat1.val, mat2.val.reshape(mat2_shape)],
         )
     else:
         raise Exception("Cannot multiply: ", mat1.shape, "by", mat2.shape)

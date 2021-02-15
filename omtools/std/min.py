@@ -19,11 +19,12 @@ def min(*exprs, axis=None, rho=20.):
         out.shape = tuple(output_shape)
 
         out.build = lambda: AxisMinComp(
-            shape=expr.shape,
-            in_name=expr.name,
+            shape=exprs[0].shape,
+            in_name=exprs[0].name,
             axis=axis,
             out_name=out.name,
             rho=rho,
+            val=exprs[0].val,
         )
 
     elif len(exprs) > 1 and axis == None:
@@ -40,16 +41,18 @@ def min(*exprs, axis=None, rho=20.):
             in_names=[expr.name for expr in exprs],
             out_name=out.name,
             rho=rho,
+            vals=[expr.val for expr in exprs],
         )
 
     elif len(exprs) == 1 and axis == None:
 
         out.build = lambda: ScalarExtremumComp(
-            shape=expr.shape,
-            in_name=expr.name,
+            shape=exprs[0].shape,
+            in_name=exprs[0].name,
             out_name=out.name,
             rho=rho,
             lower_flag=True,
+            val=exprs[0].val,
         )
 
     else:

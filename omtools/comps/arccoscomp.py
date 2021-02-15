@@ -9,27 +9,29 @@ class ArccosComp(ExplicitComponent):
     Options
     -------
     in_name: str
-        Name of the input 
-    
+        Name of the input
+
     out_name: str
         Name of the output
 
     shape: tuple[int]
         Shape of the input and output
     '''
-
     def initialize(self):
         self.options.declare('in_name')
         self.options.declare('out_name')
         self.options.declare('shape')
+        self.options.declare('val', types=np.ndarray)
 
     def setup(self):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
         shape = self.options['shape']
+        val = self.options['val']
         self.add_input(
             in_name,
             shape=shape,
+            val=val,
         )
         self.add_output(
             out_name,
@@ -46,14 +48,16 @@ class ArccosComp(ExplicitComponent):
     def compute_partials(self, inputs, partials):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
-        partials[out_name, in_name] = ( -1.0/ np.sqrt(1.0 - (inputs[in_name])**2) ).flatten()
+        partials[out_name,
+                 in_name] = (-1.0 / np.sqrt(1.0 -
+                                            (inputs[in_name])**2)).flatten()
 
 
 if __name__ == "__main__":
     from openmdao.api import Problem, IndepVarComp, Group
     n = 1
     val = np.random.rand(n)
-    print('INPUT VALUE:',  val)
+    print('INPUT VALUE:', val)
     indeps = IndepVarComp()
     indeps.add_output(
         'x',
@@ -75,6 +79,5 @@ if __name__ == "__main__":
     prob.setup()
     prob.check_partials(compact_print=True)
     prob.run_model()
-
 
     print(prob['y'])

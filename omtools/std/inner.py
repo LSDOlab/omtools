@@ -21,6 +21,7 @@ def inner(expr1: Expression, expr2: Expression, axes=None):
             in_names=[expr1.name, expr2.name],
             out_name=out.name,
             in_shape=expr1.shape[0],
+            in_vals=[expr1.val, expr2.val],
         )
 
     else:
@@ -34,5 +35,6 @@ def inner(expr1: Expression, expr2: Expression, axes=None):
             in_shapes=[expr1.shape, expr2.shape],
             axes=axes,
             out_shape=out.shape,
+            in_vals=[expr1.val, expr2.val],
         )
     return out

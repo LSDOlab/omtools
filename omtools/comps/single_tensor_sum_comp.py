@@ -1,7 +1,7 @@
 import numpy as np
 from copy import deepcopy
 from openmdao.api import ExplicitComponent
-from omtools.utils.miscellaneous_functions.process_options import name_types, get_names_list, shape_types, get_shapes_list
+from omtools.utils.process_options import name_types, get_names_list, shape_types, get_shapes_list
 
 
 class SingleTensorSumComp(ExplicitComponent):
@@ -21,7 +21,6 @@ class SingleTensorSumComp(ExplicitComponent):
     out_name: str
         Output component name that represents the summed output (can be a scalar or a tensor).
     """
-
     def initialize(self):
         self.options.declare('in_name',
                              default=None,
@@ -30,14 +29,16 @@ class SingleTensorSumComp(ExplicitComponent):
         self.options.declare('out_name', types=str)
         self.options.declare('shape', types=tuple)
         self.options.declare('axes', default=None, types=tuple)
-        self.options.declare('out_shape', default= None, types=tuple)
+        self.options.declare('out_shape', default=None, types=tuple)
+        self.options.declare('val', types=np.ndarray)
 
-    def setup(self):    
+    def setup(self):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
         shape = self.options['shape']
         axes = self.options['axes']
         out_shape = self.options['out_shape']
+        val = self.options['val']
 
         # Computation of Output shape if the shape is not provided
         if out_shape != None:
@@ -45,29 +46,31 @@ class SingleTensorSumComp(ExplicitComponent):
         elif axes != None:
             output_shape = np.delete(shape, axes)
             self.output_shape = tuple(output_shape)
-        
 
-
-        self.add_input(in_name, shape = shape)
+        self.add_input(in_name, shape=shape, val=val)
         input_size = np.prod(shape)
-        val = np.ones(input_size) 
-        
+        val = np.ones(input_size)
+
         # axes == None does a the complete sum of the tensor entries
         if axes == None:
             self.add_output(out_name)
-            self.declare_partials(out_name, in_name, val = val)
+            self.declare_partials(out_name, in_name, val=val)
 
         # axes != None takes the sum along the specified axes
         else:
-            self.add_output(out_name, shape = self.output_shape)
+            self.add_output(out_name, shape=self.output_shape)
             cols = np.arange(input_size)
 
             rows = np.unravel_index(np.arange(input_size), shape=shape)
             rows = np.delete(np.array(rows), axes, axis=0)
-            rows = np.ravel_multi_index(rows, dims=self.output_shape)       
+            rows = np.ravel_multi_index(rows, dims=self.output_shape)
 
-            self.declare_partials(out_name, in_name, rows = rows, cols = cols, val = val)
-    
+            self.declare_partials(out_name,
+                                  in_name,
+                                  rows=rows,
+                                  cols=cols,
+                                  val=val)
+
     def compute(self, inputs, outputs):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
@@ -79,7 +82,8 @@ class SingleTensorSumComp(ExplicitComponent):
 
         # axes != None takes the norm along specified axes
         else:
-            outputs[out_name] = np.sum(inputs[in_name], axis = axes)
+            outputs[out_name] = np.sum(inputs[in_name], axis=axes)
+
 
 if __name__ == "__main__":
     from openmdao.api import Problem, IndepVarComp, Group
@@ -94,7 +98,7 @@ if __name__ == "__main__":
         val=val1,
         shape=(n, m),
     )
-    
+
     indeps.add_output(
         'y',
         val=val2,
@@ -109,7 +113,10 @@ if __name__ == "__main__":
     )
     prob.model.add_subsystem(
         'sum',
-        SingleTensorSumComp(in_name='x', out_name='f', shape=(n, m), axes = (0,)),
+        SingleTensorSumComp(in_name='x',
+                            out_name='f',
+                            shape=(n, m),
+                            axes=(0, )),
         promotes=['*'],
     )
     prob.setup()

@@ -15,9 +15,10 @@ def average(*operands: List[Expression], axes=None):
     if axes == None:
         if len(operands) == 1:
             out.build = lambda: SingleTensorAverageComp(
-                in_name=expr.name,
-                shape=expr.shape,
+                in_name=operands[0].name,
+                shape=operands[0].shape,
                 out_name=out.name,
+                val=operands[0].val,
             )
         else:
             out.shape = expr.shape
@@ -25,6 +26,7 @@ def average(*operands: List[Expression], axes=None):
                 in_names=[expr.name for expr in operands],
                 shape=expr.shape,
                 out_name=out.name,
+                vals=[expr.val for expr in operands],
             )
     else:
         output_shape = np.delete(expr.shape, axes)
@@ -32,11 +34,12 @@ def average(*operands: List[Expression], axes=None):
 
         if len(operands) == 1:
             out.build = lambda: SingleTensorAverageComp(
-                in_name=expr.name,
-                shape=expr.shape,
+                in_name=operands[0].name,
+                shape=operands[0].shape,
                 out_name=out.name,
                 out_shape=out.shape,
                 axes=axes,
+                val=operands[0].val,
             )
         else:
             out.build = lambda: MultipleTensorAverageComp(
@@ -45,5 +48,6 @@ def average(*operands: List[Expression], axes=None):
                 out_name=out.name,
                 out_shape=out.shape,
                 axes=axes,
+                vals=[expr.val for expr in operands],
             )
     return out

@@ -15,5 +15,6 @@ def transpose(expr: Expression):
         in_shape=expr.shape,
         out_name=out.name,
         out_shape=out.shape,
+        val=expr.val,
     )
     return out

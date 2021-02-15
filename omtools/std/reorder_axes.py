@@ -22,5 +22,6 @@ def reorder_axes(expr: Expression, operation: str):
         out_shape=out.shape,
         operation=operation,
         new_axes_locations=new_axes_locations,
+        val=expr.val,
     )
     return out

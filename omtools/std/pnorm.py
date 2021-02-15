@@ -21,6 +21,7 @@ def pnorm(expr, pnorm_type, axis=None):
                 in_name=expr.name,
                 out_name=out.name,
                 pnorm_type=pnorm_type,
+                val=expr.val,
             )
         else:
             output_shape = np.delete(expr.shape, axis)
@@ -33,5 +34,6 @@ def pnorm(expr, pnorm_type, axis=None):
                 out_name=out.name,
                 pnorm_type=pnorm_type,
                 axis=axis,
+                val=expr.val,
             )
     return out

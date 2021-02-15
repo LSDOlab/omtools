@@ -11,9 +11,10 @@ class PassThroughComp(ExplicitComponent):
     def setup(self):
         shape = self.options['expr'].shape
         in_name = self.options['expr'].name
+        val = self.options['expr'].val
         out_name = self.options['name']
 
-        self.add_input(in_name, shape=shape)
+        self.add_input(in_name, shape=shape, val=val)
         self.add_output(out_name, shape=shape)
 
         r = np.arange(np.prod(shape))

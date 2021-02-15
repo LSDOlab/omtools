@@ -101,8 +101,8 @@ def _post_setup(func: Callable) -> Callable:
                 )
 
             # Set initial values for inputs
-            if isinstance(expr, Input):
-                self.set_input_defaults(expr.name, val=expr.val)
+            # if isinstance(expr, Input):
+            #     self.set_input_defaults(expr.name, val=expr.val)
 
             # Set design variables
             if isinstance(expr, Indep):

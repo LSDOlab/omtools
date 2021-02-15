@@ -22,6 +22,7 @@ def outer(expr1: Expression, expr2: Expression):
             in_names=[expr1.name, expr2.name],
             out_name=out.name,
             in_shapes=[expr1.shape[0], expr2.shape[0]],
+            in_vals=[expr1.val, expr2.val],
         )
 
     else:
@@ -31,5 +32,6 @@ def outer(expr1: Expression, expr2: Expression):
             in_names=[expr1.name, expr2.name],
             out_name=out.name,
             in_shapes=[expr1.shape, expr2.shape],
+            in_vals=[expr1.val, expr2.val],
         )
     return out

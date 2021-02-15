@@ -5,9 +5,9 @@ import numpy as np
 from omtools.core.expression import Expression
 from omtools.core.input import Input
 from omtools.core.output import Output
-from omtools.utils.comps.array_comps.indexed_pass_through_comp import \
+from omtools.comps.indexed_pass_through_comp import \
     IndexedPassThroughComp
-from omtools.utils.comps.array_comps.pass_through_comp import PassThroughComp
+from omtools.comps.pass_through_comp import PassThroughComp
 from omtools.utils.get_shape_val import get_shape_val
 from omtools.utils.replace_output_leaf_nodes import replace_output_leaf_nodes
 from omtools.utils.slice_to_list import slice_to_list
@@ -42,6 +42,7 @@ class ExplicitOutput(Output):
         self._tgt_indices: Dict[str, List[int]] = {}
         self.checked_indices = set()
         self.overlapping_indices = set()
+        self._tgt_vals = dict()
 
     def define(self, expr: Expression):
         """
@@ -82,7 +83,8 @@ class ExplicitOutput(Output):
             name=self.name,
         )
 
-    # TODO: index by tuple, not expression
+    # TODO: index by tuple, not expression?
+    # TODO: allow negative indices
     def __setitem__(
         self,
         key: Union[int, slice, Tuple[slice]],
@@ -90,6 +92,7 @@ class ExplicitOutput(Output):
     ):
         self.add_dependency_node(expr)
         tgt_indices = []
+        # n-d array assignment
         if isinstance(key, tuple):
             slices = [
                 slice_to_list(
@@ -102,12 +105,14 @@ class ExplicitOutput(Output):
                 tuple(np.array(np.meshgrid(*slices, indexing='ij'))),
                 self.shape,
             ).flatten()
+        # 1-d array assignment
         elif isinstance(key, slice):
             tgt_indices = slice_to_list(
                 key.start,
                 key.stop,
                 key.step,
             )
+        # integer index assignment
         elif isinstance(key, int):
             tgt_indices = [key]
         else:
@@ -125,6 +130,7 @@ class ExplicitOutput(Output):
                            " in assignment to elements in " + self.name +
                            ". Consider using omtools.expand")
         self._tgt_indices[expr.name] = (expr.shape, tgt_indices)
+        self._tgt_vals[expr.name] = expr.val
 
         # Check for overlapping indices
         self.overlapping_indices = self.checked_indices.intersection(
@@ -137,6 +143,7 @@ class ExplicitOutput(Output):
             expr_indices=self._tgt_indices,
             out_name=self.name,
             out_shape=self.shape,
+            vals=self._tgt_vals,
         )
         self.indexed_assignment = True
         self.defined = True

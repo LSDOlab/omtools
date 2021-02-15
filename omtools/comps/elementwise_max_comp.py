@@ -3,22 +3,23 @@ from openmdao.api import ExplicitComponent
 
 
 class ElementwiseMaxComp(ExplicitComponent):
-
     def initialize(self):
         self.options.declare('in_names', types=list)
         self.options.declare('out_name', types=str)
         self.options.declare('shape', types=tuple)
         self.options.declare('rho', types=float)
+        self.options.declare('vals', types=list)
 
     def setup(self):
         in_names = self.options['in_names']
         out_name = self.options['out_name']
         shape = self.options['shape']
+        vals = self.options['vals']
 
         r_c = np.arange(np.prod(shape))
 
-        for in_name in in_names:
-            self.add_input(in_name, shape=shape)
+        for in_name, val in zip(in_names, vals):
+            self.add_input(in_name, shape=shape, val=val)
         self.add_output(out_name, shape=shape)
         self.declare_partials('*', '*', rows=r_c, cols=r_c)
 
@@ -35,9 +36,7 @@ class ElementwiseMaxComp(ExplicitComponent):
         for in_name in in_names:
             arg += np.exp(rho * (inputs[in_name] - fmax))
 
-        outputs[out_name] = (
-            fmax + 1. / rho * np.log(arg)
-        )
+        outputs[out_name] = (fmax + 1. / rho * np.log(arg))
 
     def compute_partials(self, inputs, partials):
         in_names = self.options['in_names']
@@ -53,9 +52,10 @@ class ElementwiseMaxComp(ExplicitComponent):
             arg += np.exp(rho * (inputs[in_name] - fmax))
 
         for in_name in in_names:
-            partials[out_name, in_name] = (
-                    1. / arg * np.exp(rho * (inputs[in_name] - fmax))
-            ).flatten()
+            partials[out_name,
+                     in_name] = (1. / arg *
+                                 np.exp(rho *
+                                        (inputs[in_name] - fmax))).flatten()
 
 
 if __name__ == '__main__':
@@ -77,7 +77,10 @@ if __name__ == '__main__':
     comp.add_output('in3', in3, shape=shape)
     model.add_subsystem('ivc', comp, promotes=['*'])
 
-    comp = ElementwiseMaxComp(shape=shape, in_names=['in1', 'in2', 'in3'], out_name='out', rho=rho)
+    comp = ElementwiseMaxComp(shape=shape,
+                              in_names=['in1', 'in2', 'in3'],
+                              out_name='out',
+                              rho=rho)
     model.add_subsystem('comp', comp, promotes=['*'])
 
     prob.model = model

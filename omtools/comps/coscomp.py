@@ -21,15 +21,18 @@ class CosComp(ExplicitComponent):
         self.options.declare('in_name')
         self.options.declare('out_name')
         self.options.declare('shape')
+        self.options.declare('val', types=np.ndarray)
 
     def setup(self):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
         shape = self.options['shape']
+        val = self.options['val']
 
         self.add_input(
             in_name,
             shape=shape,
+            val=val,
         )
         self.add_output(
             out_name,

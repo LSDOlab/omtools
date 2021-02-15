@@ -15,9 +15,10 @@ def sum(*summands: List[Expression], axes=None):
     if axes == None:
         if len(summands) == 1:
             out.build = lambda: SingleTensorSumComp(
-                in_name=expr.name,
-                shape=expr.shape,
+                in_name=summands[0].name,
+                shape=summands[0].shape,
                 out_name=out.name,
+                val=summands[0].val,
             )
         else:
             out.shape = expr.shape
@@ -25,6 +26,7 @@ def sum(*summands: List[Expression], axes=None):
                 in_names=[expr.name for expr in summands],
                 shape=expr.shape,
                 out_name=out.name,
+                vals=[expr.val for expr in summands],
             )
     else:
         output_shape = np.delete(expr.shape, axes)
@@ -37,6 +39,7 @@ def sum(*summands: List[Expression], axes=None):
                 out_name=out.name,
                 out_shape=out.shape,
                 axes=axes,
+                val=summands[0].val,
             )
         else:
             out.build = lambda: MultipleTensorSumComp(
@@ -45,5 +48,6 @@ def sum(*summands: List[Expression], axes=None):
                 out_name=out.name,
                 out_shape=out.shape,
                 axes=axes,
+                vals=[expr.val for expr in summands],
             )
     return out

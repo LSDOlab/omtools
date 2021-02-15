@@ -13,5 +13,6 @@ def reshape(expr, new_shape):
         in_name=expr.name,
         out_name=out.name,
         new_shape=out.shape,
+        val=expr.val,
     )
     return out

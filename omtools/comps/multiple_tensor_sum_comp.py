@@ -2,6 +2,7 @@ import numpy as np
 from copy import deepcopy
 from openmdao.api import ExplicitComponent
 
+
 class MultipleTensorSumComp(ExplicitComponent):
     """
     This component can output multiple variants of summation of elements of arrays:
@@ -10,7 +11,7 @@ class MultipleTensorSumComp(ExplicitComponent):
 
     Options
     -------
-    in_names: list 
+    in_names: list
         Input component names that represent input arrays.
     shape: tuple
         Shape of the input arrays.
@@ -19,7 +20,6 @@ class MultipleTensorSumComp(ExplicitComponent):
     out_name: str
         Output component name that represents the summed output tensor.
     """
-
     def initialize(self):
         self.options.declare('in_names',
                              default=None,
@@ -28,7 +28,8 @@ class MultipleTensorSumComp(ExplicitComponent):
         self.options.declare('out_name', types=str)
         self.options.declare('shape', types=tuple)
         self.options.declare('axes', default=None, types=tuple)
-        self.options.declare('out_shape', default= None, types=tuple)
+        self.options.declare('out_shape', default=None, types=tuple)
+        self.options.declare('vals', types=list)
 
     def setup(self):
         in_names = self.options['in_names']
@@ -36,12 +37,13 @@ class MultipleTensorSumComp(ExplicitComponent):
         shape = self.options['shape']
         out_shape = self.options['out_shape']
         axes = self.options['axes']
+        vals = self.options['vals']
 
         # Computation of Output shape if the shape is not provided
         if out_shape == None and axes != None:
             output_shape = np.delete(shape, axes)
             self.output_shape = tuple(output_shape)
-        
+
         else:
             self.output_shape = out_shape
 
@@ -51,25 +53,33 @@ class MultipleTensorSumComp(ExplicitComponent):
 
         # axes not specified => elementwise sum
         if axes == None:
-            self.add_output(out_name, shape = shape)
-            for in_name in in_names:
-                self.add_input(in_name, shape=shape)
+            self.add_output(out_name, shape=shape)
+            for in_name, in_val in zip(in_names, vals):
+                self.add_input(in_name, shape=shape, val=in_val)
                 rows = cols = np.arange(input_size)
-                self.declare_partials(out_name, in_name, rows = rows, cols = cols, val = val)
+                self.declare_partials(out_name,
+                                      in_name,
+                                      rows=rows,
+                                      cols=cols,
+                                      val=val)
 
         # axes specified => axiswise sum
         else:
-            self.add_output(out_name, shape = self.output_shape)
+            self.add_output(out_name, shape=self.output_shape)
             cols = np.arange(input_size)
 
             rows = np.unravel_index(np.arange(input_size), shape=shape)
             rows = np.delete(np.array(rows), axes, axis=0)
-            rows = np.ravel_multi_index(rows, dims=self.output_shape)              
+            rows = np.ravel_multi_index(rows, dims=self.output_shape)
 
-            for in_name in in_names:
-                self.add_input(in_name, shape=shape)
-                self.declare_partials(out_name, in_name, rows = rows, cols = cols, val = val)
-    
+            for in_name, in_val in zip(in_names, vals):
+                self.add_input(in_name, shape=shape, val=in_val)
+                self.declare_partials(out_name,
+                                      in_name,
+                                      rows=rows,
+                                      cols=cols,
+                                      val=val)
+
     def compute(self, inputs, outputs):
         in_names = self.options['in_names']
         out_name = self.options['out_name']
@@ -83,9 +93,10 @@ class MultipleTensorSumComp(ExplicitComponent):
 
         # axes != None takes the sum along specified axes
         else:
-            outputs[out_name] = np.sum(inputs[in_names[0]], axis = axes)
+            outputs[out_name] = np.sum(inputs[in_names[0]], axis=axes)
             for i in range(1, self.num_inputs):
-                outputs[out_name] += np.sum(inputs[in_names[i]], axis = axes)
+                outputs[out_name] += np.sum(inputs[in_names[i]], axis=axes)
+
 
 if __name__ == "__main__":
     from openmdao.api import Problem, IndepVarComp, Group
@@ -100,7 +111,7 @@ if __name__ == "__main__":
         val=val1,
         shape=(n, m),
     )
-    
+
     indeps.add_output(
         'y',
         val=val2,
@@ -115,7 +126,10 @@ if __name__ == "__main__":
     )
     prob.model.add_subsystem(
         'sum',
-        MultipleTensorSumComp(in_names=['x', 'y'], out_name='f', shape=(n, m), axes = (0,)),
+        MultipleTensorSumComp(in_names=['x', 'y'],
+                              out_name='f',
+                              shape=(n, m),
+                              axes=(0, )),
         promotes=['*'],
     )
     prob.setup()

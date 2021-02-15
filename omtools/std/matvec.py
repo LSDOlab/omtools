@@ -19,6 +19,7 @@ def matvec(mat1, vec1):
             in_names=[mat1.name, vec1.name],
             out_name=out.name,
             in_shapes=[mat1.shape, vec1.shape],
+            in_vals=[mat1.val, vec1.val],
         )
 
     else:

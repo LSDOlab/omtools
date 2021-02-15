@@ -13,5 +13,6 @@ def arccos(expr):
         shape=expr.shape,
         in_name=expr.name,
         out_name=out.name,
+        val=expr.val,
     )
     return out

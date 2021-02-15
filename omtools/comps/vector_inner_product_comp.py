@@ -3,7 +3,6 @@ from openmdao.api import ExplicitComponent
 
 
 class VectorInnerProductComp(ExplicitComponent):
-
     def initialize(self):
         self.options.declare('in_names',
                              default=None,
@@ -11,20 +10,22 @@ class VectorInnerProductComp(ExplicitComponent):
                              allow_none=True)
         self.options.declare('out_name', types=str)
         self.options.declare('in_shape', types=int)
+        self.options.declare('in_vals', types=list)
 
     def setup(self):
         in_names = self.options['in_names']
         in_shape = self.options['in_shape']
         out_name = self.options['out_name']
+        in_vals = self.options['in_vals']
 
-        self.add_input(in_names[0], shape=(in_shape,))
-        self.add_input(in_names[1], shape=(in_shape,))
-        
+        self.add_input(in_names[0], shape=(in_shape, ), val=in_vals[0])
+        self.add_input(in_names[1], shape=(in_shape, ), val=in_vals[1])
+
         self.add_output(out_name)
 
         self.declare_partials(out_name, in_names[0])
         self.declare_partials(out_name, in_names[1])
-        
+
     def compute(self, inputs, outputs):
         in_names = self.options['in_names']
         out_name = self.options['out_name']
@@ -43,13 +44,11 @@ if __name__ == '__main__':
     from openmdao.api import Problem, IndepVarComp
     import time
 
-
     prob = Problem()
 
     comp = IndepVarComp()
     comp.add_output('x', np.arange(7))
-    comp.add_output('y', np.arange(7,14))
-    
+    comp.add_output('y', np.arange(7, 14))
 
     prob.model.add_subsystem('input_comp', comp, promotes=['*'])
 

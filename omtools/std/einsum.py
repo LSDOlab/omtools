@@ -25,6 +25,7 @@ def einsum(*operands: List[Expression],
             out_name=out.name,
             operation=subscripts,
             out_shape=shape,
+            in_vals=[expr.val for expr in operands],
         )
     elif partial_format == 'sparse':
         out.build = lambda: SparsePartialEinsumComp(
@@ -33,6 +34,7 @@ def einsum(*operands: List[Expression],
             out_name=out.name,
             operation=subscripts,
             out_shape=shape,
+            in_vals=[expr.val for expr in operands],
         )
     else:
         raise Exception('partial_format should be either dense or sparse')

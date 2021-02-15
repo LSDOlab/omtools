@@ -3,7 +3,8 @@ from typing import Optional, Tuple, Union
 
 import numpy as np
 
-from omtools.utils.api import LinearCombinationComp, PowerCombinationComp
+from omtools.comps.linearcombination_comp import LinearCombinationComp
+from omtools.comps.arithmetic_comps.power_combination_comp import PowerCombinationComp
 from omtools.utils.gen_hex_name import gen_hex_name
 from omtools.utils.slice_to_list import slice_to_list
 
@@ -138,7 +139,7 @@ class Expression():
     ):
         if self._getitem_called == False:
             self._getitem_called = True
-            self._decomp = Expression(shape=self.shape, val=self.val)
+            self._decomp = Expression(shape=self.shape, val=self.val[key])
             self._decomp.name = 'decompose_' + self.name
             self._decomp.add_dependency_node(self)
 
@@ -200,6 +201,7 @@ class Expression():
         self._decomp.build = lambda: DecomposeComp(
             in_name=self.name,
             expr=self._decomp,
+            val=self.val,
         )
         return expr
 
@@ -417,6 +419,7 @@ class ElementwiseAddition(Expression):
                     out_name=self.name,
                     in_names=[expr1.name, expr2.name],
                     coeffs=1,
+                    in_vals=[expr1.val, expr2.val],
                 )
 
             else:
@@ -435,6 +438,7 @@ class ElementwiseAddition(Expression):
                 in_names=[expr2.name],
                 coeffs=1,
                 constant=expr1,
+                in_vals=[expr2.val],
             )
 
         if (isinstance(expr2, numbers.Number) or isinstance(
@@ -446,6 +450,7 @@ class ElementwiseAddition(Expression):
                 in_names=[expr1.name],
                 coeffs=1,
                 constant=expr2,
+                in_vals=[expr1.val],
             )
 
     def __repr__(self):
@@ -477,6 +482,7 @@ class ElementwiseSubtraction(Expression):
                     out_name=self.name,
                     in_names=[expr1.name, expr2.name],
                     coeffs=[1, -1],
+                    in_vals=[expr1.val, expr2.val],
                 )
 
             else:
@@ -495,6 +501,7 @@ class ElementwiseSubtraction(Expression):
                 in_names=[expr2.name],
                 coeffs=-1,
                 constant=expr1,
+                in_vals=[expr2.val],
             )
 
         if (isinstance(expr2, numbers.Number) or isinstance(
@@ -506,6 +513,7 @@ class ElementwiseSubtraction(Expression):
                 in_names=[expr1.name],
                 coeffs=1,
                 constant=-expr2,
+                in_vals=[expr1.val],
             )
 
     def __repr__(self):
@@ -537,6 +545,7 @@ class ElementwiseMultiplication(Expression):
                     out_name=self.name,
                     in_names=[expr1.name, expr2.name],
                     powers=1,
+                    in_vals=[expr1.val, expr2.val],
                 )
 
             else:
@@ -557,6 +566,7 @@ class ElementwiseMultiplication(Expression):
                 in_names=[expr2.name],
                 coeff=expr1,
                 powers=1,
+                in_vals=[expr2.val],
             )
 
         if (isinstance(expr2, numbers.Number) or isinstance(
@@ -570,6 +580,7 @@ class ElementwiseMultiplication(Expression):
                 in_names=[expr1.name],
                 coeff=expr2,
                 powers=1,
+                in_vals=[expr1.val],
             )
 
     def __repr__(self):
@@ -601,6 +612,7 @@ class ElementwiseDivision(Expression):
                     out_name=self.name,
                     in_names=[expr1.name, expr2.name],
                     powers=[1, -1],
+                    in_vals=[expr1.val, expr2.val],
                 )
 
             else:
@@ -621,6 +633,7 @@ class ElementwiseDivision(Expression):
                 in_names=[expr2.name],
                 coeff=expr1,
                 powers=-1,
+                in_vals=[expr2.val],
             )
 
         if (isinstance(expr2, numbers.Number) or isinstance(
@@ -636,6 +649,7 @@ class ElementwiseDivision(Expression):
                 in_names=[expr1.name],
                 coeff=1 / expr2,
                 powers=1,
+                in_vals=[expr1.val],
             )
 
     def __repr__(self):
@@ -664,6 +678,7 @@ class ElementwisePower(Expression):
                 out_name=self.name,
                 in_names=[expr1.name],
                 powers=expr2,
+                in_vals=[expr1.val],
             )
         if isinstance(expr2, np.ndarray):
             if expr1.shape != expr2.shape:
@@ -675,6 +690,7 @@ class ElementwisePower(Expression):
                 out_name=self.name,
                 in_names=[expr1.name],
                 powers=expr2,
+                in_vals=[expr1.val],
             )
 
         else:

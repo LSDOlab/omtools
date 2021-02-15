@@ -8,13 +8,16 @@ class DecomposeComp(ExplicitComponent):
     def initialize(self):
         self.options.declare('in_name', types=str)
         self.options.declare('expr', types=Expression)
+        self.options.declare('val', types=np.ndarray)
 
     def setup(self):
         expr = self.options['expr']
         in_name = self.options['in_name']
+        val = self.options['val']
         self.add_input(
             in_name,
             shape=expr.shape,
+            val=val,
             # units=in_expr.units,
         )
 

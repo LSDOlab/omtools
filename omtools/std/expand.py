@@ -1,7 +1,7 @@
 from omtools.comps.array_expansion_comp import ArrayExpansionComp
 from omtools.comps.scalar_expansion_comp import ScalarExpansionComp
 from omtools.core.expression import Expression
-from omtools.utils.miscellaneous_functions.decompose_shape_tuple import decompose_shape_tuple
+from omtools.utils.decompose_shape_tuple import decompose_shape_tuple
 
 
 def expand(expr: Expression, shape: tuple, indices=None):
@@ -49,6 +49,7 @@ def expand(expr: Expression, shape: tuple, indices=None):
             expand_indices=expand_indices,
             in_name=expr.name,
             out_name=out.name,
+            val=expr.val,
         )
     else:
         if indices is not None:

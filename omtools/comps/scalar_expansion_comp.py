@@ -2,11 +2,10 @@ import numpy as np
 
 from openmdao.api import ExplicitComponent
 
-from omtools.utils.miscellaneous_functions.get_array_indices import get_array_indices
+from omtools.utils.get_array_indices import get_array_indices
 
 
 class ScalarExpansionComp(ExplicitComponent):
-
     def initialize(self):
         self.options.declare('shape', types=tuple)
         self.options.declare('in_name', types=str)
