@@ -5,9 +5,12 @@ from typing import List
 import numpy as np
 
 
-def pnorm(expr, pnorm_type, axis=None):
+def pnorm(expr, pnorm_type=2, axis=None):
     if not isinstance(expr, Variable):
         raise TypeError(expr, " is not an Variable object")
+    if axis is not None:
+        if not isinstance(axis, int) and not isinstance(axis, tuple):
+            raise TypeError("axis must be an integer or tuple of integers")
     out = Variable()
     out.add_dependency_node(expr)
 
@@ -33,7 +36,7 @@ def pnorm(expr, pnorm_type, axis=None):
                 out_shape=out.shape,
                 out_name=out.name,
                 pnorm_type=pnorm_type,
-                axis=axis,
+                axis=axis if isinstance(axis, tuple) else (axis, ),
                 val=expr.val,
             )
     return out

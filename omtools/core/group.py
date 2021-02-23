@@ -41,6 +41,13 @@ def _post_setup(func: Callable) -> Callable:
         # Create a record of all nodes in DAG
         self._root.register_nodes(self.nodes)
 
+        # Ensure independent variables are at the top of n2 diagram
+        for node in self.nodes.values():
+            for indep in self._root.dependencies:
+                if isinstance(indep, Indep):
+                    if not isinstance(node, Indep):
+                        node.add_dependency_node(indep)
+
         # Clean up graph, removing dependencies that do not constrain
         # execution order
         for node in self.nodes.values():
@@ -380,12 +387,8 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
             promotes_inputs=promotes_inputs,
             promotes_outputs=promotes_outputs,
         )
-        # Ensure that independent variables are always at the top of n2
-        # diagram
         for dependency in self._root.dependencies:
-            if isinstance(dependency, Indep):
-                self._most_recently_added_subsystem.add_dependency_node(
-                    dependency)
+            self._most_recently_added_subsystem.add_dependency_node(dependency)
 
         # Add subystem to DAG
         self._root.add_dependency_node(self._most_recently_added_subsystem)
@@ -397,11 +400,18 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         Create a ``Group`` object and add as a subsystem, promoting all
         inputs and outputs.
         For use in ``with`` contexts.
+        NOTE: Only use if planning to promote all varaibales within
+        child ``Group`` object.
 
         Parameters
         ----------
         name: str
             Name of new child ``Group`` object
+
+        Returns
+        -------
+        Group
+            Child ``Group`` object whosevariables are all promoted
         """
         try:
             group = Group()

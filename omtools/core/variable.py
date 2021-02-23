@@ -102,6 +102,12 @@ class Variable():
             raise TypeError(other, " is not an Variable or a literal value")
         return ElementwiseDivision(other, self)
 
+    # def __lt__(self, other):
+    #     return self - other
+
+    # def __gt__(self, other):
+    #     return other - self
+
     def initialize(self, *args, **kwargs):
         for k, v in kwargs.items():
             if k == 'name':
@@ -119,14 +125,13 @@ class Variable():
         self._id = _id
         self.name = _id
         self.shape = (1, )
-        self.val = 1,
+        self.val = np.array([1])
         self.units = None
         self.dependencies: list = []
         self.dependents: list = []
         self.build = None
         self.times_visited = 0
         self._dag_cost = 1
-        self.is_residual: bool = False
         self.initialize(*args, **kwargs)
         self._getitem_called = False
         self._decomp = None
@@ -230,10 +235,6 @@ class Variable():
             An Variable object upon which this Variable object
             depends
         """
-        if dependency.is_residual == True:
-            raise ValueError(
-                dependency.name +
-                " already used as residual; cannot use in another expression")
 
         # Add dependency
         self.dependencies.append(dependency)
@@ -494,6 +495,8 @@ class ElementwiseSubtraction(Variable):
 
         if (isinstance(expr1, numbers.Number) or isinstance(
                 expr1, np.ndarray)) and isinstance(expr2, Variable):
+            self.shape = expr2.shape
+            self.val = expr2.val
 
             self.build = lambda: LinearCombinationComp(
                 shape=expr2.shape,
@@ -506,6 +509,8 @@ class ElementwiseSubtraction(Variable):
 
         if (isinstance(expr2, numbers.Number) or isinstance(
                 expr2, np.ndarray)) and isinstance(expr1, Variable):
+            self.shape = expr1.shape
+            self.val = expr1.val
 
             self.build = lambda: LinearCombinationComp(
                 shape=expr1.shape,
@@ -559,6 +564,7 @@ class ElementwiseMultiplication(Variable):
                 expr1, np.ndarray)) and isinstance(expr2, Variable):
 
             self.shape = expr2.shape
+            self.val = expr2.val
 
             self.build = lambda: PowerCombinationComp(
                 shape=expr2.shape,
@@ -573,6 +579,7 @@ class ElementwiseMultiplication(Variable):
                 expr2, np.ndarray)) and isinstance(expr1, Variable):
 
             self.shape = expr1.shape
+            self.val = expr1.val
 
             self.build = lambda: PowerCombinationComp(
                 shape=expr1.shape,
@@ -626,6 +633,7 @@ class ElementwiseDivision(Variable):
                 expr1, np.ndarray)) and isinstance(expr2, Variable):
 
             self.shape = expr2.shape
+            self.val = expr2.val
 
             self.build = lambda: PowerCombinationComp(
                 shape=expr2.shape,
@@ -642,6 +650,7 @@ class ElementwiseDivision(Variable):
                 raise ValueError("Cannot divide by zero")
 
             self.shape = expr1.shape
+            self.val = expr1.val
 
             self.build = lambda: PowerCombinationComp(
                 shape=expr1.shape,
@@ -672,6 +681,7 @@ class ElementwisePower(Variable):
             raise TypeError(expr1, " is not an Variable object or literal")
         if isinstance(expr2, numbers.Number):
             self.shape = expr1.shape
+            self.val = expr1.val
 
             self.build = lambda: PowerCombinationComp(
                 shape=expr1.shape,
@@ -684,6 +694,7 @@ class ElementwisePower(Variable):
             if expr1.shape != expr2.shape:
                 raise ValueError("Shape mismatch between base and power array")
             self.shape = expr1.shape
+            self.val = expr1.val
 
             self.build = lambda: PowerCombinationComp(
                 shape=expr1.shape,

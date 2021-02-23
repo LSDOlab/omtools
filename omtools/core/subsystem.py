@@ -1,5 +1,4 @@
 from omtools.core.variable import Variable
-from openmdao.api import Group
 from openmdao.core.system import System
 
 
