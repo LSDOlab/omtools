@@ -239,7 +239,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         Indep
             An object to use in expressions
         """
-        indep = Indep(name, shape=shape, val=val, dv=False)
+        indep = Indep(name, shape=shape, val=val, dv=dv)
 
         # Ensure that independent variables are always at the top of n2
         # diagram
