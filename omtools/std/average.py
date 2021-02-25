@@ -6,6 +6,24 @@ import numpy as np
 
 
 def average(*operands: List[Variable], axes=None):
+    '''
+    This is a component that computes the natural logarithm using numpy.log()
+
+    Options
+    -------
+    in_name: str
+        Name of the input
+
+    out_name: str
+        Name of the output
+
+    shape: tuple[int]
+        Shape of the input and output
+
+
+
+    '''
+
     out = Variable()
     for expr in operands:
         if not isinstance(expr, Variable):
