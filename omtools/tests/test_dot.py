@@ -43,7 +43,7 @@ def test_tensor_tensor_first_dot():
     ten2 = np.arange(num_ten_elements, 2 * num_ten_elements).reshape(ten_shape)
 
     # TENSOR TENSOR
-    desired_output = np.tensordot(ten1, ten2, axes=([0], [0]))
+    desired_output = np.sum(ten1 * ten2, axis=0)
     np.testing.assert_almost_equal(example.prob['TenTenDotFirst'],
                                    desired_output)
 
@@ -55,9 +55,9 @@ def test_tensor_tensor_first_dot():
 def test_tensor_tensor_last_dot():
     import omtools.examples.valid.ex_dot_tensor_tensor_last as example
 
-    m = 3
+    m = 2
     n = 4
-    p = 5
+    p = 3
 
     # Shape of the tensors
     ten_shape = (m, n, p)
@@ -70,7 +70,7 @@ def test_tensor_tensor_last_dot():
     ten2 = np.arange(num_ten_elements, 2 * num_ten_elements).reshape(ten_shape)
 
     # TENSOR TENSOR
-    desired_output = np.tensordot(ten1, ten2, axes=([2], [2]))
+    desired_output = np.sum(ten1 * ten2, axis=2)
     np.testing.assert_almost_equal(example.prob['TenTenDotLast'],
                                    desired_output)
 

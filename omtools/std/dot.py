@@ -1,4 +1,4 @@
-from omtools.comps.tensor_inner_product_comp import TensorInnerProductComp
+from omtools.comps.tensor_dot_product_comp import TensorDotProductComp
 from omtools.comps.vector_inner_product_comp import VectorInnerProductComp
 
 from omtools.core.variable import Variable
@@ -16,27 +16,30 @@ def dot(expr1: Variable, expr2: Variable, axis=None):
     if expr1.shape != expr2.shape:
         raise Exception("The shapes of the inputs must match!")
 
-    if expr1.shape[axis] != 3:
-        raise Exception(
-            "The specified axis must correspond to the value of 3 in shape")
+    print(len(expr1.shape))
+    print(len(expr2.shape))
 
-    if len(expr1.shape) == 1 and len(expr2.shape) == 1:
+    if len(expr1.shape) == 1:
         out.build = lambda: VectorInnerProductComp(
             in_names=[expr1.name, expr2.name],
             out_name=out.name,
             in_shape=expr1.shape[0],
             in_vals=[expr1.val, expr2.val],
         )
-
     else:
-        out.shape = np.delete(list(expr1.shape), axis)
+        if expr1.shape[axis] != 3:
+            raise Exception(
+                "The specified axis must correspond to the value of 3 in shape"
+            )
+        else:
+            out.shape = tuple(np.delete(list(expr1.shape), axis))
 
-        out.build = lambda: TensorDotProductComp(
-            in_names=[expr1.name, expr2.name],
-            out_name=out.name,
-            in_shapes=[expr1.shape, expr2.shape],
-            axis=axis,
-            out_shape=out.shape,
-            in_vals=[expr1.val, expr2.val],
-        )
+            out.build = lambda: TensorDotProductComp(
+                in_names=[expr1.name, expr2.name],
+                out_name=out.name,
+                in_shape=expr1.shape,
+                axis=axis,
+                out_shape=out.shape,
+                in_vals=[expr1.val, expr2.val],
+            )
     return out
