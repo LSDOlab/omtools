@@ -27,7 +27,8 @@ class ExampleTensorTensorLast(Group):
         ten2 = self.declare_input('ten2', val=ten2)
 
         # Tensor-Tensor Dot Product specifying the last axis
-        self.register_output('TenTenDotLast', ot.dot(ten1, ten2, axis=2))
+        self.register_output('TenTenDotLast',
+                             ot.dot(ten1, ten2, axis=([0, 2], [0, 2])))
 
 
 prob = Problem()

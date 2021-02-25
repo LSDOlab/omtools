@@ -5,6 +5,9 @@ This function allows you to compute the average of vectors, matrices, and tensor
 Examples for all the possible use cases are provided below.
 
 
+
+
+
 Single Inputs
 --------------
 .. toctree::

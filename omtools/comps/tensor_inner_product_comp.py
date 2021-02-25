@@ -28,6 +28,7 @@ class TensorInnerProductComp(ExplicitComponent):
 
         new_in0_shape = np.delete(list(in_shapes[0]), axes[0])
         new_in1_shape = np.delete(list(in_shapes[1]), axes[1])
+
         if out_shape == None:
             out_shape = tuple(np.append(new_in0_shape, new_in1_shape))
 
