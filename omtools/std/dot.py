@@ -7,6 +7,22 @@ import numpy as np
 
 
 def dot(expr1: Variable, expr2: Variable, axis=None):
+    '''
+    This can the dot product between two inputs.
+
+    Parameters
+    ----------
+    expr1: Variable
+        The first input for the dot product.
+    
+    expr2: Variable
+        The second input for the dot product.     
+
+    axis: int
+        The axis along which the dot product is taken. The axis must 
+        have an axis of 3.
+    '''
+
     if not (isinstance(expr1, Variable) and isinstance(expr2, Variable)):
         raise TypeError("Arguments must both be Variable objects")
     out = Variable()

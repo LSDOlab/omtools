@@ -5,6 +5,8 @@ This function allows you to take the inner product.
 
 Examples for all the possible use cases are provided below.
 
+.. autofunction:: omtools.std.inner.inner
+
 .. toctree::
    :maxdepth: 1
    :titlesonly:

@@ -8,6 +8,21 @@ from typing import List
 def einsum_new_api(*operands: List[Variable],
                    operation: List[tuple],
                    partial_format='dense'):
+    '''
+    The Einstein Summation function performs the equivalent of numpy.einsum using a new api
+
+    Parameters
+    ----------
+    operands: Variables(s)
+        The Variable(s) which you would like to perform an einsum with.
+       
+    subscripts: list[tuple]
+        Specifies the subscripts for summation as a list of tuples 
+    
+    partial_format: str
+        Denotes whether to compute 'dense' partials or 'sparse' partials 
+        
+    '''
     out = Variable()
     for expr in operands:
         if not isinstance(expr, Variable):

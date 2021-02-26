@@ -7,6 +7,20 @@ import numpy as np
 
 
 def inner(expr1: Variable, expr2: Variable, axes=None):
+    '''
+    This can the dot product between two inputs.
+
+    Parameters
+    ----------
+    expr1: Variable
+        The first input for the inner product.
+    
+    expr2: Variable
+        The second input for the inner product.     
+
+    axes: tuple[int]
+        The axes along which the inner product is taken. 
+    '''
     if not isinstance(expr1, Variable):
         raise TypeError(expr1, " is not an Variable object")
     elif not isinstance(expr2, Variable):

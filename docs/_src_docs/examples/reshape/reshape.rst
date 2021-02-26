@@ -2,6 +2,7 @@ Reshape
 ========
 This function allows you to take the reshape an input from tensor to vector, or vice versa.
 
+.. autofunction:: omtools.std.reshape.reshape
 
 Examples for all the possible use cases are provided below.
 

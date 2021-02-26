@@ -3,6 +3,7 @@ Rotation Matrix
 
 This function allows you to produce a rotation matrix. 
 
+.. autofunction:: omtools.std.rotmat.rotmat
 
 Examples for all the possible use cases are provided below.
 

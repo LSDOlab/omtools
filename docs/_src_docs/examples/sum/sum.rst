@@ -2,6 +2,8 @@ Sum
 ====
 This function allows you to compute the sum of vectors, matrices, and tensors.
 
+.. autofunction:: omtools.std.sum.sum
+
 Examples for all the possible use cases are provided below.
 
 

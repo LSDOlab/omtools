@@ -3,6 +3,22 @@ from omtools.core.variable import Variable
 
 
 def cross(in1, in2, axis: int):
+    '''
+    This can the cross product between two inputs.
+
+    Parameters
+    ----------
+    in1: Variable
+        The first input for the cross product.
+    
+    in2: Variable
+        The second input for the cross product.     
+
+    axis: int
+        The axis along which the cross product is taken. The axis specified must   
+        have a value of 3.
+    '''
+
     if not (isinstance(in1, Variable) and isinstance(in2, Variable)):
         raise TypeError("Arguments must both be Variable objects")
     out = Variable()

@@ -8,6 +8,23 @@ import numpy as np
 
 
 def min(*exprs, axis=None, rho=20.):
+    '''
+    This function can compute an elementwise or axiswise minimum of 
+    a single or multiple inputs.
+
+    Parameters
+    ----------
+    exprs: Variable(s)
+        The Variable(s) over which to take the minimum
+       
+    axis: int
+        The axis along which the minimum will be taken over
+    
+    rho: float
+        This is a smoothing parameter, which dictates how smooth or sharp  
+        the minimum is 
+    '''
+
     out = Variable()
     for expr in exprs:
         if not isinstance(expr, Variable):

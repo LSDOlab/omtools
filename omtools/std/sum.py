@@ -6,6 +6,20 @@ import numpy as np
 
 
 def sum(*summands: List[Variable], axes=None):
+    '''
+    This function can compute an elementwise or axiswise sum of 
+    a single or multiple inputs.
+
+    Parameters
+    ----------
+    summands: Variable(s)
+        The Variable(s) over which to take the sum
+       
+    axes: tuple[int]
+        The axes along which the sum will be taken over
+
+    '''
+
     out = Variable()
     for expr in summands:
         if not isinstance(expr, Variable):

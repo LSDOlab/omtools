@@ -4,6 +4,8 @@ This function allows you to compute the minimum of vectors, matrices, and tensor
 
 It provides functionality to compute axiswise, and elementwise minimums as well.
 
+.. autofunction:: omtools.std.min.min
+
 Examples for all the possible use cases are provided below.
 
 .. toctree::

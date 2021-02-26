@@ -3,6 +3,8 @@ Reorder
 
 This function can be used to reorder the contents of matrices and tensors.
 
+.. autofunction:: omtools.std.reorder_axes.reorder_axes
+
 Examples for all the possible use cases are provided below.
 
 .. toctree::
