@@ -87,3 +87,8 @@ def test_dot_vec_different_shapes():
 def test_dot_ten_different_shapes():
     with pytest.raises(Exception):
         import omtools.examples.invalid.ex_dot_ten_different_shapes as example
+
+
+def test_dot_wrong_axis():
+    with pytest.raises(Exception):
+        import omtools.examples.invalid.ex_dot_ten_different_shapes as example
