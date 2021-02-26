@@ -23,7 +23,7 @@ class ExampleAxiswise(Group):
         ten = self.declare_input('tensor', val=val)
 
         # Computing the axiswise minimum on the tensor
-        axis = (1, 2)
+        axis = 1
         self.register_output('AxiswiseMin', ot.min(ten, axis=axis))
 
 

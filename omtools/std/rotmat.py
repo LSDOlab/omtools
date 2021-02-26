@@ -3,6 +3,19 @@ from omtools.core.variable import Variable
 
 
 def rotmat(expr: Variable, axis: str):
+    '''
+    This function creates a rotation matrix depending on the input value and the axis.
+
+    Parameters
+    ----------
+    expr: Variable
+        The value which determines by how much the rotation matrix 
+       
+    axis: str
+        The axis along which the rotation matrix should rotate. Can we specified 
+        with: 'x' , 'y' , or 'z'.
+
+    '''
     if not isinstance(expr, Variable):
         raise TypeError(expr, " is not an Variable object")
     out = Variable()

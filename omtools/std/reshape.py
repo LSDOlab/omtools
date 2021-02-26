@@ -2,7 +2,18 @@ from omtools.comps.reshape_comp import ReshapeComp
 from omtools.core.variable import Variable
 
 
-def reshape(expr, new_shape):
+def reshape(expr: Variable, new_shape: tuple):
+    '''
+    This function reshapes the input into a new shape. 
+
+    Parameters
+    ----------
+    expr: Variable
+        The Variable which you want to reshape 
+       
+    new_shape: tuple[int] 
+        A tuple of ints specifying the new shape desired
+    '''
     if not isinstance(expr, Variable):
         raise TypeError(expr, " is not an Variable object")
     out = Variable()

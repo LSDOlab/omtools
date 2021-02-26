@@ -6,7 +6,7 @@ It is analogous to numpy.einsum, and uses the same notation.
 
 Examples for all the possible use cases are provided below.
 
-
+.. autofunction:: omtools.std.einsum_new_api.einsum_new_api
 
 
 

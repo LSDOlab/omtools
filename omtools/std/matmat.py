@@ -5,6 +5,20 @@ import numpy as np
 
 
 def matmat(mat1, mat2):
+    '''
+    This function can compute a matrix-matrix multiplication, similar to the 
+    numpy counterpart.
+
+    Parameters
+    ----------
+    mat1: Variable
+        The first input for the matrix-matrix multiplication
+       
+    mat2: Variable
+        The second input for the matrix-matrix multiplication
+
+    '''
+
     if not (isinstance(mat1, Variable) and isinstance(mat2, Variable)):
         raise TypeError("Arguments must both be Variable objects")
     out = Variable()

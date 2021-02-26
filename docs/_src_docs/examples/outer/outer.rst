@@ -2,6 +2,7 @@ Outer
 ======
 This function allows you to take the outer product. 
 
+.. autofunction:: omtools.std.outer.outer
 
 Examples for all the possible use cases are provided below.
 

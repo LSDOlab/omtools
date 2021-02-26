@@ -5,6 +5,19 @@ import numpy as np
 
 
 def matvec(mat1, vec1):
+    '''
+    This function can compute a matrix-vector multiplication, similar to the 
+    numpy counterpart.
+
+    Parameters
+    ----------
+    mat1: Variable
+        The matrix needed for the matrix-vector multiplication
+       
+    vec1: Variable
+        The vector needed for the matrix-vector multiplication
+
+    '''
     if not (isinstance(mat1, Variable) and isinstance(vec1, Variable)):
         raise TypeError("Arguments must both be Variable objects")
     out = Variable()

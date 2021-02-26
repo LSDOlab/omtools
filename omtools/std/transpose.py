@@ -5,6 +5,15 @@ import numpy as np
 
 
 def transpose(expr: Variable):
+    '''
+    This function can perform the transpose of an input 
+
+    Parameters
+    ----------
+    expr: Variable
+        The input which will be transposed
+       
+    '''
     if not isinstance(expr, Variable):
         raise TypeError(expr, " is not an Variable object")
     out = Variable()

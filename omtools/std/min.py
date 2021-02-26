@@ -18,12 +18,13 @@ def min(*exprs, axis=None, rho=20.):
         The Variable(s) over which to take the minimum
        
     axis: int
-        The axis along which the dot product is taken. The axis must 
-        have an axis of 3.
+        The axis along which the minimum will be taken over
     
     rho: float
-
+        This is a smoothing parameter, which dictates how smooth or sharp  
+        the minimum is 
     '''
+
     out = Variable()
     for expr in exprs:
         if not isinstance(expr, Variable):

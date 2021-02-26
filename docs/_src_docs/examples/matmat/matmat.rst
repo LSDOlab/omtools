@@ -5,6 +5,8 @@ matrix-vector multiplication.
 
 An example of how to use the operation is provided below. 
 
+.. autofunction:: omtools.std.matmat.matmat
+
 .. jupyter-execute::
   ../../../../omtools/examples/valid/ex_matmat_mat_mat_product.py
 

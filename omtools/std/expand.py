@@ -5,6 +5,7 @@ from omtools.utils.decompose_shape_tuple import decompose_shape_tuple
 
 
 def expand(expr: Variable, shape: tuple, indices=None):
+
     if not isinstance(expr, Variable):
         raise TypeError(expr, " is not an Variable object")
 

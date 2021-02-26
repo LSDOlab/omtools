@@ -6,6 +6,19 @@ from omtools.utils.reorder_axes_utils import compute_new_axes_locations
 
 
 def reorder_axes(expr: Variable, operation: str):
+    '''
+    The function reorders the axes of the input.
+
+    Parameters
+    ----------
+    expr: Variable
+        The Variable that will have its axes reordered. 
+       
+    operation: str
+        Specifies the subscripts for reordering as comma separated list of subscript labels.
+        Ex: 'ijk->kij'
+    
+    '''
     if not isinstance(expr, Variable):
         raise TypeError(expr, " is not an Variable object")
     out = Variable()

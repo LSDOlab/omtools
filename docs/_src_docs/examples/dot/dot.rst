@@ -5,6 +5,8 @@ This function allows you to take the dot product.
 
 Examples for all the possible use cases are provided below.
 
+.. autofunction:: omtools.std.dot.dot
+
 .. toctree::
    :maxdepth: 1
    :titlesonly:

@@ -6,6 +6,21 @@ import numpy as np
 
 
 def pnorm(expr, pnorm_type=2, axis=None):
+    '''
+    This function computes the pnorm 
+
+    Parameters
+    ----------
+    expr: Variable
+        The Variable(s) over which to take the minimum
+       
+    pnorm_type: int
+        This specifies what pnorm to compute. Values must be nonzero positive and even.
+    
+    axis: int
+        Specifies the axis over which to take the pnorm
+    '''
+
     if not isinstance(expr, Variable):
         raise TypeError(expr, " is not an Variable object")
     if axis is not None:

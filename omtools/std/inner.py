@@ -18,8 +18,8 @@ def inner(expr1: Variable, expr2: Variable, axes=None):
     expr2: Variable
         The second input for the inner product.     
 
-    axis: int
-        The axis along which the inner product is taken. 
+    axes: tuple[int]
+        The axes along which the inner product is taken. 
     '''
     if not isinstance(expr1, Variable):
         raise TypeError(expr1, " is not an Variable object")
