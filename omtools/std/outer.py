@@ -7,6 +7,18 @@ import numpy as np
 
 
 def outer(expr1: Variable, expr2: Variable):
+    '''
+    This can the outer product between two inputs.
+
+    Parameters
+    ----------
+    expr1: Variable
+        The first input for the outer product.
+    
+    expr2: Variable
+        The second input for the outer product.     
+
+    '''
     if not isinstance(expr1, Variable):
         raise TypeError(expr1, " is not an Variable object")
     elif not isinstance(expr2, Variable):

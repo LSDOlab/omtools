@@ -7,20 +7,18 @@ import numpy as np
 
 def average(*operands: List[Variable], axes=None):
     '''
-    This is a component that computes the natural logarithm using numpy.log()
+    This function can compute the average of a single input, multiple inputs, or 
+    along an axis.
 
-    Options
-    -------
-    in_name: str
-        Name of the input
+    Parameters
+    ----------
+    
+    operands: Variables
+        The Variable(s) over which to take the average
+        
 
-    out_name: str
-        Name of the output
-
-    shape: tuple[int]
-        Shape of the input and output
-
-
+    axes: tuple[int]
+        Axes along which to take the average, default value is None
 
     '''
 
