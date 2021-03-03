@@ -77,7 +77,19 @@ class ExampleWithSubsystems(ImplicitComponent):
     def setup(self):
         g = self.group
 
-        c = g.declare_input('c', val=3)
+        # define a subsystem (this is a very simple example)
+        group = Group()
+        p = group.create_indep_var('p', val=7)
+        q = group.create_indep_var('q', val=8)
+        r = p + q
+        group.register_output('r', r)
+
+        # add child system
+        g.add_subsystem('R', group, promotes=['*'])
+        # declare output of child system as input to parent system
+        r = g.declare_input('r')
+
+        c = g.declare_input('c', val=18)
 
         # a == (3 + a - 2 * a**2)**(1 / 4)
         group = Group()
@@ -94,7 +106,7 @@ class ExampleWithSubsystems(ImplicitComponent):
 
         b = g.declare_input('b')
         y = g.create_implicit_output('y')
-        z = a * y**2 + b * y + c
+        z = a * y**2 + b * y + c - r
         y.define_residual(z)
         self.linear_solver = ScipyKrylov()
         self.nonlinear_solver = NewtonSolver(
@@ -110,7 +122,19 @@ class ExampleWithSubsystemsBracketedScalar(ImplicitComponent):
     def setup(self):
         g = self.group
 
-        c = g.declare_input('c', val=3)
+        # define a subsystem (this is a very simple example)
+        group = Group()
+        p = group.create_indep_var('p', val=7)
+        q = group.create_indep_var('q', val=8)
+        r = p + q
+        group.register_output('r', r)
+
+        # add child system
+        g.add_subsystem('R', group, promotes=['*'])
+        # declare output of child system as input to parent system
+        r = g.declare_input('r')
+
+        c = g.declare_input('c', val=18)
 
         # a == (3 + a - 2 * a**2)**(1 / 4)
         with g.create_group('coeff_a') as group:
@@ -125,7 +149,7 @@ class ExampleWithSubsystemsBracketedScalar(ImplicitComponent):
 
         b = g.declare_input('b')
         y = g.create_implicit_output('y')
-        z = a * y**2 + b * y + c
+        z = a * y**2 + b * y + c - r
         y.define_residual_bracketed(z, x1=0, x2=2)
 
 
@@ -136,7 +160,19 @@ class ExampleWithSubsystemsBracketedArray(ImplicitComponent):
     def setup(self):
         g = self.group
 
-        c = g.declare_input('c', val=[3, -3])
+        # define a subsystem (this is a very simple example)
+        group = Group()
+        p = group.create_indep_var('p', val=[7, -7])
+        q = group.create_indep_var('q', val=[8, -8])
+        r = p + q
+        group.register_output('r', r)
+
+        # add child system
+        g.add_subsystem('R', group, promotes=['*'])
+        # declare output of child system as input to parent system
+        r = g.declare_input('r', shape=(2, ))
+
+        c = g.declare_input('c', val=[18, -18])
 
         # a == (3 + a - 2 * a**2)**(1 / 4)
         with g.create_group('coeff_a') as group:
@@ -156,7 +192,7 @@ class ExampleWithSubsystemsBracketedArray(ImplicitComponent):
 
         b = g.declare_input('b', shape=(2, ))
         y = g.create_implicit_output('y', shape=(2, ))
-        z = a * y**2 + b * y + c
+        z = a * y**2 + b * y + c - r
         y.define_residual_bracketed(
             z,
             x1=[0, 2.],
@@ -171,7 +207,19 @@ class ExampleWithSubsystemsInternalN2(ImplicitComponent):
     def setup(self):
         g = self.group
 
-        c = g.declare_input('c', val=3)
+        # define a subsystem (this is a very simple example)
+        group = Group()
+        p = group.create_indep_var('p', val=7)
+        q = group.create_indep_var('q', val=8)
+        r = p + q
+        group.register_output('r', r)
+
+        # add child system
+        g.add_subsystem('R', group, promotes=['*'])
+        # declare output of child system as input to parent system
+        r = g.declare_input('r')
+
+        c = g.declare_input('c', val=18)
 
         # a == (3 + a - 2 * a**2)**(1 / 4)
         group = Group()
@@ -188,7 +236,7 @@ class ExampleWithSubsystemsInternalN2(ImplicitComponent):
 
         b = g.declare_input('b')
         y = g.create_implicit_output('y')
-        z = a * y**2 + b * y + c
+        z = a * y**2 + b * y + c - r
         y.define_residual(z)
         self.linear_solver = ScipyKrylov()
         self.nonlinear_solver = NewtonSolver(
