@@ -4,7 +4,7 @@ import time
 from guppy import hpy
 
 from openmdao.api import ExplicitComponent
-from omtools.utils.miscellaneous_functions.process_options import name_types, get_names_list, shape_types, get_shapes_list
+from omtools.utils.process_options import name_types, get_names_list, shape_types, get_shapes_list
 from omtools.utils.einsum_utils import compute_einsum_shape
 
 
@@ -36,6 +36,7 @@ class SparsePartialEinsumComp(ExplicitComponent):
         # Nametypes might be a string or a list
         self.options.declare('operation', types=str)
         self.options.declare('out_shape', types=tuple, default=None)
+        self.options.declare('in_vals', types=list)
 
     # Add inputs and output, and declare partials
     def setup(self):
@@ -49,6 +50,7 @@ class SparsePartialEinsumComp(ExplicitComponent):
         in_shapes = self.options['in_shapes']
         out_name = self.options['out_name']
         out_shape = self.options['out_shape']
+        in_vals = self.options['in_vals']
 
         # Find unused characters in operation
         check_string = 'abcdefghijklmnopqrstuvwxyz'
@@ -68,7 +70,7 @@ class SparsePartialEinsumComp(ExplicitComponent):
             elif (char == ',' or char == '-'):
                 self.operation_aslist.append(tensor_rep)
                 tensor_rep = ''
-       
+
         # When output is a scalar
         if operation[-1] == '>':
             self.operation_aslist.append(tensor_rep)
@@ -86,18 +88,18 @@ class SparsePartialEinsumComp(ExplicitComponent):
         else:
             self.out_shape = out_shape
 
-        if self.out_shape == (1,):
+        if self.out_shape == (1, ):
             self.add_output(out_name)
-        else:    
+        else:
             self.add_output(out_name, shape=self.out_shape)
 
         completed_in_names = []
-        for idx, in_name in enumerate(in_names):
+        for idx, (in_name, in_val) in enumerate(zip(in_names, in_vals)):
             if in_name in completed_in_names:
                 continue
             else:
                 completed_in_names.append(in_name)
-            self.add_input(in_name, shape=in_shapes[idx])
+            self.add_input(in_name, shape=in_shapes[idx], val=in_val)
             self.declare_partials(out_name, in_name)
 
         # List contains tuples, each tuple contains all the indices for a given input tensor
@@ -109,7 +111,7 @@ class SparsePartialEinsumComp(ExplicitComponent):
         self.flattened_indices_list = []
         operation_aslist = self.operation_aslist
         self.sparsity_partials = [False] * len(in_names)
-        
+
         for in_name_index, in_name in enumerate(in_names):
 
             # Map locations of axes from the input to that in the output for axes that does not get nullified in the output (for computing indices of nonzeros in the partials)
@@ -153,7 +155,6 @@ class SparsePartialEinsumComp(ExplicitComponent):
             for idx, same_name in enumerate(in_names):
                 if same_name == in_name:
                     locations.append(idx)
-            
             '''
             When tried to compute indices in just one go
 
@@ -188,7 +189,7 @@ class SparsePartialEinsumComp(ExplicitComponent):
             full_partial_indices_list = [np.array([
                 0,
             ])] * partial_rank
-            
+
             for loc in locations:
                 if self.surviving_axes_map[loc]:
                     self.sparsity_partials[loc] = True
@@ -198,11 +199,11 @@ class SparsePartialEinsumComp(ExplicitComponent):
                 if self.sparsity_partials[loc] == False:
                     sparse_partial = False
                     break
-            
+
             if sparse_partial:
                 for loc in locations:
                     # Partials are dense if surviving_axes_map is empty
-                    if not(self.surviving_axes_map[loc]):
+                    if not (self.surviving_axes_map[loc]):
                         sparse_partial
                     if self.surviving_axes_map[loc]:
                         remainder_output_shape = []
@@ -213,11 +214,13 @@ class SparsePartialEinsumComp(ExplicitComponent):
                         # surviving_axes_index_in_output = [item for sublist in common_surviving_axes.values() for item in sublist]
 
                         for idx, axis in enumerate(output_tensor_rep):
-                            if not (idx in self.surviving_axes_map[loc].values()):
+                            if not (idx
+                                    in self.surviving_axes_map[loc].values()):
                                 remainder_output_shape.append(out_shape[idx])
                             else:
                                 partial_indices_list[output_tensor_rep.index(
-                                    axis)] = ind[operation_aslist[loc].index(axis)]
+                                    axis)] = ind[operation_aslist[loc].index(
+                                        axis)]
                             '''
                             When tried to compute indices in just one go
 
@@ -227,13 +230,16 @@ class SparsePartialEinsumComp(ExplicitComponent):
                             #             partial_indices_list[output_tensor_rep.index(axis)] = ind[operation_aslist[loc].index(axis)]
                             #             break
                             '''
-                        
+
                         remainder_output_size = 1
                         # Computing remainder indices if remainder_output_shape is not empty
                         if remainder_output_shape:
-                            remainder_output_shape = tuple(remainder_output_shape)
-                            remainder_output_size = np.prod(remainder_output_shape)
-                            remainder_flat_indices = np.arange(remainder_output_size)
+                            remainder_output_shape = tuple(
+                                remainder_output_shape)
+                            remainder_output_size = np.prod(
+                                remainder_output_shape)
+                            remainder_flat_indices = np.arange(
+                                remainder_output_size)
                             remainder_output_ind = np.unravel_index(
                                 remainder_flat_indices, remainder_output_shape)
 
@@ -376,7 +382,6 @@ class SparsePartialEinsumComp(ExplicitComponent):
                     len(completed_in_names) - 1]
 
                 partials[out_name, in_name] = partial[partial_indices_list]
-
 
             else:
                 partials[out_name, in_name] = partial

@@ -4,7 +4,7 @@ from typing import Dict, Tuple
 import numpy as np
 
 # from omtools.comps.implicit_component import ImplicitComponent
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from omtools.core.input import Input
 from omtools.core.output import Output
 from omtools.core.subsystem import Subsystem
@@ -15,7 +15,7 @@ from omtools.utils.replace_output_leaf_nodes import replace_output_leaf_nodes
 
 
 def replace_input_leaf_nodes(
-    node: Expression,
+    node: Variable,
     leaves: Dict[str, Input],
 ):
     """
@@ -24,18 +24,20 @@ def replace_input_leaf_nodes(
     graphs for residuals so that ``ImplicitComponent`` objects do
     not include subsystems.
     """
-    for pred in node.predecessors:
-        if isinstance(pred, Input):
-            if len(pred.predecessors) > 0:
-                node.remove_predecessor_node(pred)
-                if pred._id in leaves.keys():
-                    node.add_predecessor_node(leaves[pred._id])
+    for dependency in node.dependencies:
+        if isinstance(dependency, Input):
+            if len(dependency.dependencies) > 0:
+                node.remove_dependency_node(dependency)
+                if dependency._id in leaves.keys():
+                    node.add_dependency_node(leaves[dependency._id])
                 else:
-                    leaf = Input(pred.name, shape=pred.shape, val=pred.val)
-                    leaf._id = pred._id
-                    node.add_predecessor_node(leaf)
-                    leaves[pred._id] = leaf
-        replace_input_leaf_nodes(pred, leaves)
+                    leaf = Input(dependency.name,
+                                 shape=dependency.shape,
+                                 val=dependency.val)
+                    leaf._id = dependency._id
+                    node.add_dependency_node(leaf)
+                    leaves[dependency._id] = leaf
+        replace_input_leaf_nodes(dependency, leaves)
 
 
 class ImplicitOutput(Output):
@@ -68,7 +70,7 @@ class ImplicitOutput(Output):
 
     def define_residual(
         self,
-        residual_expr: Expression,
+        residual_expr: Variable,
     ):
         """
         Define the residual that must equal zero for this output to be
@@ -76,16 +78,16 @@ class ImplicitOutput(Output):
 
         Parameters
         ----------
-        residual_expr: Expression
+        residual_expr: Variable
             Residual expression
         """
         if residual_expr is self:
-            raise ValueError("Expression for residual of " + self.name +
+            raise ValueError("Variable for residual of " + self.name +
                              " cannot be self")
         if self.defined == True:
-            raise ValueError("Expression for residual of " + self.name +
+            raise ValueError("Variable for residual of " + self.name +
                              " is already defined")
-        # Replace leaf nodes of residual Expression object that
+        # Replace leaf nodes of residual Variable object that
         # correspond to this ImplicitOutput node with Input objects;
         replace_output_leaf_nodes(
             self,
@@ -107,7 +109,7 @@ class ImplicitOutput(Output):
 
     def define_residual_bracketed(
         self,
-        residual_expr: Expression,
+        residual_expr: Variable,
         x1=0.,
         x2=1.,
     ):
@@ -117,16 +119,16 @@ class ImplicitOutput(Output):
 
         Parameters
         ----------
-        residual_expr: Expression
+        residual_expr: Variable
             Residual expression
         """
         if residual_expr is self:
-            raise ValueError("Expression for residual of " + self.name +
+            raise ValueError("Variable for residual of " + self.name +
                              " cannot be self")
         if self.defined == True:
-            raise ValueError("Expression for residual of " + self.name +
+            raise ValueError("Variable for residual of " + self.name +
                              " is already defined")
-        # Replace leaf nodes of residual Expression object that
+        # Replace leaf nodes of residual Variable object that
         # correspond to this ImplicitOutput node with Input objects;
         replace_output_leaf_nodes(
             self,

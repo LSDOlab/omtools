@@ -1,7 +1,7 @@
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 
 
-class Output(Expression):
+class Output(Variable):
     """
     Base class for outputs; used to prevent circular imports
     """

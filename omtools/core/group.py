@@ -1,5 +1,5 @@
-from contextlib import contextmanager
 from collections.abc import Iterable
+from contextlib import contextmanager
 from typing import Callable, Dict, Tuple
 
 from openmdao.api import Group as OMGroup
@@ -7,15 +7,13 @@ from openmdao.core.system import System
 
 # from omtools.core._group import _Group
 from omtools.core.explicit_output import ExplicitOutput
-from omtools.core.expression import Expression
-from omtools.core.graph import remove_indirect_predecessors, topological_sort
+from omtools.core.variable import Variable
+from omtools.core.graph import remove_indirect_dependencies, topological_sort
 from omtools.core.implicit_output import ImplicitOutput
 from omtools.core.indep import Indep
 from omtools.core.input import Input
 from omtools.core.output import Output
 from omtools.core.subsystem import Subsystem
-from omtools.utils.ensure_subsystems_are_added import \
-    ensure_subsystems_are_added
 
 
 def _post_setup(func: Callable) -> Callable:
@@ -43,23 +41,34 @@ def _post_setup(func: Callable) -> Callable:
         # Create a record of all nodes in DAG
         self._root.register_nodes(self.nodes)
 
-        # Ensure that all subsystems that registerd outputs depend on
-        # are considered in topological sort
-        for registered_output in self._root.predecessors:
-            ensure_subsystems_are_added(registered_output)
+        # Ensure independent variables are at the top of n2 diagram
         for node in self.nodes.values():
-            node.times_visited = 0
+            for indep in self._root.dependencies:
+                if isinstance(indep, Indep):
+                    if not isinstance(node, Indep):
+                        node.add_dependency_node(indep)
 
         # Clean up graph, removing dependencies that do not constrain
         # execution order
         for node in self.nodes.values():
-            remove_indirect_predecessors(node)
+            remove_indirect_dependencies(node)
+
+        # add forward edges
+        self._root.add_fwd_edges()
+
+        # remove unused expressions
+        keys = []
+        for name, node in self.nodes.items():
+            if len(node.dependents) == 0:
+                keys.append(name)
+        for name in keys:
+            del node[name]
 
         # Compute branch costs and sort branches to get desired sparsity
         # pattern in system jacobian
         self._root.compute_dag_cost()
         for node in self.nodes.values():
-            node.sort_predecessor_branches(
+            node.sort_dependency_branches(
                 reverse_branch_sorting=self.reverse_branch_sorting)
 
         # Sort expressions, preventing unnecessary feedbacks (i.e.
@@ -74,12 +83,12 @@ def _post_setup(func: Callable) -> Callable:
                 if expr.defined == False:
                     raise ValueError("Output not defined for ", expr)
 
-            # Construct Component object corresponding to Expression
+            # Construct Component object corresponding to Variable
             # object, if applicable.
-            # Input objects and root Expression object do not have
+            # Input objects and root Variable object do not have
             # a build method defined.
             if expr.build is not None:
-                sys = expr.build(expr.name)
+                sys = expr.build()
                 pfx = 'comp_'
                 promotes = ['*']
                 promotes_inputs = None
@@ -99,8 +108,8 @@ def _post_setup(func: Callable) -> Callable:
                 )
 
             # Set initial values for inputs
-            if isinstance(expr, Input):
-                self.set_input_defaults(expr.name, val=expr.val)
+            # if isinstance(expr, Input):
+            #     self.set_input_defaults(expr.name, val=expr.val)
 
             # Set design variables
             if isinstance(expr, Indep):
@@ -146,7 +155,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         self.input_vals: dict = {}
         self.sorted_builders = []
         self.reverse_branch_sorting: bool = False
-        self._root = Expression()
+        self._root = Variable()
         self._most_recently_added_subsystem: Subsystem = None
         self.res_out_map: Dict[str, str] = dict()
         self.brackets_map = None
@@ -198,11 +207,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
             # units=units,
         )
         if self._most_recently_added_subsystem is not None:
-            inp.add_predecessor_node(self._most_recently_added_subsystem)
-            # This is to guarantee that the subsystem is added even if
-            # outputs that depend on the subsystem are not registered
-            self._most_recently_added_subsystem.decr_num_successors()
-            self._most_recently_added_subsystem.num_inputs += 1
+            inp.add_dependency_node(self._most_recently_added_subsystem)
         return inp
 
     def create_indep_var(
@@ -234,7 +239,13 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         Indep
             An object to use in expressions
         """
-        indep = Indep(name, shape=shape, val=val, dv=False)
+        indep = Indep(name, shape=shape, val=val, dv=dv)
+
+        # Ensure that independent variables are always at the top of n2
+        # diagram
+        if self._most_recently_added_subsystem is not None:
+            self._most_recently_added_subsystem.add_dependency_node(indep)
+
         # NOTE: We choose to always include IndepVarComp objects, even
         # if they are not used by other Component objects
         self.register_output(name, indep)
@@ -268,7 +279,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
             shape=shape,
             val=val,
         )
-        self._root.add_predecessor_node(ex)
+        self._root.add_dependency_node(ex)
         return ex
 
     def create_implicit_output(
@@ -299,7 +310,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
             shape=shape,
             val=val,
         )
-        # self._root.add_predecessor_node(im)
+        # self._root.add_dependency_node(im)
         return im
 
     def register_output(self, name: str,
@@ -315,27 +326,33 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         name: str
             Name of variable in OpenMDAO
 
-        expr: Expression
-            Expression that computes output
+        expr: Variable
+            Variable that computes output
 
         Returns
         -------
-        Expression
-            Expression that computes output
+        Variable
+            Variable that computes output
         """
         if isinstance(expr, Input):
             raise TypeError("Cannot register input " + expr + " as an output")
+
+        if expr in self._root.dependencies:
+            raise ValueError(
+                "Cannot register output twice; attempting to register " +
+                expr.name + " as " + name)
+
         expr.name = name
-        self._root.add_predecessor_node(expr)
+        self._root.add_dependency_node(expr)
         return expr
 
     def add_subsystem(
         self,
         name: str,
         subsys: System,
-        promotes=None,
-        promotes_inputs=None,
-        promotes_outputs=None,
+        promotes: Iterable = None,
+        promotes_inputs: Iterable = None,
+        promotes_outputs: Iterable = None,
     ):
         """
         Add a subsystem to the ``Group``.
@@ -370,14 +387,32 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
             promotes_inputs=promotes_inputs,
             promotes_outputs=promotes_outputs,
         )
-        self._most_recently_added_subsystem.add_predecessor_node(self._root)
-        new_root = Expression()
-        new_root.add_predecessor_node(self._most_recently_added_subsystem)
-        self._root = new_root
+        for dependency in self._root.dependencies:
+            self._most_recently_added_subsystem.add_dependency_node(dependency)
+
+        # Add subystem to DAG
+        self._root.add_dependency_node(self._most_recently_added_subsystem)
         return subsys
 
     @contextmanager
     def create_group(self, name: str):
+        """
+        Create a ``Group`` object and add as a subsystem, promoting all
+        inputs and outputs.
+        For use in ``with`` contexts.
+        NOTE: Only use if planning to promote all varaibales within
+        child ``Group`` object.
+
+        Parameters
+        ----------
+        name: str
+            Name of new child ``Group`` object
+
+        Returns
+        -------
+        Group
+            Child ``Group`` object whosevariables are all promoted
+        """
         try:
             group = Group()
             self.add_subsystem(name, group, promotes=['*'])

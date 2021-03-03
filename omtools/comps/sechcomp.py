@@ -9,27 +9,29 @@ class SechComp(ExplicitComponent):
     Options
     -------
     in_name: str
-        Name of the input 
-    
+        Name of the input
+
     out_name: str
         Name of the output
 
     shape: tuple[int]
         Shape of the input and output
     '''
-
     def initialize(self):
         self.options.declare('in_name')
         self.options.declare('out_name')
         self.options.declare('shape')
+        self.options.declare('val', types=np.ndarray)
 
     def setup(self):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
         shape = self.options['shape']
+        val = self.options['val']
         self.add_input(
             in_name,
             shape=shape,
+            val=val,
         )
         self.add_output(
             out_name,
@@ -46,7 +48,8 @@ class SechComp(ExplicitComponent):
     def compute_partials(self, inputs, partials):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
-        partials[out_name, in_name] = -1.0 * np.tanh(inputs[in_name])*(1.0 / np.cosh(inputs[in_name])).flatten()
+        partials[out_name, in_name] = -1.0 * np.tanh(
+            inputs[in_name]) * (1.0 / np.cosh(inputs[in_name])).flatten()
 
 
 if __name__ == "__main__":

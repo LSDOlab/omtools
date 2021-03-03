@@ -1,6 +1,7 @@
 from openmdao.api import Problem
-from omtools.api import Group
 import numpy as np
+import omtools.api as ot
+from omtools.api import Group
 
 
 class ExampleInteger(Group):
@@ -21,6 +22,10 @@ class ExampleInteger(Group):
         x[5] = f
         x[6] = g
 
+        # Get value from indices
+        self.register_output('x0', x[0])
+        self.register_output('x6', x[6])
+
 
 prob = Problem()
 prob.model = ExampleInteger()
@@ -29,3 +34,7 @@ prob.run_model()
 
 print('x', prob['x'].shape)
 print(prob['x'])
+print('x0', prob['x0'].shape)
+print(prob['x0'])
+print('x6', prob['x6'].shape)
+print(prob['x6'])

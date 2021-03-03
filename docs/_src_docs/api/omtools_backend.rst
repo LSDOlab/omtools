@@ -1,7 +1,7 @@
 OM Tools Developer API
 ======================
 
-.. autoclass:: omtools.core.expression.Expression
+.. autoclass:: omtools.core.variable.Variable
    :members:
    :special-members:
 

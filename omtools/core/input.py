@@ -1,10 +1,10 @@
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from typing import Tuple
 from omtools.utils.get_shape_val import get_shape_val
 import numpy as np
 
 
-class Input(Expression):
+class Input(Variable):
     """
     Class for declaring an input variable
     """

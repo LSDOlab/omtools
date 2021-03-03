@@ -1,9 +1,8 @@
-from omtools.core.expression import Expression
-from openmdao.api import Group
+from omtools.core.variable import Variable
 from openmdao.core.system import System
 
 
-class Subsystem(Expression):
+class Subsystem(Variable):
     """
     Class for declaring an input variable
     """
@@ -22,9 +21,8 @@ class Subsystem(Expression):
         self.promotes = promotes
         self.promotes_inputs = promotes_inputs
         self.promotes_outputs = promotes_outputs
-        self.num_inputs = 0
 
-        self.build = lambda name: subsys
+        self.build = lambda: subsys
 
     def __repr__(self):
         shape_str = "("

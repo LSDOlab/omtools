@@ -4,7 +4,7 @@ import time
 from guppy import hpy
 
 from openmdao.api import ExplicitComponent
-from omtools.utils.miscellaneous_functions.process_options import name_types, get_names_list, shape_types, get_shapes_list
+from omtools.utils.process_options import name_types, get_names_list, shape_types, get_shapes_list
 from omtools.utils.einsum_utils import compute_einsum_shape
 
 
@@ -36,6 +36,7 @@ class EinsumComp(ExplicitComponent):
         # Nametypes might be a string or a list
         self.options.declare('operation', types=str)
         self.options.declare('out_shape', types=tuple, default=None)
+        self.options.declare('in_vals', types=list)
 
     # Add inputs and output, and declare partials
     def setup(self):
@@ -49,6 +50,7 @@ class EinsumComp(ExplicitComponent):
         in_shapes = self.options['in_shapes']
         out_name = self.options['out_name']
         out_shape = self.options['out_shape']
+        in_vals = self.options['in_vals']
 
         # Find unused characters in operation
         check_string = 'abcdefghijklmnopqrstuvwxyz'
@@ -68,7 +70,7 @@ class EinsumComp(ExplicitComponent):
             elif (char == ',' or char == '-'):
                 self.operation_aslist.append(tensor_rep)
                 tensor_rep = ''
-        
+
         # When output is a scalar
         if operation[-1] == '>':
             self.operation_aslist.append(tensor_rep)
@@ -86,21 +88,22 @@ class EinsumComp(ExplicitComponent):
         else:
             self.out_shape = out_shape
 
-        if self.out_shape == (1,):
+        if self.out_shape == (1, ):
             self.add_output(out_name)
-        else:    
+        else:
             self.add_output(out_name, shape=self.out_shape)
 
         completed_in_names = []
         self.I = []
         operation_aslist = self.operation_aslist
 
-        for in_name_index, in_name in enumerate(in_names):
+        for in_name_index, (in_name,
+                            in_val) in enumerate(zip(in_names, in_vals)):
             if in_name in completed_in_names:
                 continue
             else:
                 completed_in_names.append(in_name)
-            self.add_input(in_name, shape=in_shapes[in_name_index])
+            self.add_input(in_name, shape=in_shapes[in_name_index], val=in_val)
             self.declare_partials(out_name, in_name)
 
             shape = in_shapes[in_name_index]

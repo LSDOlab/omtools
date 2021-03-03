@@ -1,20 +1,29 @@
 from omtools.comps.transpose_comp import TransposeComp
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from typing import List
 import numpy as np
 
-class transpose(Expression):
-    def initialize(self, expr: Expression):   
 
-        if isinstance(expr, Expression) == False:
-            raise TypeError(expr, " is not an Expression object")
+def transpose(expr: Variable):
+    '''
+    This function can perform the transpose of an input 
 
-        self.add_predecessor_node(expr)
-
-        self.shape = expr.shape[::-1]
-        self.build = lambda name: TransposeComp(
-            in_name = expr.name,
-            in_shape = expr.shape,
-            out_name = name,
-            out_shape = self.shape,
-        )
+    Parameters
+    ----------
+    expr: Variable
+        The input which will be transposed
+       
+    '''
+    if not isinstance(expr, Variable):
+        raise TypeError(expr, " is not an Variable object")
+    out = Variable()
+    out.add_dependency_node(expr)
+    out.shape = expr.shape[::-1]
+    out.build = lambda: TransposeComp(
+        in_name=expr.name,
+        in_shape=expr.shape,
+        out_name=out.name,
+        out_shape=out.shape,
+        val=expr.val,
+    )
+    return out

@@ -1,6 +1,7 @@
 from openmdao.api import Problem
-from omtools.api import Group
 import numpy as np
+import omtools.api as ot
+from omtools.api import Group
 
 
 class ExampleOneDimensional(Group):
@@ -21,6 +22,13 @@ class ExampleOneDimensional(Group):
         y[0:n - 4] = 2 * (v + 1)
         y[n - 4:n] = w - 3
 
+        # Get value from indices
+        z = self.create_output('z', shape=(3, ))
+        z[0:3] = ot.expand(x[2], (3, ))
+        self.register_output('x0_5', x[0:5])
+        self.register_output('x3_', x[3:])
+        self.register_output('x2_4', x[2:4])
+
 
 prob = Problem()
 prob.model = ExampleOneDimensional()
@@ -31,3 +39,11 @@ print('x', prob['x'].shape)
 print(prob['x'])
 print('y', prob['y'].shape)
 print(prob['y'])
+print('z', prob['z'].shape)
+print(prob['z'])
+print('x0_5', prob['x0_5'].shape)
+print(prob['x0_5'])
+print('x3_', prob['x3_'].shape)
+print(prob['x3_'])
+print('x2_4', prob['x2_4'].shape)
+print(prob['x2_4'])

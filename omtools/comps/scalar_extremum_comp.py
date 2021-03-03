@@ -4,7 +4,6 @@ from openmdao.core.explicitcomponent import ExplicitComponent
 
 
 class ScalarExtremumComp(ExplicitComponent):
-
     def initialize(self):
         """
         Declare options.
@@ -16,7 +15,7 @@ class ScalarExtremumComp(ExplicitComponent):
 
         self.options.declare('lower_flag', types=bool, default=False)
         self.options.declare('rho', 50.0, desc="Aggregation Factor.")
-
+        self.options.declare('val', types=np.ndarray)
 
     def setup(self):
         """
@@ -24,14 +23,14 @@ class ScalarExtremumComp(ExplicitComponent):
         """
         in_name = self.options['in_name']
         out_name = self.options['out_name']
-
         shape = self.options['shape']
+        val = self.options['val']
 
         # Inputs
-        self.add_input(in_name, shape=shape)
+        self.add_input(in_name, shape=shape, val=val)
 
         # Outputs
-        self.add_output(out_name, shape=(1,))
+        self.add_output(out_name, shape=(1, ))
 
         self.declare_partials(of=out_name, wrt=in_name)
 
@@ -52,8 +51,8 @@ class ScalarExtremumComp(ExplicitComponent):
         rho = self.options['rho']
 
         if lower_flag:
-            g_max = np.max(-1.0*inputs[in_name])
-            g_diff = -1.0*inputs[in_name] - g_max
+            g_max = np.max(-1.0 * inputs[in_name])
+            g_diff = -1.0 * inputs[in_name] - g_max
         else:
             g_max = np.max(inputs[in_name])
             g_diff = inputs[in_name] - g_max
@@ -68,7 +67,7 @@ class ScalarExtremumComp(ExplicitComponent):
             outputs[out_name] = result
 
         dsum_dg = rho * exponents
-        dKS_dsum = 1.0 / (rho * summation*np.ones(shape))
+        dKS_dsum = 1.0 / (rho * summation * np.ones(shape))
         dKS_dg = dKS_dsum * dsum_dg
 
         self.dKS_dg = dKS_dg
@@ -109,7 +108,6 @@ if __name__ == '__main__':
         shape=shape,
         lower_flag=False,
         rho=100.,
-
     )
     prob.model.add_subsystem('ScalarExtremumComp', comp, promotes=['*'])
 

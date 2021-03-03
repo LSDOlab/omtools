@@ -1,40 +1,61 @@
-from omtools.comps.tensor_inner_product_comp import TensorInnerProductComp
+from omtools.comps.tensor_dot_product_comp import TensorDotProductComp
 from omtools.comps.vector_inner_product_comp import VectorInnerProductComp
 
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 from typing import List
 import numpy as np
 
-class dot(Expression):
-    def initialize(self, expr1: Expression, expr2: Expression, axes=None):   
 
-        if isinstance(expr1, Expression) == False:
-            raise TypeError(expr1, " is not an Expression object")
-        elif isinstance(expr2, Expression) == False:
-            raise TypeError(expr2, " is not an Expression object")
+def dot(expr1: Variable, expr2: Variable, axis=None):
+    '''
+    This can the dot product between two inputs.
 
-        self.add_predecessor_node(expr1)
-        self.add_predecessor_node(expr2)
+    Parameters
+    ----------
+    expr1: Variable
+        The first input for the dot product.
+    
+    expr2: Variable
+        The second input for the dot product.     
 
-        if len(expr1.shape) == 1 and len(expr2.shape) == 1:
-            self.build = lambda name: VectorInnerProductComp(
-                in_names=[expr1.name, expr2.name],
-                out_name= name,
-                in_shape= expr1.shape[0],
+    axis: int
+        The axis along which the dot product is taken. The axis must 
+        have an axis of 3.
+    '''
+
+    if not (isinstance(expr1, Variable) and isinstance(expr2, Variable)):
+        raise TypeError("Arguments must both be Variable objects")
+    out = Variable()
+    out.add_dependency_node(expr1)
+    out.add_dependency_node(expr2)
+
+    if expr1.shape != expr2.shape:
+        raise Exception("The shapes of the inputs must match!")
+
+    print(len(expr1.shape))
+    print(len(expr2.shape))
+
+    if len(expr1.shape) == 1:
+        out.build = lambda: VectorInnerProductComp(
+            in_names=[expr1.name, expr2.name],
+            out_name=out.name,
+            in_shape=expr1.shape[0],
+            in_vals=[expr1.val, expr2.val],
+        )
+    else:
+        if expr1.shape[axis] != 3:
+            raise Exception(
+                "The specified axis must correspond to the value of 3 in shape"
             )
-        
         else:
-            new_in0_shape = np.delete(list(expr1.shape), axes[0])
-            new_in1_shape = np.delete(list(expr2.shape), axes[1])
-            self.shape = tuple(np.append(new_in0_shape, new_in1_shape))
-        
-            self.build = lambda name: TensorInnerProductComp(
-                    in_names=[expr1.name, expr2.name],
-                    out_name= name,
-                    in_shapes= [expr1.shape, expr2.shape],
-                    axes= axes,
-                    out_shape = self.shape,
-                )
-            
+            out.shape = tuple(np.delete(list(expr1.shape), axis))
 
-        
+            out.build = lambda: TensorDotProductComp(
+                in_names=[expr1.name, expr2.name],
+                out_name=out.name,
+                in_shape=expr1.shape,
+                axis=axis,
+                out_shape=out.shape,
+                in_vals=[expr1.val, expr2.val],
+            )
+    return out

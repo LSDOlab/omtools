@@ -1,18 +1,18 @@
 from omtools.comps.arccoscomp import ArccosComp
-from omtools.core.expression import Expression
+from omtools.core.variable import Variable
 
 
-class arccos(Expression):
-    def initialize(self, expr):
-        if isinstance(expr, Expression):
-            self.shape = expr.shape
-            self.add_predecessor_node(expr)
+def arccos(expr):
+    if not isinstance(expr, Variable):
+        raise TypeError(expr, " is not an Variable object")
+    out = Variable()
+    out.shape = expr.shape
+    out.add_dependency_node(expr)
 
-            self.build = lambda name: ArccosComp(
-                shape=expr.shape,
-                in_name=expr.name,
-                out_name=name,
-            )
-
-        else:
-            raise TypeError(expr, " is not an Expression object")
+    out.build = lambda: ArccosComp(
+        shape=expr.shape,
+        in_name=expr.name,
+        out_name=out.name,
+        val=expr.val,
+    )
+    return out

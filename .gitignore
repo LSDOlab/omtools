@@ -7,3 +7,5 @@ _build/
 .vscode/
 *.out
 *.egg-info
+omtools/examples/valid/__init__.py
+omtools/examples/invalid/__init__.py

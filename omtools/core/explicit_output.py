@@ -1,14 +1,16 @@
-from omtools.core.expression import Expression
+from typing import Dict, List, Tuple, Union
+
+import numpy as np
+
+from omtools.core.variable import Variable
 from omtools.core.input import Input
 from omtools.core.output import Output
-from omtools.utils.replace_output_leaf_nodes import replace_output_leaf_nodes
-import numpy as np
-from typing import Union, Tuple, Dict, List
-from omtools.utils.slice_to_list import slice_to_list
-from omtools.utils.comps.array_comps.pass_through_comp import PassThroughComp
-from omtools.utils.comps.array_comps.indexed_pass_through_comp import IndexedPassThroughComp
+from omtools.comps.indexed_pass_through_comp import \
+    IndexedPassThroughComp
+from omtools.comps.pass_through_comp import PassThroughComp
 from omtools.utils.get_shape_val import get_shape_val
-import numpy as np
+from omtools.utils.replace_output_leaf_nodes import replace_output_leaf_nodes
+from omtools.utils.slice_to_list import slice_to_list
 
 
 class ExplicitOutput(Output):
@@ -37,11 +39,12 @@ class ExplicitOutput(Output):
         self.shape, self.val = get_shape_val(shape, val)
         self.defined = False
         self.indexed_assignment = False
-        self.indices: Dict[Expression, List[int]] = {}
+        self._tgt_indices: Dict[str, List[int]] = {}
         self.checked_indices = set()
         self.overlapping_indices = set()
+        self._tgt_vals = dict()
 
-    def define(self, expr: Expression):
+    def define(self, expr: Variable):
         """
         Define expression (in terms of ``self``) that computes value for
         this output. This method defines a cyclic relationship, which
@@ -49,78 +52,98 @@ class ExplicitOutput(Output):
 
         Parameters
         ----------
-        expr: Expression
+        expr: Variable
             The expression to compute iteratively until convergence
         """
         if expr is self:
-            raise ValueError("Expression for output " + self.name +
+            raise ValueError("Variable for output " + self.name +
                              " cannot be self")
         if self.indexed_assignment == True and self.defined == True:
             raise ValueError(
-                "Expression for output " + self.name +
+                "Variable for output " + self.name +
                 " is already defined using indexed assignment; use index assignment to concatenate expression outputs"
             )
 
         if self.defined == True:
             raise ValueError(
-                "Expression for output " + self.name +
+                "Variable for output " + self.name +
                 ", which forms a cycle to be computed iteratively, is already defined"
             )
         self.defined = True
 
-        self.add_predecessor_node(expr)
+        self.add_dependency_node(expr)
         replace_output_leaf_nodes(
             self,
             self,
             Input(self.name, shape=self.shape, val=self.val),
         )
 
-        self.build = lambda name: PassThroughComp(
+        self.build = lambda: PassThroughComp(
             expr=expr,
-            name=name,
+            name=self.name,
         )
 
+    # TODO: index by tuple, not expression?
+    # TODO: allow negative indices
     def __setitem__(
         self,
-        key: Union[int, np.ndarray, slice, Tuple[slice]],
-        expr: Expression,
+        key: Union[int, slice, Tuple[slice]],
+        expr: Variable,
     ):
-        self.add_predecessor_node(expr)
-        flat_dest_indices = []
+        self.add_dependency_node(expr)
+        tgt_indices = []
+        # n-d array assignment
         if isinstance(key, tuple):
-            slices = []
-            for s in key:
-                slices.append(s)
-            slices = [slice_to_list(s) for s in slices]
-            flat_dest_indices = np.ravel_multi_index(
+            slices = [
+                slice_to_list(
+                    s.start,
+                    s.stop,
+                    s.step,
+                ) for s in list(key)
+            ]
+            tgt_indices = np.ravel_multi_index(
                 tuple(np.array(np.meshgrid(*slices, indexing='ij'))),
                 self.shape,
             ).flatten()
+        # 1-d array assignment
         elif isinstance(key, slice):
-            flat_dest_indices = slice_to_list(key)
+            tgt_indices = slice_to_list(
+                key.start,
+                key.stop,
+                key.step,
+            )
+        # integer index assignment
         elif isinstance(key, int):
-            flat_dest_indices = [key]
+            tgt_indices = [key]
         else:
             raise TypeError(
-                "When assigning indices of an expression, key must be an int, a slice, or a tple of slices"
+                "When assigning indices of an expression, key must be an int, a slice, or a tuple of slices"
             )
 
         # Check size
-        if np.amax(flat_dest_indices) >= np.prod(self.shape):
+        if np.amax(tgt_indices) >= np.prod(self.shape):
             raise ValueError("Indices given are out of range for " +
                              self.__repr__())
-        self.indices[expr] = flat_dest_indices
+
+        if expr.name in self._tgt_indices.keys():
+            raise KeyError("Repeated use of expression " + expr.name +
+                           " in assignment to elements in " + self.name +
+                           ". Consider using omtools.expand")
+        self._tgt_indices[expr.name] = (expr.shape, tgt_indices)
+        self._tgt_vals[expr.name] = expr.val
 
         # Check for overlapping indices
         self.overlapping_indices = self.checked_indices.intersection(
-            flat_dest_indices)
-        self.checked_indices = self.checked_indices.union(flat_dest_indices)
+            tgt_indices)
+        self.checked_indices = self.checked_indices.union(tgt_indices)
         if len(self.overlapping_indices) > 0:
             raise ValueError("Indices used for assignment must not overlap")
 
-        self.build = lambda name: IndexedPassThroughComp(
-            expr_indices=self.indices,
-            out_expr=self,
+        self.build = lambda: IndexedPassThroughComp(
+            expr_indices=self._tgt_indices,
+            out_name=self.name,
+            out_shape=self.shape,
+            vals=self._tgt_vals,
         )
         self.indexed_assignment = True
         self.defined = True

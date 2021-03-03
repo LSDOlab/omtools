@@ -1,9 +1,14 @@
-from typing import List
+from typing import List, Union
 
 
-def slice_to_list(s: slice) -> List[int]:
-    return list(range(
-        s.start,
-        s.stop,
-        s.step if s.step is not None else 1,
-    ))
+def slice_to_list(
+    start: Union[int, None],
+    stop: Union[int, None],
+    step: Union[int, None],
+) -> List[int]:
+    return list(
+        range(
+            start if start is not None else 0,
+            stop if stop is not None else start + 1,
+            step if step is not None else 1,
+        ))

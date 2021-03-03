@@ -4,18 +4,20 @@ from openmdao.core.explicitcomponent import ExplicitComponent
 
 
 class AxisMinComp(ExplicitComponent):
-
     def initialize(self):
         self.options.declare('shape', types=tuple)
         self.options.declare('axis', types=int)
         self.options.declare('out_name', types=str)
         self.options.declare('in_name', types=str)
-        self.options.declare('rho', 20.0, desc="Constraint Aggregation Factor.")
+        self.options.declare('rho',
+                             20.0,
+                             desc="Constraint Aggregation Factor.")
+        self.options.declare('val', types=np.ndarray)
 
     def setup(self):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
-
+        val = self.options['val']
         total_rank = len(self.options['shape'])
 
         if self.options['axis'] < 0:
@@ -25,9 +27,9 @@ class AxisMinComp(ExplicitComponent):
         axis = self.options['axis']
 
         in_shape = tuple(shape)
-        out_shape = shape[:axis] + shape[axis+1:]
+        out_shape = shape[:axis] + shape[axis + 1:]
 
-        self.add_input(in_name, shape=in_shape)
+        self.add_input(in_name, shape=in_shape, val=val)
         self.add_output(out_name, shape=out_shape)
 
         out_indices = np.arange(np.prod(out_shape)).reshape(out_shape)
@@ -36,7 +38,7 @@ class AxisMinComp(ExplicitComponent):
         alphabet = 'abcdefghijkl'
 
         self.einsum_str = einsum_str = '{},{}->{}'.format(
-            alphabet[:axis] + alphabet[axis+1:total_rank],
+            alphabet[:axis] + alphabet[axis + 1:total_rank],
             alphabet[axis],
             alphabet[:total_rank],
         )

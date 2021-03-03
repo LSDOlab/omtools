@@ -20,7 +20,7 @@ def gen_hex_name(num: int):
     remainder = 0
 
     # name will have leading zeros
-    prefix = "0000"
+    prefix = "_0000"
     terminate = False
     while terminate == False:
         remainder = num % base

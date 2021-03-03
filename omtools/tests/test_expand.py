@@ -3,8 +3,8 @@ import numpy as np
 import pytest
 
 
-def test_expand():
-    import omtools.examples.valid.ex_expand_simple as example
+def test_expand_scalar2array():
+    import omtools.examples.valid.ex_expand_scalar2_array as example
     np.testing.assert_array_equal(example.prob['scalar'], np.array([1]))
     np.testing.assert_array_equal(
         example.prob['expanded_scalar'],
@@ -13,6 +13,13 @@ def test_expand():
             [1., 1., 1.],
         ]),
     )
+
+    result = example.prob.check_partials(out_stream=None, compact_print=True)
+    assert_check_partials(result, atol=1.e-8, rtol=1.e-8)
+
+
+def test_expand_array2higherarray():
+    import omtools.examples.valid.ex_expand_array2_higher_array as example
 
     array = np.array([
         [1., 2., 3.],

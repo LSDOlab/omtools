@@ -3,11 +3,10 @@ from omtools.api import Group
 import numpy as np
 
 
-class ExampleSimple(Group):
+class ExampleScalar2Array(Group):
     """
     :param var: scalar
     :param var: expanded_scalar
-    :param var: expanded_array
     """
     def setup(self):
         # Expanding a scalar into an array
@@ -15,6 +14,13 @@ class ExampleSimple(Group):
         expanded_scalar = ot.expand(scalar, (2, 3))
         self.register_output('expanded_scalar', expanded_scalar)
 
+
+class ExampleArray2HigherArray(Group):
+    """
+    :param var: array
+    :param var: expanded_array
+    """
+    def setup(self):
         # Expanding an array into a higher-rank array
         val = np.array([
             [1., 2., 3.],
