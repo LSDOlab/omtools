@@ -44,7 +44,7 @@ class SinComp(ExplicitComponent):
     def compute(self, inputs, outputs):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
-        outputs[out_name] = np.sin(inputs[in_name]).flatten()
+        outputs[out_name] = np.sin(inputs[in_name])
 
     def compute_partials(self, inputs, partials):
         in_name = self.options['in_name']

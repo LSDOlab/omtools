@@ -81,7 +81,7 @@ def _post_setup(func: Callable) -> Callable:
             # Check if outputs are defined
             if isinstance(expr, Output):
                 if expr.defined == False:
-                    raise ValueError("Output not defined for ", expr)
+                    raise ValueError("Output not defined for " + repr(expr))
 
             # Construct Component object corresponding to Variable
             # object, if applicable.
@@ -383,7 +383,7 @@ class Group(OMGroup, metaclass=_ComponentBuilder):
         self._most_recently_added_subsystem = Subsystem(
             name,
             subsys,
-            promotes,
+            promotes=promotes,
             promotes_inputs=promotes_inputs,
             promotes_outputs=promotes_outputs,
         )

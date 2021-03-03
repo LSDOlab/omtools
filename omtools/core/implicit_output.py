@@ -87,6 +87,11 @@ class ImplicitOutput(Output):
         if self.defined == True:
             raise ValueError("Variable for residual of " + self.name +
                              " is already defined")
+
+        # set flag so that this expression is a residual and not an
+        # output of an ImplicitComponent
+        residual_expr.is_residual = True
+
         # Replace leaf nodes of residual Variable object that
         # correspond to this ImplicitOutput node with Input objects;
         replace_output_leaf_nodes(
@@ -128,6 +133,11 @@ class ImplicitOutput(Output):
         if self.defined == True:
             raise ValueError("Variable for residual of " + self.name +
                              " is already defined")
+
+        # set flag so that this expression is a residual and not an
+        # output of an ImplicitComponent
+        residual_expr.is_residual = True
+
         # Replace leaf nodes of residual Variable object that
         # correspond to this ImplicitOutput node with Input objects;
         replace_output_leaf_nodes(

@@ -137,6 +137,7 @@ class Variable():
         self._decomp = None
         self.indexed_exprs = dict()
         self.src_indices = dict()
+        self.is_residual = False
 
     def __getitem__(
         self,

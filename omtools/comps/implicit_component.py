@@ -9,12 +9,30 @@ from openmdao.solvers.solver import Solver
 from omtools.core.subsystem import Subsystem
 from omtools.core.variable import Variable
 from omtools.core.explicit_output import ExplicitOutput
+from omtools.core.implicit_output import ImplicitOutput
 from omtools.core.group import Group
 from omtools.core.input import Input
 from omtools.utils.collect_input_exprs import collect_input_exprs
 
 
-# TODO: make new Group class for ImplicitComponent
+def _remove_nonresiduals(root: Variable):
+    """
+    Remove dependence of root on expressions that are not
+    residuals
+
+    Parameters
+    ----------
+    root: Variable
+        Node that serves as root for DAG
+    """
+    remove = []
+    for expr in root.dependencies:
+        if expr.is_residual == False:
+            remove.append(expr)
+    for rem in remove:
+        root.remove_dependency_node(rem)
+
+
 # TODO: disallow independent variables
 # TODO: disallow implicit variables in main group class
 def _post_setup(func: Callable) -> Callable:
@@ -22,10 +40,14 @@ def _post_setup(func: Callable) -> Callable:
         func(self)
         # setup internal problem
         g = self.group
+
+        _remove_nonresiduals(g._root)
+
+        # Collect residual expressions and their corresponding inputs
+        # and outputs
         for res_expr in g._root.dependencies:
             if isinstance(res_expr, Subsystem) == False and isinstance(
-                    res_expr, Input) == False and isinstance(
-                        res_expr, ExplicitOutput) == False:
+                    res_expr, ExplicitOutput) == False:
                 # inputs for this residual only
                 in_exprs = set(collect_input_exprs([], res_expr, res_expr))
                 # output corresponding to this residual
