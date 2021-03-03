@@ -38,13 +38,6 @@ class ErrorScalarIncorrectOrder(Group):
         self.register_output('expanded_scalar', expanded_scalar)
 
 
-class ErrorScalarIndices(Group):
-    def setup(self):
-        scalar = self.declare_input('scalar', val=1.)
-        expanded_scalar = ot.expand(scalar, (2, 3), '->ij')
-        self.register_output('expanded_scalar', expanded_scalar)
-
-
 class ErrorArrayNoIndices(Group):
     def setup(self):
         # Test array expansion

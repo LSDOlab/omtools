@@ -53,10 +53,6 @@ def expand(expr: Variable, shape: tuple, indices=None):
             val=expr.val,
         )
     else:
-        if indices is not None:
-            raise ValueError('If expanding a scalar ' +
-                             'indices must not be given')
-
         out.build = lambda: ScalarExpansionComp(
             shape=shape,
             in_name=expr.name,

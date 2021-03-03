@@ -43,11 +43,6 @@ def test_scalar_incorrect_order():
         import omtools.examples.invalid.ex_expand_scalar_incorrect_order as example
 
 
-def test_scalar_indices():
-    with pytest.raises(ValueError):
-        import omtools.examples.invalid.ex_expand_scalar_indices as example
-
-
 def test_no_indices():
     with pytest.raises(ValueError):
         import omtools.examples.invalid.ex_expand_array_no_indices as example
