@@ -98,24 +98,29 @@ class ExplicitOutput(Output):
             newkey = [None] * len(key)
             for i, s in enumerate(list(key)):
                 if isinstance(s, int):
-                    newkey[i] = slice(s, None, None)
+                    newkey[i] = slice(s, s + 1, None)
                 else:
                     newkey[i] = s
             slices = [
-                slice_to_list(s.start, s.stop, s.step, size=self.shape[i])
-                for i, s in enumerate(newkey)
+                slice_to_list(
+                    s.start,
+                    s.stop,
+                    s.step,
+                    size=self.shape[i],
+                ) for i, s in enumerate(newkey)
             ]
 
             tgt_indices = np.ravel_multi_index(
                 tuple(np.array(np.meshgrid(*slices, indexing='ij'))),
                 self.shape,
-            ).flatten()
+            )
         # 1-d array assignment
         elif isinstance(key, slice):
             tgt_indices = slice_to_list(
                 key.start,
                 key.stop,
                 key.step,
+                size=self.shape[0],
             )
         # integer index assignment
         elif isinstance(key, int):
@@ -124,6 +129,13 @@ class ExplicitOutput(Output):
             raise TypeError(
                 "When assigning indices of an expression, key must be an int, a slice, or a tuple of slices"
             )
+
+        # Check shape
+        if np.array(tgt_indices).shape != expr.shape:
+            print(np.array(tgt_indices).shape, expr.shape)
+            raise ValueError(
+                "Shape of expression and assignment indices do not match")
+        tgt_indices = np.array(tgt_indices).flatten()
 
         # Check size
         if np.amax(tgt_indices) >= np.prod(self.shape):

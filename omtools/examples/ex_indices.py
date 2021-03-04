@@ -95,6 +95,7 @@ class ExampleMultidimensional(Group):
     :param var: q
     :param var: r
     :param var: s
+    :param var: t
     """
     def setup(self):
         # Works with two dimensional arrays
@@ -123,6 +124,10 @@ class ExampleMultidimensional(Group):
         r = self.create_output('r', shape=(2, 20))
         r[0, :] = vec
         r[1, :] = 2 * vec
+
+        # Negative indices
+        t = self.create_output('t', shape=(5, 3, 3), val=0)
+        t[0:5, 0:-1, 0:3] = p
 
 
 class ErrorIntegerOutOfRange(Group):

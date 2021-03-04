@@ -33,6 +33,10 @@ class ExampleMultidimensional(Group):
         s[0, :] = vec
         s[1, :] = 2 * vec
 
+        # negative indices
+        t = self.create_output('t', shape=(5, 3, 3), val=0)
+        t[0:5, 0:-1, 0:3] = p
+
 
 prob = Problem()
 prob.model = ExampleMultidimensional()
@@ -47,3 +51,5 @@ print('r', prob['r'].shape)
 print(prob['r'])
 print('s', prob['s'].shape)
 print(prob['s'])
+print('t', prob['t'].shape)
+print(prob['t'])
