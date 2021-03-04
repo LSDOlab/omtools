@@ -94,6 +94,7 @@ class ExampleMultidimensional(Group):
     :param var: x
     :param var: q
     :param var: r
+    :param var: s
     """
     def setup(self):
         # Works with two dimensional arrays
@@ -112,6 +113,16 @@ class ExampleMultidimensional(Group):
 
         # Get value from indices
         self.register_output('r', p[0, :, :])
+
+        # Assign a vector to a slice
+        vec = self.create_indep_var(
+            'vec',
+            shape=(1, 20),
+            val=np.arange(20).reshape((1, 20)),
+        )
+        r = self.create_output('r', shape=(2, 20))
+        r[0, :] = vec
+        r[1, :] = 2 * vec
 
 
 class ErrorIntegerOutOfRange(Group):

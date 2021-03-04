@@ -92,5 +92,14 @@ def test_multidimensional_dimensional_index_assignement():
         example.prob['q'],
         np.arange(30).reshape((5, 2, 3)),
     )
+    u = np.arange(20).reshape((1, 20))
+    v = 2 * np.arange(20).reshape((1, 20))
+    w = np.zeros(40).reshape((2, 20))
+    w[0, :] = u
+    w[1, :] = v
+    np.testing.assert_array_equal(
+        example.prob['s'],
+        w,
+    )
     result = example.prob.check_partials(out_stream=None, compact_print=True)
     assert_check_partials(result, atol=1.e-8, rtol=1.e-8)

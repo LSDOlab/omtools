@@ -23,6 +23,16 @@ class ExampleMultidimensional(Group):
         # Get value from indices
         self.register_output('r', p[0, :, :])
 
+        # Assign a vector to a slice
+        vec = self.create_indep_var(
+            'vec',
+            shape=(1, 20),
+            val=np.arange(20).reshape((1, 20)),
+        )
+        s = self.create_output('s', shape=(2, 20))
+        s[0, :] = vec
+        s[1, :] = 2 * vec
+
 
 prob = Problem()
 prob.model = ExampleMultidimensional()
@@ -35,3 +45,5 @@ print('q', prob['q'].shape)
 print(prob['q'])
 print('r', prob['r'].shape)
 print(prob['r'])
+print('s', prob['s'].shape)
+print(prob['s'])

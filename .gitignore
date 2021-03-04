@@ -1,6 +1,7 @@
 *.html
 .DS_Store
 .mypy_cache/
+.pytest_cache/
 __pycache__/
 html/
 _build/
@@ -9,3 +10,4 @@ _build/
 *.egg-info
 omtools/examples/valid/__init__.py
 omtools/examples/invalid/__init__.py
+.idea/

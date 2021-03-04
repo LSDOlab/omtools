@@ -92,15 +92,20 @@ class ExplicitOutput(Output):
     ):
         self.add_dependency_node(expr)
         tgt_indices = []
+
         # n-d array assignment
         if isinstance(key, tuple):
+            newkey = [None] * len(key)
+            for i, s in enumerate(list(key)):
+                if isinstance(s, int):
+                    newkey[i] = slice(s, None, None)
+                else:
+                    newkey[i] = s
             slices = [
-                slice_to_list(
-                    s.start,
-                    s.stop,
-                    s.step,
-                ) for s in list(key)
+                slice_to_list(s.start, s.stop, s.step, size=self.shape[i])
+                for i, s in enumerate(newkey)
             ]
+
             tgt_indices = np.ravel_multi_index(
                 tuple(np.array(np.meshgrid(*slices, indexing='ij'))),
                 self.shape,
