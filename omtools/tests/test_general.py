@@ -12,4 +12,4 @@ def test_unused_inputs_create_no_subsystems():
     from openmdao.api import Group
     import omtools.examples.valid.ex_general_unused_inputs as example
     assert example.prob.model._group_inputs == {}
-    assert example.prob.model._subsystems_allprocs == []
+    assert example.prob.model._subsystems_allprocs == {}
