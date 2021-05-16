@@ -259,9 +259,6 @@ class ImplicitComponent(OMImplicitComponent, metaclass=_ProblemBuilder):
                     jac[res_name, out_name]).reshape(res_expr.shape)
 
     def solve_linear(self, d_outputs, d_residuals, mode):
-        out_expr = self.options['out_expr']
-        out_name = out_expr.name
-
         for out_name in self.group.res_out_map.values():
             if mode == 'fwd':
                 d_outputs[out_name] += 1. / self.derivs[
