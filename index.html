@@ -1,0 +1,440 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>OM Tools &mdash; omtools 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="_static/thebelab.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting Started" href="_src_docs/getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> omtools
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="_src_docs/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_src_docs/api/omtools_group.html">OM Tools Group</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_src_docs/api/library_of_operations.html">OM Tools Library of Operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_src_docs/api/omtools_backend.html">OM Tools Developer API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">omtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>OM Tools</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="om-tools">
+<h1>OM Tools<a class="headerlink" href="#om-tools" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">omtools</span></code> (i.e. OpenMDAO Tools) provides an interface to <a class="reference external" href="https://openmdao.org/">OpenMDAO
+framework</a>, making it easier for the user to
+define <code class="docutils literal notranslate"><span class="pre">Group</span></code> subclasses by alowing the user to write expressions
+without the need to define a new <code class="docutils literal notranslate"><span class="pre">Component</span></code> subclass or provide
+analytic derivatives.
+The result is that <code class="docutils literal notranslate"><span class="pre">omtools</span></code> <code class="docutils literal notranslate"><span class="pre">Group</span></code> subclasses are easier to read
+and write, with assurance that analytic derivatives for their models are
+correct.</p>
+</div>
+<div class="section" id="benefits">
+<h2>Benefits<a class="headerlink" href="#benefits" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>OpenMDAO <code class="docutils literal notranslate"><span class="pre">Group</span></code> subclass definitions are easier to read and
+write.</p></li>
+<li><p>Provides stock <code class="docutils literal notranslate"><span class="pre">Component</span></code> subclasses with pre-defined analytic
+partial derivatives.</p></li>
+<li><p>Prevents unnecessary feedback that can result from manually adding
+subsystems out of order.</p></li>
+</ul>
+<p>In addition to the above benefits, <code class="docutils literal notranslate"><span class="pre">omtools</span></code> has a stable API, so any
+improvements in efficiency for the models that <code class="docutils literal notranslate"><span class="pre">omtools</span></code> generates are
+performance improvements for all user defined models.
+This means that users can update <code class="docutils literal notranslate"><span class="pre">omtools</span></code> and expect performance
+improvements to their models without making any changes to their models.</p>
+</div>
+<div class="section" id="how-it-works">
+<h2>How it Works<a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">omtools</span></code> stores a graph of nodes and edges representing
+variables and their dependencies, analyzing the graph, and directing
+OpenMDAO to construct corresponding <code class="docutils literal notranslate"><span class="pre">Component</span></code> objects and issuing
+the necessary connections.</p>
+<p>The source code is hosted on <a class="reference external" href="https://github.com/lsdolab/omtools">GitHub</a>.</p>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_src_docs/getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="_src_docs/examples/getting_started/basic_user_guide.html">Basic User Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/getting_started/simple_explicit.html">Simple Explicit Expressions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/getting_started/simple_explicit_with_subsystems.html">Simple Explicit Expressions with Subsystems</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="_src_docs/examples/getting_started/additional_examples.html">Additional Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/getting_started/indexing.html">Array Indexing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/getting_started/implicit_relationships.html">Implicit Relationships</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/getting_started/implicit_with_subsystems.html">Implicit Relationships with Subsystems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/getting_started/cyclic_relationships.html">Expressing Cyclic Relationships with Explicit Outputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/getting_started/groups.html">Omtools and OpenMDAO Group Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/getting_started/ot_group_in_ot_group.html">An Omtools Group within an Omtools Group</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/getting_started/ot_group_in_om_group.html">An Omtools Group within an OpenMDAO Group</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/getting_started/om_group_in_ot_group.html">An OpenMDAO Group within an Omtools Group</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="_src_docs/api/omtools_group.html">OM Tools Group</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_src_docs/api/library_of_operations.html">OM Tools Library of Operations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="_src_docs/examples/library_of_operations/unary_expressions.html">Unary Expressions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/unary_expressions/trigonometric_functions.html">Trigonometric Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/unary_expressions/logarithmic_exponentials.html">Logarithmic and Exponential Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="_src_docs/examples/library_of_operations/array_operations.html">Array Operations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/min/min.html">Minimum</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/min/ex_min_scalar.html">Minimum Returning a Scalar</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/min/ex_min_elementwise.html">Elementwise Minimum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/min/ex_min_axiswise.html">Axiswise Minimum</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/max/max.html">Maximum</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/max/ex_max_scalar.html">Maximum Returning a Scalar</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/max/ex_max_elementwise.html">Elementwise Maximum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/max/ex_max_axiswise.html">Axiswise Maximum</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/average/average.html">Average</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/average/ex_average_single_vector.html">Average of a Single Vector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/average/ex_average_single_matrix.html">Average of a Single Matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/average/ex_average_single_tensor.html">Average of a Single Tensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/average/ex_average_multiple_vector.html">Average of Multiple Vectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/average/ex_average_multiple_matrix.html">Average of Multiple Matrices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/average/ex_average_multiple_tensor.html">Average of Multiple Tensors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/average/ex_average_single_matrix_along0.html">Average of a Single Matrix along Columns</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/average/ex_average_single_matrix_along1.html">Average of a Single Matrix along Rows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/average/ex_average_multiple_matrix_along0.html">Average of Multiple Matrices along Columns</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/average/ex_average_multiple_matrix_along1.html">Average of Multiple Matrices along Rows</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/sum/sum.html">Sum</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/sum/ex_sum_single_vector.html">Sum of a Single Vector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/sum/ex_sum_single_matrix.html">Sum of a Single Matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/sum/ex_sum_single_tensor.html">Sum of a Single Tensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/sum/ex_sum_multiple_vector.html">Sum of Multiple Vectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/sum/ex_sum_multiple_matrix.html">Sum of Multiple Matrices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/sum/ex_sum_multiple_tensor.html">Sum of Multiple Tensors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/sum/ex_sum_single_matrix_along0.html">Sum of a Single Matrix along Columns</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/sum/ex_sum_single_matrix_along1.html">Sum of a Single Matrix along Rows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/sum/ex_sum_multiple_matrix_along0.html">Sum of Multiple Matrices along Columns</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/sum/ex_sum_multiple_matrix_along1.html">Sum of Multiple Matrices along Rows</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/expand/expand.html">Array Expansion and Contraction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/expand/ex_expand_scalar.html">Scalar Expansion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/expand/ex_expand_array.html">Array Expansion</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/reshape/reshape.html">Reshape</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/reshape/ex_reshape_tensor2_vector.html">Reshape a Tensor to a Vector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/reshape/ex_reshape_vector2_tensor.html">Reshape a Vector to a Tensor</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/reorder/reorder.html">Reorder</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/reorder/ex_reorder_axes_matrix.html">Reordering a Matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/reorder/ex_reorder_axes_tensor.html">Reordering a Tensor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="_src_docs/examples/library_of_operations/vector_algebra.html">Vector Algebra</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/dot/dot.html">Dot</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/dot/ex_dot_vector_vector.html">Dot Product between Two Vectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/dot/ex_dot_tensor_tensor_first.html">Dot Product between Two Tensors Across the First Axis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/dot/ex_dot_tensor_tensor_last.html">Dot Product between Two Tensors Across the Last Axis</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/cross/cross.html">Cross</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/cross/ex_cross_vector_vector.html">Cross Product between Two Vectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/cross/ex_cross_tensor_tensor.html">Cross Product between Two Tensors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/rotmat/rotmat.html">Rotation Matrix</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/rotmat/ex_rotmat_scalar_rot_x.html">X-Axis Rotation Matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/rotmat/ex_rotmat_scalar_rot_y.html">Y-Axis Rotation Matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/rotmat/ex_rotmat_diff_radian_tensor_rot_x.html">X-Axis Rotation Tensor For Different Angles in a Tensor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="_src_docs/examples/library_of_operations/linear_algebra.html">Linear Algebra</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/pnorm/pnorm.html">Pnorm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/pnorm/ex_pnorm_axisfree.html">Axis Free Pnorm Computation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/pnorm/ex_pnorm_axiswise.html">Axiswise Pnorm Computation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/transpose/transpose.html">Transpose</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/transpose/ex_transpose_matrix.html">Matrix Transpose</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/transpose/ex_transpose_tensor.html">Tensor Transpose</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/inner/inner.html">Inner</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/inner/ex_inner_vector_vector.html">Inner Product between Two Vectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/inner/ex_inner_tensor_vector.html">Inner Product between a Tensor and a Vector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/inner/ex_inner_tensor_tensor.html">Inner Product between Two Tensors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/outer/outer.html">Outer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/outer/ex_outer_vector_vector.html">Outer Product between Two Vectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/outer/ex_outer_tensor_vector.html">Outer Product between a Tensor and a Vector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/outer/ex_outer_tensor_tensor.html">Outer Product between Two Tensors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/matvec/matvec.html">Matrix-Vector Multiplication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/matmat/matmat.html">Matrix-Matrix Multiplication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/einsum_old/einsum_old.html">Einstein Summation Numpy API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_inner_vector_vector.html">Vector-Vector Inner Product using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_inner_vector_vector_sparse.html">Vector-Vector Inner Product using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_inner_tensor_vector.html">Tensor-Vector Inner Product using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_inner_tensor_vector_sparse.html">Tensor-Vector Inner Product using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_outer_vector_vector.html">Vector-Vector Outer Product using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_outer_vector_vector_sparse.html">Vector-Vector Outer Product using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_outer_tensor_vector.html">Tensor-Vector Outer Product using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_outer_tensor_vector_sparse.html">Tensor-Vector Outer Product using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_reorder_matrix.html">Reordering a Matrix using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_reorder_matrix_sparse.html">Reordering a Matrix using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_reorder_tensor.html">Reordering a Tensor using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_reorder_tensor_sparse.html">Reordering a Tensor using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_vector_summation.html">Single Vector Summation using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_vector_summation_sparse.html">Single Vector Summation using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_tensor_summation.html">Single Tensor Summation using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_tensor_summation_sparse.html">Single Tensor Summation using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_multiple_vector_summation.html">Multiple Vector Summation using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_old/ex_einsum_old_multiple_vector_summation_sparse.html">Multiple Vector Summation using Einsum with Sparse Partials</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_src_docs/examples/einsum_new/einsum_new.html">Einstein Summation New API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_inner_vector_vector.html">Vector-Vector Inner Product using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_inner_vector_vector_sparse.html">Vector-Vector Inner Product using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_inner_tensor_vector.html">Tensor-Vector Inner Product using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_inner_tensor_vector_sparse.html">Tensor-Vector Inner Product using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_outer_vector_vector.html">Vector-Vector Outer Product using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_outer_vector_vector_sparse.html">Vector-Vector Outer Product using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_outer_tensor_vector.html">Tensor-Vector Outer Product using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_outer_tensor_vector_sparse.html">Tensor-Vector Outer Product using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_reorder_matrix.html">Reordering a Matrix using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_reorder_matrix_sparse.html">Reordering a Matrix using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_reorder_tensor.html">Reordering a Tensor using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_reorder_tensor_sparse.html">Reordering a Tensor using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_vector_summation.html">Single Vector Summation using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_vector_summation_sparse.html">Single Vector Summation using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_tensor_summation.html">Single Tensor Summation using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_tensor_summation_sparse.html">Single Tensor Summation using Einsum with Sparse Partials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_multiple_vector_summation.html">Multiple Vector Summation using Einsum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_src_docs/examples/einsum_new/ex_einsum_new_multiple_vector_summation_sparse.html">Multiple Vector Summation using Einsum with Sparse Partials</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="_src_docs/api/omtools_backend.html">OM Tools Developer API</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="_src_docs/getting_started.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2020, LSDO Lab, UCSD.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,697 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>OM Tools Developer API &mdash; omtools 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/thebelab.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="Multiple Vector Summation using Einsum with Sparse Partials" href="../examples/einsum_new/ex_einsum_new_multiple_vector_summation_sparse.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> omtools
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="omtools_group.html">OM Tools Group</a></li>
+<li class="toctree-l1"><a class="reference internal" href="library_of_operations.html">OM Tools Library of Operations</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">OM Tools Developer API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">omtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>OM Tools Developer API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/_src_docs/api/omtools_backend.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="om-tools-developer-api">
+<h1>OM Tools Developer API<a class="headerlink" href="#om-tools-developer-api" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omtools.core.variable.</span></span><span class="sig-name descname"><span class="pre">Variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">Variable</span></code> class is a base type for nodes in a Directed
+Acyclic Graph (DAG) that represents the computation to be performed
+during model evaluation.</p>
+<p>Each <code class="docutils literal notranslate"><span class="pre">Variable</span></code> object stores a function that constructs an
+OpenMDAO <code class="docutils literal notranslate"><span class="pre">Component</span></code> object corresponding to the computation that
+the <code class="docutils literal notranslate"><span class="pre">Variable</span></code> object represents.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.__add__">
+<span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.__add__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent addition between two expressions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.__mul__">
+<span class="sig-name descname"><span class="pre">__mul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.__mul__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent multiplication between two expressions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.__pow__">
+<span class="sig-name descname"><span class="pre">__pow__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.__pow__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent raising an expression to a real number</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.__radd__">
+<span class="sig-name descname"><span class="pre">__radd__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.__radd__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent addition between two expressions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.__rmul__">
+<span class="sig-name descname"><span class="pre">__rmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.__rmul__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent multiplication between two expressions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.__rsub__">
+<span class="sig-name descname"><span class="pre">__rsub__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.__rsub__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent subtraction between two expressions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.__rtruediv__">
+<span class="sig-name descname"><span class="pre">__rtruediv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.__rtruediv__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent division between two expressions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.__sub__">
+<span class="sig-name descname"><span class="pre">__sub__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.__sub__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent subtraction between two expressions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.__truediv__">
+<span class="sig-name descname"><span class="pre">__truediv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.__truediv__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent division between two expressions</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.__weakref__">
+<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#omtools.core.variable.Variable.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.add_dependency_node">
+<span class="sig-name descname"><span class="pre">add_dependency_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dependency</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.add_dependency_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a dependency node to the DAG representing the computation
+that OpenMDAO will perform during model evaluation. Each
+<code class="docutils literal notranslate"><span class="pre">Variable</span></code> object represents some computation that returns a
+value. The number of dependency nodes of an <code class="docutils literal notranslate"><span class="pre">Variable</span></code>
+object is the number of arguments required to return a value.
+for example, in <code class="docutils literal notranslate"><span class="pre">c</span> <span class="pre">=</span> <span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code>, the object <code class="docutils literal notranslate"><span class="pre">c</span></code> has two
+dependencies: <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>predecesor: Variable</strong></dt><dd><p>An Variable object upon which this Variable object
+depends</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.compute_dag_cost">
+<span class="sig-name descname"><span class="pre">compute_dag_cost</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">int</span><a class="headerlink" href="#omtools.core.variable.Variable.compute_dag_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute cost of traversing all nodes in the DAG starting at
+<code class="docutils literal notranslate"><span class="pre">self</span></code>; ignores cycles, so it is guaranteed to compute finite
+values of cost and terminate; required for sorting branches
+before performing <code class="docutils literal notranslate"><span class="pre">topological_sort</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>branch: set[Variable]</strong></dt><dd><p>Set of all Variable objects traversed so far in current
+branch. If a dependency is in <code class="docutils literal notranslate"><span class="pre">branch</span></code>, then
+<code class="docutils literal notranslate"><span class="pre">compute_dag_cost</span></code> will terminate and return a value. If
+<code class="docutils literal notranslate"><span class="pre">self</span></code> is a leaf node, then <code class="docutils literal notranslate"><span class="pre">compute_dag_cost</span></code> will
+terminate.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>int</strong><span class="classifier"></span></dt><dd><p>Cost of traversing DAG starting with <code class="docutils literal notranslate"><span class="pre">self</span></code></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.get_dependency_index">
+<span class="sig-name descname"><span class="pre">get_dependency_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidate</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#omtools.core.variable.Variable.get_dependency_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get index of dependency in <code class="docutils literal notranslate"><span class="pre">self.dependencies</span></code>. Used for
+removing indirect dependencies that woud otherwise affect the
+cost of branches in the DAG, which would affect execution order,
+even with the sme constraints on execution order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>candidate: Variable</strong></dt><dd><p>The candidate dependency node</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Optional[int]</strong><span class="classifier"></span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">dependency</span></code> is a dependency of <code class="docutils literal notranslate"><span class="pre">self</span></code>, then the index of
+<code class="docutils literal notranslate"><span class="pre">dependency</span></code> in <code class="docutils literal notranslate"><span class="pre">self.dependencies</span></code> is returned. Otherwise,
+<code class="docutils literal notranslate"><span class="pre">None</span></code> is returned.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.incr_times_visited">
+<span class="sig-name descname"><span class="pre">incr_times_visited</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.incr_times_visited" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increment number of times a node is visited during <code class="docutils literal notranslate"><span class="pre">topological_sort</span></code>.
+This is necessary for <code class="docutils literal notranslate"><span class="pre">topological_sort</span></code> to determine
+execution order for expressions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.print_dag">
+<span class="sig-name descname"><span class="pre">print_dag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.print_dag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the graph starting at this node (debugging tool)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.register_nodes">
+<span class="sig-name descname"><span class="pre">register_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.register_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register all nodes in DAG.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>nodes: dict[Variable]</strong></dt><dd><p>Dictionary of nodes registered so far</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.remove_dependency_by_index">
+<span class="sig-name descname"><span class="pre">remove_dependency_by_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.remove_dependency_by_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove dependency node, given its index. does nothing if
+<code class="docutils literal notranslate"><span class="pre">index</span></code> is out of range. See
+<code class="docutils literal notranslate"><span class="pre">Variable.remove_dependency</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>index: int</strong></dt><dd><p>Index within <code class="docutils literal notranslate"><span class="pre">self.dependencies</span></code> where the node to be
+removed might be</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.remove_dependency_node">
+<span class="sig-name descname"><span class="pre">remove_dependency_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.remove_dependency_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove dependency node. Does nothing if <cite>candidate</cite> is not a
+dependency. Used for removing indirect dependencies and
+preventing cycles from forming in DAG.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>candidate: Variable</strong></dt><dd><p>Node to remove from <code class="docutils literal notranslate"><span class="pre">self.dependencies</span></code></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.variable.Variable.sort_dependency_branches">
+<span class="sig-name descname"><span class="pre">sort_dependency_branches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reverse_branch_sorting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.variable.Variable.sort_dependency_branches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort dependencies by DAG cost so that branches with higher cost
+(<code class="docutils literal notranslate"><span class="pre">Variable._dag_cost</span></code>) appear before shorter branches
+(“critical path” sorting). User can set flag to force branches
+with lower cost to appear before branches with hgiher cost (“low
+hanging fruit” sorting).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>reverse_branch_sorting: bool = False</strong></dt><dd><p>Flag to set sorting preference. Default is “critical path”.
+Reverse branch sorting to produce “low hanging fruit”
+sorting.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="omtools.core.explicit_output.ExplicitOutput">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omtools.core.explicit_output.</span></span><span class="sig-name descname"><span class="pre">ExplicitOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.explicit_output.ExplicitOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for creating an explicit output</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.explicit_output.ExplicitOutput.define">
+<span class="sig-name descname"><span class="pre">define</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#omtools.core.variable.Variable" title="omtools.core.variable.Variable"><span class="pre">omtools.core.variable.Variable</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.explicit_output.ExplicitOutput.define" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define expression (in terms of <code class="docutils literal notranslate"><span class="pre">self</span></code>) that computes value for
+this output. This method defines a cyclic relationship, which
+requires an iterative solver to converge using OpenMDAO.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>expr: Variable</strong></dt><dd><p>The expression to compute iteratively until convergence</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.explicit_output.ExplicitOutput.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">(1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.explicit_output.ExplicitOutput.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize explicit output</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: str</strong></dt><dd><p>Name of variable to compute explicitly</p>
+</dd>
+<dt><strong>shape: Tuple[int]</strong></dt><dd><p>Shape of variable to compute explicitly</p>
+</dd>
+<dt><strong>val: Number or ndarray</strong></dt><dd><p>Initial value of variable to compute explicitly</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="omtools.core.implicit_output.ImplicitOutput">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omtools.core.implicit_output.</span></span><span class="sig-name descname"><span class="pre">ImplicitOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.implicit_output.ImplicitOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for creating an implicit output</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.implicit_output.ImplicitOutput.define_residual">
+<span class="sig-name descname"><span class="pre">define_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residual_expr</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#omtools.core.variable.Variable" title="omtools.core.variable.Variable"><span class="pre">omtools.core.variable.Variable</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.implicit_output.ImplicitOutput.define_residual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the residual that must equal zero for this output to be
+computed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>residual_expr: Variable</strong></dt><dd><p>Residual expression</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.implicit_output.ImplicitOutput.define_residual_bracketed">
+<span class="sig-name descname"><span class="pre">define_residual_bracketed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residual_expr</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#omtools.core.variable.Variable" title="omtools.core.variable.Variable"><span class="pre">omtools.core.variable.Variable</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.implicit_output.ImplicitOutput.define_residual_bracketed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the residual that must equal zero for this output to be
+computed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>residual_expr: Variable</strong></dt><dd><p>Residual expression</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.implicit_output.ImplicitOutput.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">(1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.implicit_output.ImplicitOutput.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize implicit output</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: str</strong></dt><dd><p>Name of variable to compute implicitly</p>
+</dd>
+<dt><strong>shape: Tuple[int]</strong></dt><dd><p>Shape of variable to compute implicitly</p>
+</dd>
+<dt><strong>val: Number or ndarray</strong></dt><dd><p>Initial value of variable to compute implicitly</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="omtools.core.indep.Indep">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omtools.core.indep.</span></span><span class="sig-name descname"><span class="pre">Indep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.indep.Indep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Container for creating a value that is constant during model
+evaluation; i.e. independent variable, or design variable</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="omtools.core.indep.Indep.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="pre">:</span> <span class="pre">list</span></em><a class="headerlink" href="#omtools.core.indep.Indep.dependencies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="omtools.core.indep.Indep.dependents">
+<span class="sig-name descname"><span class="pre">dependents</span></span><em class="property"><span class="pre">:</span> <span class="pre">list</span></em><a class="headerlink" href="#omtools.core.indep.Indep.dependents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.indep.Indep.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.indep.Indep.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize independent variable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: str</strong></dt><dd><p>Name of independent variable (constant during model
+evaluation)</p>
+</dd>
+<dt><strong>shape: Tuple[int]</strong></dt><dd><p>Shape of independent variable (constant during model
+evaluation)</p>
+</dd>
+<dt><strong>val: Number or ndarray</strong></dt><dd><p>Value of independent variable (constant during model
+evaluation)</p>
+</dd>
+<dt><strong>dv: bool</strong></dt><dd><p>Flag to set independent variable as a design variable,
+allowing the optimizer to modify the value</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="omtools.core.input.Input">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omtools.core.input.</span></span><span class="sig-name descname"><span class="pre">Input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.input.Input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for declaring an input variable</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="omtools.core.input.Input.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="pre">:</span> <span class="pre">list</span></em><a class="headerlink" href="#omtools.core.input.Input.dependencies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="omtools.core.input.Input.dependents">
+<span class="sig-name descname"><span class="pre">dependents</span></span><em class="property"><span class="pre">:</span> <span class="pre">list</span></em><a class="headerlink" href="#omtools.core.input.Input.dependents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omtools.core.input.Input.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">(1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.input.Input.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize subsystem input</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: str</strong></dt><dd><p>Name of variable computed by another <code class="docutils literal notranslate"><span class="pre">System</span></code> object</p>
+</dd>
+<dt><strong>shape: Tuple[int]</strong></dt><dd><p>Shape of variable computed by another <code class="docutils literal notranslate"><span class="pre">System</span></code> object</p>
+</dd>
+<dt><strong>val: Number or ndarray</strong></dt><dd><p>Default value of variable computed by another <code class="docutils literal notranslate"><span class="pre">System</span></code>
+object, takes effect if there is no connection to another
+<code class="docutils literal notranslate"><span class="pre">System</span></code> object’s output</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="omtools.core.output.Output">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omtools.core.output.</span></span><span class="sig-name descname"><span class="pre">Output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.output.Output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for outputs; used to prevent circular imports</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="omtools.core.subsystem.Subsystem">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omtools.core.subsystem.</span></span><span class="sig-name descname"><span class="pre">Subsystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.subsystem.Subsystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for declaring an input variable</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="omtools.core.group._post_setup">
+<span class="sig-prename descclassname"><span class="pre">omtools.core.group.</span></span><span class="sig-name descname"><span class="pre">_post_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Callable</span><a class="headerlink" href="#omtools.core.group._post_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function replaces <code class="docutils literal notranslate"><span class="pre">Group.setup</span></code> with a new method that calls
+<code class="docutils literal notranslate"><span class="pre">Group.setup</span></code> and performs the necessary steps to determine
+execution order and construct and add the appropriate subsystems.</p>
+<p>The new method is the core of the <code class="docutils literal notranslate"><span class="pre">omtools</span></code> package. This function
+analyzes the Directed Acyclic Graph (DAG), sorts expressions, and
+directs OpenMDAO to add the corresponding <code class="docutils literal notranslate"><span class="pre">Component</span></code> objects.</p>
+<p>This function ensures an execution order that is free of unnecessary
+feedback regardless of the order in which the user registers
+outputs.</p>
+</dd></dl>
+
+<span class="target" id="module-omtools.core.graph"></span><dl class="py function">
+<dt class="sig sig-object py" id="omtools.core.graph.remove_indirect_dependencies">
+<span class="sig-prename descclassname"><span class="pre">omtools.core.graph.</span></span><span class="sig-name descname"><span class="pre">remove_indirect_dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#omtools.core.variable.Variable" title="omtools.core.variable.Variable"><span class="pre">omtools.core.variable.Variable</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#omtools.core.graph.remove_indirect_dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the dependencies that do not constrin execution order. That
+is, if C depends on B and A, and B depends on A, then the execution
+order must be A, B, C, even without the dependence of C on A.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>node: Variable</strong></dt><dd><p>The node to treat as “root”. In <code class="docutils literal notranslate"><span class="pre">omtools.group</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Group._root</span></code> is treated as the “root” node.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="omtools.core.graph.topological_sort">
+<span class="sig-prename descclassname"><span class="pre">omtools.core.graph.</span></span><span class="sig-name descname"><span class="pre">topological_sort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#omtools.core.variable.Variable" title="omtools.core.variable.Variable"><span class="pre">omtools.core.variable.Variable</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#omtools.core.variable.Variable" title="omtools.core.variable.Variable"><span class="pre">omtools.core.variable.Variable</span></a><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#omtools.core.graph.topological_sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a topological sort on the Directed Acyclic Graph (DAG).
+If any cycles are detected when traversing the graph,
+<code class="docutils literal notranslate"><span class="pre">topological_sort</span></code> will not terminate, and it will cause a memory
+overflow.</p>
+<p>This version of a topological sort is modified so that a node will
+not be added to the sorted list until the node has been visited as
+many times as its in-degree; i.e. the number of dependents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>node: Variable</strong></dt><dd><p>The node to treat as “root”. In <code class="docutils literal notranslate"><span class="pre">omtools.group</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Group._root</span></code> is treated as the “root” node.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>list[Variable]</strong><span class="classifier"></span></dt><dd><p>List of <code class="docutils literal notranslate"><span class="pre">Variable</span></code> objects sorted from root to leaf. When
+overriding <code class="docutils literal notranslate"><span class="pre">omtools.Group.setup</span></code>, the first node will be
+<code class="docutils literal notranslate"><span class="pre">Group._root</span></code>, and the last will be an <code class="docutils literal notranslate"><span class="pre">Input</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ExplicitOutput</span></code>, <code class="docutils literal notranslate"><span class="pre">ImplicitOutput</span></code>, or <code class="docutils literal notranslate"><span class="pre">IndepVar</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../examples/einsum_new/ex_einsum_new_multiple_vector_summation_sparse.html" class="btn btn-neutral float-left" title="Multiple Vector Summation using Einsum with Sparse Partials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2020, LSDO Lab, UCSD.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
